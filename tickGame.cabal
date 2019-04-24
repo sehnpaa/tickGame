@@ -14,23 +14,29 @@ library
     default-language: Haskell2010
     exposed-modules: Lib
     build-depends:
-        base >=4.11 && <4.12,
+        base >=4.11 && <5,
         gi-gtk -any,
         gi-gtk-declarative -any,
         gi-gtk-declarative-app-simple -any,
         microlens-platform,
         text -any
+      , tasty
+      , tasty-hunit
+      , tasty-quickcheck
 
 executable tickGame
     main-is: Main.hs
     hs-source-dirs: src
     default-language: Haskell2010
     build-depends:
-        base >=4.11 && <4.12,
+        base >=4.11 && <5,
         gi-gtk -any,
         gi-gtk-declarative -any,
         gi-gtk-declarative-app-simple -any,
         text -any
+      , tasty
+      , tasty-hunit
+      , tasty-quickcheck
     ghc-options: -Wall
 
 test-suite test-foo
@@ -39,7 +45,7 @@ test-suite test-foo
     type: exitcode-stdio-1.0
     default-language: Haskell2010
     build-depends:
-        base >=4.11 && <4.12
+        base >=4.11 && <5
       , tasty
       , tasty-hunit
       , tasty-quickcheck

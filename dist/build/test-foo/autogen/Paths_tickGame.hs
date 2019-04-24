@@ -30,7 +30,7 @@ version = Version [0,1,0,0] []
 bindir, libdir, dynlibdir, datadir, libexecdir, sysconfdir :: FilePath
 
 bindir     = "/home/peter/haskell/tickGame/.cabal-sandbox/bin"
-libdir     = "/home/peter/haskell/tickGame/.cabal-sandbox/lib/x86_64-linux-ghc-8.4.4/tickGame-0.1.0.0-1gO3X3V8vt8E5O1wNgC0hY-test-foo"
+libdir     = "/home/peter/haskell/tickGame/.cabal-sandbox/lib/x86_64-linux-ghc-8.4.4/tickGame-0.1.0.0-CGZdKk7bhfZKo7ZlHusPRK-test-foo"
 dynlibdir  = "/home/peter/haskell/tickGame/.cabal-sandbox/lib/x86_64-linux-ghc-8.4.4"
 datadir    = "/home/peter/haskell/tickGame/.cabal-sandbox/share/x86_64-linux-ghc-8.4.4/tickGame-0.1.0.0"
 libexecdir = "/home/peter/haskell/tickGame/.cabal-sandbox/libexec/x86_64-linux-ghc-8.4.4/tickGame-0.1.0.0"

@@ -16,10 +16,11 @@ let
         isExecutable = true;
         libraryHaskellDepends = [
           base gi-gtk gi-gtk-declarative gi-gtk-declarative-app-simple
-          microlens-platform text
+          microlens-platform tasty tasty-hunit tasty-quickcheck text
         ];
         executableHaskellDepends = [
-          base gi-gtk gi-gtk-declarative gi-gtk-declarative-app-simple text
+          base gi-gtk gi-gtk-declarative gi-gtk-declarative-app-simple tasty
+          tasty-hunit tasty-quickcheck text
         ];
         testHaskellDepends = [ base tasty tasty-hunit tasty-quickcheck ];
         license = stdenv.lib.licenses.bsd3;
