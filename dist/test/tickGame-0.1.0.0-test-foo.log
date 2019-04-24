@@ -1,0 +1,8 @@
+Test suite test-foo: RUNNING...
+Tests
+  Unit tests
+    first: OK
+
+All 1 tests passed (0.00s)
+Test suite test-foo: PASS
+Test suite logged to: dist/test/tickGame-0.1.0.0-test-foo.log

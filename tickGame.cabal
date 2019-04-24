@@ -32,3 +32,13 @@ executable tickGame
         gi-gtk-declarative-app-simple -any,
         text -any
     ghc-options: -Wall
+
+test-suite test-foo
+    main-is:    test-foo.hs
+    type:       exitcode-stdio-1.0
+    default-language: Haskell2010
+    build-depends:
+        base >=4.11 && <4.12
+      , tasty
+      , tasty-hunit
+      , tasty-quickcheck

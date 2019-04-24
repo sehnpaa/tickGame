@@ -5,7 +5,8 @@ let
   inherit (nixpkgs) pkgs;
 
   f = { mkDerivation, base, gi-gtk, gi-gtk-declarative
-      , gi-gtk-declarative-app-simple, microlens-platform, stdenv, text
+      , gi-gtk-declarative-app-simple, microlens-platform, stdenv, tasty
+      , tasty-hunit, tasty-quickcheck, text
       }:
       mkDerivation {
         pname = "tickGame";
@@ -20,6 +21,7 @@ let
         executableHaskellDepends = [
           base gi-gtk gi-gtk-declarative gi-gtk-declarative-app-simple text
         ];
+        testHaskellDepends = [ base tasty tasty-hunit tasty-quickcheck ];
         license = stdenv.lib.licenses.bsd3;
       };
 
