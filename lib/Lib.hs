@@ -1,6 +1,8 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Lib where
 
-import Data.Text (Text)
+import Data.Text (concat, pack, Text)
 
 import Mod
 
@@ -24,7 +26,11 @@ data MyEvent
 data Action = CreateHelperAction deriving (Eq, Show)
 
 nextTick :: MyState -> MyState
-nextTick (MyState as [] p h s True) = MyState as [] (p+h*2) h (succ s) True
+nextTick (MyState as es p h s True) = MyState as es (p+h*2) h (succ s) True
 
 buyHelper :: MyState -> MyState
-buyHelper (MyState as [] p h s True) = MyState as [] (p-10) (succ h) s True
+buyHelper (MyState as es p h s True) =
+  let price = 10 in
+    if p < price
+      then MyState as (es ++ [Data.Text.concat ["Tick ", pack (show s), ": You need more paperclips."]]) p h s True
+      else MyState as es (p - price) (succ h) s True
