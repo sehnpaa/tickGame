@@ -19,5 +19,8 @@ data MyEvent
 
 data Action = CreateHelperAction
 
+nextTick :: MyState -> MyState
+nextTick (MyState as p h s True) = MyState as (p+h*10) h (succ s) True
 
-g = f
+buyHelper :: MyState -> MyState
+buyHelper (MyState as p h s True) = MyState as (p-100) (succ h) s True
