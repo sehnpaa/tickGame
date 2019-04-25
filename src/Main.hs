@@ -6,9 +6,11 @@ module Main where
 
 import Control.Concurrent (threadDelay)
 import Control.Monad (void)
+import Data.Functor ((<&>))
+import Data.Vector (Vector, fromList)
 import Data.Text (append, pack, Text)
 import GI.Gtk (Box(..), Button(..)
-  , Dialog(..), Label(..), Orientation(..), Window(..))
+  , Dialog(..), Label(..), ListBox(..), ListBoxRow(..), Orientation(..), Window(..))
 import GI.Gtk.Declarative
 import GI.Gtk.Declarative.App.Simple
 
@@ -18,7 +20,7 @@ main :: IO ()
 main = void $ run app
 
 view' :: MyState -> AppView Window MyEvent
-view' state@(MyState actions paperclips helpers seconds isStarted) = bin Window
+view' state@(MyState actions errorlog paperclips helpers seconds isStarted) = bin Window
       [ #title := "Hello"
       , on #deleteEvent (const (True, ExitApplication))
       , #widthRequest := 600
@@ -30,6 +32,7 @@ view' state@(MyState actions paperclips helpers seconds isStarted) = bin Window
           [ buttons
           , margin
           , stats state]
+        , container ListBox [] (fromList errorlog <&> \name -> bin ListBoxRow [#activatable := False, #selectable := False] $ widget Label [#label := name])
         , container Box [#orientation := OrientationVertical] [widget Label [#label := "here"]]]
 
 buttons :: BoxChild MyEvent
@@ -57,11 +60,11 @@ ticker :: IO (Maybe MyEvent)
 ticker = fmap (const (Just Tick)) (threadDelay 1000000)
 
 update' :: MyState -> MyEvent -> Transition MyState MyEvent
-update' (MyState as p h s False) Start = Transition (MyState as p h s True) ticker
-update' (MyState as p h s True) CreatePC = Transition (MyState as (succ p) h s True) (pure Nothing)
+update' (MyState as el p h s False) Start = Transition (MyState as el p h s True) ticker
+update' (MyState as el p h s True) CreatePC = Transition (MyState as el (succ p) h s True) (pure Nothing)
 update' state CreateHelper = Transition (buyHelper state) (pure Nothing)
 update' state Tick = Transition (nextTick state) ticker
-update' (MyState as p h s _) Dec = Exit
+update' (MyState as el p h s _) Dec = Exit
 update' state ExitApplication = Exit
 update' state _ = Transition state (pure Nothing)
 
@@ -70,4 +73,4 @@ app = App
   { view = view'
   , update = update'
   , inputs = []
-  , initialState = MyState [] 0 0 0 False}
+  , initialState = MyState [] [] 0 0 0 False}

@@ -6,7 +6,7 @@ let
 
   f = { mkDerivation, base, gi-gtk, gi-gtk-declarative
       , gi-gtk-declarative-app-simple, microlens-platform, stdenv, tasty
-      , tasty-hunit, tasty-quickcheck, text
+      , tasty-hunit, tasty-quickcheck, text, vector
       }:
       mkDerivation {
         pname = "tickGame";
@@ -16,13 +16,15 @@ let
         isExecutable = true;
         libraryHaskellDepends = [
           base gi-gtk gi-gtk-declarative gi-gtk-declarative-app-simple
-          microlens-platform tasty tasty-hunit tasty-quickcheck text
+          microlens-platform tasty tasty-hunit tasty-quickcheck text vector
         ];
         executableHaskellDepends = [
           base gi-gtk gi-gtk-declarative gi-gtk-declarative-app-simple tasty
-          tasty-hunit tasty-quickcheck text
+          tasty-hunit tasty-quickcheck text vector
         ];
-        testHaskellDepends = [ base tasty tasty-hunit tasty-quickcheck ];
+        testHaskellDepends = [
+          base tasty tasty-hunit tasty-quickcheck vector
+        ];
         doHaddock = false;
         license = stdenv.lib.licenses.bsd3;
       };
