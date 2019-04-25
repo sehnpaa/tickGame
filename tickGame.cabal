@@ -51,3 +51,4 @@ test-suite test-foo
       , tasty
       , tasty-hunit
       , tasty-quickcheck
+      , tickGameLib

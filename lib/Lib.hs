@@ -7,7 +7,7 @@ data MyState = MyState
   , paperclips :: Integer
   , helpers :: Integer
   , seconds :: Integer
-  , isStarted :: Bool }
+  , isStarted :: Bool } deriving (Eq, Show)
 
 data MyEvent
   = Start
@@ -16,11 +16,12 @@ data MyEvent
   | Dec
   | ExitApplication
   | Tick
+  deriving (Eq, Show)
 
-data Action = CreateHelperAction
+data Action = CreateHelperAction deriving (Eq, Show)
 
 nextTick :: MyState -> MyState
-nextTick (MyState as p h s True) = MyState as (p+h*10) h (succ s) True
+nextTick (MyState as p h s True) = MyState as (p+h*2) h (succ s) True
 
 buyHelper :: MyState -> MyState
-buyHelper (MyState as p h s True) = MyState as (p-100) (succ h) s True
+buyHelper (MyState as p h s True) = MyState as (p-10) (succ h) s True
