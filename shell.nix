@@ -12,7 +12,7 @@ let
         pname = "tickGame";
         version = "0.1.0.0";
         src = ./.;
-        isLibrary = true;
+        isLibrary = false;
         isExecutable = true;
         libraryHaskellDepends = [
           base gi-gtk gi-gtk-declarative gi-gtk-declarative-app-simple
@@ -23,6 +23,7 @@ let
           tasty-hunit tasty-quickcheck text
         ];
         testHaskellDepends = [ base tasty tasty-hunit tasty-quickcheck ];
+        doHaddock = false;
         license = stdenv.lib.licenses.bsd3;
       };
 

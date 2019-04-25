@@ -12,25 +12,10 @@ import GI.Gtk (Box(..), Button(..)
 import GI.Gtk.Declarative
 import GI.Gtk.Declarative.App.Simple
 
+import Lib
+
 main :: IO ()
 main = void $ run app
-
-data MyState = MyState
-  { actions :: [Action]
-  , paperclips :: Integer
-  , helpers :: Integer
-  , seconds :: Integer
-  , isStarted :: Bool }
-
-data MyEvent
-  = Start
-  | CreatePC
-  | CreateHelper
-  | Dec
-  | ExitApplication
-  | Tick
-
-data Action = CreateHelperAction
 
 view' :: MyState -> AppView Window MyEvent
 view' state@(MyState actions paperclips helpers seconds isStarted) = bin Window
@@ -72,6 +57,7 @@ stats state = container Box [#orientation := OrientationVertical]
 statProperty :: Show a => Text -> a -> BoxChild MyEvent
 statProperty labelText n = container Box [#orientation := OrientationHorizontal]
   [ widget Label [#label := (append labelText ": ")], widget Label [#label := (pack . show $ n)]]
+
 
 ticker :: IO (Maybe MyEvent)
 ticker = fmap (const (Just Tick)) (threadDelay 1000000)

@@ -9,10 +9,11 @@ build-type: Simple
 extra-source-files:
     ChangeLog.md
 
-library
+library tickGameLib
     hs-source-dirs: lib
     default-language: Haskell2010
     exposed-modules: Lib
+    other-modules: Mod
     build-depends:
         base >=4.11 && <5,
         gi-gtk -any,
@@ -37,6 +38,7 @@ executable tickGame
       , tasty
       , tasty-hunit
       , tasty-quickcheck
+      , tickGameLib
     ghc-options: -Wall
 
 test-suite test-foo

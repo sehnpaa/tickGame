@@ -66,6 +66,50 @@
   (major1) == 1 && (major2) == 2 && (minor) <= 3)
 #endif /* MIN_VERSION_text */
 
+/* package tasty-1.2 */
+#ifndef VERSION_tasty
+#define VERSION_tasty "1.2"
+#endif /* VERSION_tasty */
+#ifndef MIN_VERSION_tasty
+#define MIN_VERSION_tasty(major1,major2,minor) (\
+  (major1) <  1 || \
+  (major1) == 1 && (major2) <  2 || \
+  (major1) == 1 && (major2) == 2 && (minor) <= 0)
+#endif /* MIN_VERSION_tasty */
+
+/* package tasty-hunit-0.10.0.1 */
+#ifndef VERSION_tasty_hunit
+#define VERSION_tasty_hunit "0.10.0.1"
+#endif /* VERSION_tasty_hunit */
+#ifndef MIN_VERSION_tasty_hunit
+#define MIN_VERSION_tasty_hunit(major1,major2,minor) (\
+  (major1) <  0 || \
+  (major1) == 0 && (major2) <  10 || \
+  (major1) == 0 && (major2) == 10 && (minor) <= 0)
+#endif /* MIN_VERSION_tasty_hunit */
+
+/* package tasty-quickcheck-0.10 */
+#ifndef VERSION_tasty_quickcheck
+#define VERSION_tasty_quickcheck "0.10"
+#endif /* VERSION_tasty_quickcheck */
+#ifndef MIN_VERSION_tasty_quickcheck
+#define MIN_VERSION_tasty_quickcheck(major1,major2,minor) (\
+  (major1) <  0 || \
+  (major1) == 0 && (major2) <  10 || \
+  (major1) == 0 && (major2) == 10 && (minor) <= 0)
+#endif /* MIN_VERSION_tasty_quickcheck */
+
+/* package tickGame-0.1.0.0 */
+#ifndef VERSION_tickGame
+#define VERSION_tickGame "0.1.0.0"
+#endif /* VERSION_tickGame */
+#ifndef MIN_VERSION_tickGame
+#define MIN_VERSION_tickGame(major1,major2,minor) (\
+  (major1) <  0 || \
+  (major1) == 0 && (major2) <  1 || \
+  (major1) == 0 && (major2) == 1 && (minor) <= 0)
+#endif /* MIN_VERSION_tickGame */
+
 /* tool gcc-7.4.0 */
 #ifndef TOOL_VERSION_gcc
 #define TOOL_VERSION_gcc "7.4.0"
