@@ -15,15 +15,15 @@ library tickGameLib
     exposed-modules: Lib
     other-modules: Mod
     build-depends:
-        base >=4.11 && <5,
-        gi-gtk -any,
-        gi-gtk-declarative -any,
-        gi-gtk-declarative-app-simple -any,
-        microlens-platform,
-        text -any
+        base >=4.11 && <5
+      , gi-gtk
+      , gi-gtk-declarative
+      , gi-gtk-declarative-app-simple
+      , microlens-platform
       , tasty
       , tasty-hunit
       , tasty-quickcheck
+      , text
       , vector
 
 executable tickGame
@@ -31,14 +31,14 @@ executable tickGame
     hs-source-dirs: src
     default-language: Haskell2010
     build-depends:
-        base >=4.11 && <5,
-        gi-gtk -any,
-        gi-gtk-declarative -any,
-        gi-gtk-declarative-app-simple -any,
-        text -any
+        base >=4.11 && <5
+      , gi-gtk
+      , gi-gtk-declarative
+      , gi-gtk-declarative-app-simple
       , tasty
       , tasty-hunit
       , tasty-quickcheck
+      , text
       , tickGameLib
       , vector
     ghc-options: -Wall
