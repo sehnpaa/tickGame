@@ -55,16 +55,16 @@
   (major1) == 0 && (major2) == 4 && (minor) <= 0)
 #endif /* MIN_VERSION_gi_gtk_declarative_app_simple */
 
-/* package text-1.2.3.1 */
-#ifndef VERSION_text
-#define VERSION_text "1.2.3.1"
-#endif /* VERSION_text */
-#ifndef MIN_VERSION_text
-#define MIN_VERSION_text(major1,major2,minor) (\
-  (major1) <  1 || \
-  (major1) == 1 && (major2) <  2 || \
-  (major1) == 1 && (major2) == 2 && (minor) <= 3)
-#endif /* MIN_VERSION_text */
+/* package microlens-platform-0.3.11 */
+#ifndef VERSION_microlens_platform
+#define VERSION_microlens_platform "0.3.11"
+#endif /* VERSION_microlens_platform */
+#ifndef MIN_VERSION_microlens_platform
+#define MIN_VERSION_microlens_platform(major1,major2,minor) (\
+  (major1) <  0 || \
+  (major1) == 0 && (major2) <  3 || \
+  (major1) == 0 && (major2) == 3 && (minor) <= 11)
+#endif /* MIN_VERSION_microlens_platform */
 
 /* package tasty-1.2 */
 #ifndef VERSION_tasty
@@ -98,6 +98,17 @@
   (major1) == 0 && (major2) <  10 || \
   (major1) == 0 && (major2) == 10 && (minor) <= 0)
 #endif /* MIN_VERSION_tasty_quickcheck */
+
+/* package text-1.2.3.1 */
+#ifndef VERSION_text
+#define VERSION_text "1.2.3.1"
+#endif /* VERSION_text */
+#ifndef MIN_VERSION_text
+#define MIN_VERSION_text(major1,major2,minor) (\
+  (major1) <  1 || \
+  (major1) == 1 && (major2) <  2 || \
+  (major1) == 1 && (major2) == 2 && (minor) <= 3)
+#endif /* MIN_VERSION_text */
 
 /* package tickGame-0.1.0.0 */
 #ifndef VERSION_tickGame

@@ -66,17 +66,6 @@
   (major1) == 0 && (major2) == 3 && (minor) <= 11)
 #endif /* MIN_VERSION_microlens_platform */
 
-/* package text-1.2.3.1 */
-#ifndef VERSION_text
-#define VERSION_text "1.2.3.1"
-#endif /* VERSION_text */
-#ifndef MIN_VERSION_text
-#define MIN_VERSION_text(major1,major2,minor) (\
-  (major1) <  1 || \
-  (major1) == 1 && (major2) <  2 || \
-  (major1) == 1 && (major2) == 2 && (minor) <= 3)
-#endif /* MIN_VERSION_text */
-
 /* package tasty-1.2 */
 #ifndef VERSION_tasty
 #define VERSION_tasty "1.2"
@@ -109,6 +98,17 @@
   (major1) == 0 && (major2) <  10 || \
   (major1) == 0 && (major2) == 10 && (minor) <= 0)
 #endif /* MIN_VERSION_tasty_quickcheck */
+
+/* package text-1.2.3.1 */
+#ifndef VERSION_text
+#define VERSION_text "1.2.3.1"
+#endif /* VERSION_text */
+#ifndef MIN_VERSION_text
+#define MIN_VERSION_text(major1,major2,minor) (\
+  (major1) <  1 || \
+  (major1) == 1 && (major2) <  2 || \
+  (major1) == 1 && (major2) == 2 && (minor) <= 3)
+#endif /* MIN_VERSION_text */
 
 /* package vector-0.12.0.2 */
 #ifndef VERSION_vector

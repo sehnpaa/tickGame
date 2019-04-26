@@ -19,8 +19,8 @@ let
           microlens-platform tasty tasty-hunit tasty-quickcheck text vector
         ];
         executableHaskellDepends = [
-          base gi-gtk gi-gtk-declarative gi-gtk-declarative-app-simple tasty
-          tasty-hunit tasty-quickcheck text vector
+          base gi-gtk gi-gtk-declarative gi-gtk-declarative-app-simple
+          microlens-platform tasty tasty-hunit tasty-quickcheck text vector
         ];
         testHaskellDepends = [
           base tasty tasty-hunit tasty-quickcheck vector

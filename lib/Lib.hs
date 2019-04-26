@@ -2,18 +2,26 @@
 
 module Lib where
 
+import Data.Functor
 import Data.Text (concat, pack, Text)
+import Lens.Micro.Platform
 
 import Mod
 
 data MyState = MyState
-  { actions :: [Action]
+  { _actions :: [Action]
   , errorLog :: [Text]
-  , paperclips :: Integer
+  , _paperclips :: Integer
   , helpers :: Integer
   , treeSeeds :: Integer
   , seconds :: Integer
   , isStarted :: Bool } deriving (Eq, Show)
+
+actions :: Lens' MyState [Action]
+actions f state = (\actions' -> state { _actions = actions'}) <$> f (_actions state)
+
+paperclips :: Lens' MyState Integer
+paperclips f state = (\paperclips' -> state { _paperclips = paperclips'}) <$> f (_paperclips state)
 
 data MyEvent
   = Start

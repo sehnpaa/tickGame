@@ -35,6 +35,7 @@ executable tickGame
       , gi-gtk
       , gi-gtk-declarative
       , gi-gtk-declarative-app-simple
+      , microlens-platform
       , tasty
       , tasty-hunit
       , tasty-quickcheck
