@@ -14,7 +14,7 @@ import GI.Gtk (Box(..), Button(..)
 import GI.Gtk.Declarative
 import GI.Gtk.Declarative.App.Simple
 
-import Lib (buyHelper, nextTick, viewHelpers, viewPaperclips, viewTreeSeeds, plantASeed, MyEvent(..), MyState(..))
+import Lib (buyHelper, nextTick, viewHelpers, viewPaperclips, viewSeconds, viewTreeSeeds, plantASeed, MyEvent(..), MyState(..))
 
 main :: IO ()
 main = void $ run app
@@ -51,12 +51,11 @@ stats state = container Box [#orientation := OrientationVertical]
   [ statProperty "Paperclips" (viewPaperclips state)
   , statProperty "Helpers" (viewHelpers state)
   , statProperty "Tree seeds" (viewTreeSeeds state)
-  , statProperty "Seconds" (seconds state) ]
+  , statProperty "Seconds" (viewSeconds state) ]
 
 statProperty :: Show a => Text -> a -> BoxChild MyEvent
 statProperty labelText n = container Box [#orientation := OrientationHorizontal]
   [ widget Label [#label := (append labelText ": ")], widget Label [#label := (pack . show $ n)]]
-
 
 ticker :: IO (Maybe MyEvent)
 ticker = fmap (const (Just Tick)) (threadDelay 1000000)

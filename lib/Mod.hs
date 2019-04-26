@@ -9,8 +9,8 @@ data MyState = MyState
   , _paperclips :: Integer
   , _helpers :: Integer
   , _treeSeeds :: Integer
-  , seconds :: Integer
-  , isStarted :: Bool } deriving (Eq, Show)
+  , _seconds :: Integer
+  , _isStarted :: Bool } deriving (Eq, Show)
 
 actions :: Lens' MyState [Action]
 actions f state = (\actions' -> state { _actions = actions'}) <$> f (_actions state)
@@ -41,6 +41,18 @@ treeSeeds f state = (\treeSeeds' -> state { _treeSeeds = treeSeeds'}) <$> f (_tr
 
 viewTreeSeeds :: MyState -> Integer
 viewTreeSeeds = view treeSeeds
+
+seconds :: Lens' MyState Integer
+seconds f state = (\seconds' -> state { _seconds = seconds'}) <$> f (_seconds state)
+
+viewSeconds :: MyState -> Integer
+viewSeconds = view seconds
+
+isStarted :: Lens' MyState Bool
+isStarted f state = (\isStarted' -> state { _isStarted = isStarted'}) <$> f (_isStarted state)
+
+viewIsStarted :: MyState -> Bool
+viewIsStarted = view isStarted
 
 data MyEvent
   = Start
