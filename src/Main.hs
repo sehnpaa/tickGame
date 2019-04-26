@@ -13,9 +13,8 @@ import GI.Gtk (Box(..), Button(..)
   , Dialog(..), Label(..), ListBox(..), ListBoxRow(..), Orientation(..), Window(..))
 import GI.Gtk.Declarative
 import GI.Gtk.Declarative.App.Simple
-import qualified Lens.Micro.Platform as L
 
-import Lib (buyHelper, nextTick, paperclips, plantASeed, MyEvent(..), MyState(..))
+import Lib (buyHelper, nextTick, viewHelpers, viewPaperclips, viewTreeSeeds, plantASeed, MyEvent(..), MyState(..))
 
 main :: IO ()
 main = void $ run app
@@ -49,9 +48,9 @@ margin = container Box [#widthRequest := 10] []
 
 stats :: MyState -> BoxChild MyEvent
 stats state = container Box [#orientation := OrientationVertical]
-  [ statProperty "Paperclips" (L.view paperclips state)
-  , statProperty "Helpers" (helpers state)
-  , statProperty "Tree seeds" (treeSeeds state)
+  [ statProperty "Paperclips" (viewPaperclips state)
+  , statProperty "Helpers" (viewHelpers state)
+  , statProperty "Tree seeds" (viewTreeSeeds state)
   , statProperty "Seconds" (seconds state) ]
 
 statProperty :: Show a => Text -> a -> BoxChild MyEvent
