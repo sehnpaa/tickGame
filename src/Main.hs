@@ -7,10 +7,9 @@ module Main where
 import Control.Concurrent (threadDelay)
 import Control.Monad (void)
 import Data.Functor ((<&>))
-import Data.Vector (Vector, fromList)
+import Data.Vector (fromList)
 import Data.Text (append, pack, Text)
-import GI.Gtk (Box(..), Button(..)
-  , Dialog(..), Label(..), ListBox(..), ListBoxRow(..), Orientation(..), Window(..))
+import GI.Gtk (Box(..), Button(..), Label(..), ListBox(..), ListBoxRow(..), Orientation(..), Window(..))
 import GI.Gtk.Declarative
 import GI.Gtk.Declarative.App.Simple
 

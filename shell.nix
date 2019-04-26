@@ -16,15 +16,13 @@ let
         isExecutable = true;
         libraryHaskellDepends = [
           base gi-gtk gi-gtk-declarative gi-gtk-declarative-app-simple
-          microlens-platform tasty tasty-hunit tasty-quickcheck text vector
+          microlens-platform tasty tasty-hunit tasty-quickcheck text
         ];
         executableHaskellDepends = [
           base gi-gtk gi-gtk-declarative gi-gtk-declarative-app-simple tasty
           tasty-hunit tasty-quickcheck text vector
         ];
-        testHaskellDepends = [
-          base tasty tasty-hunit tasty-quickcheck vector
-        ];
+        testHaskellDepends = [ base tasty tasty-hunit tasty-quickcheck ];
         doHaddock = false;
         license = stdenv.lib.licenses.bsd3;
       };

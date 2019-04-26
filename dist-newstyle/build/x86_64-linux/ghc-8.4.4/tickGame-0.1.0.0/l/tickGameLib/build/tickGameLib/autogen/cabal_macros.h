@@ -110,17 +110,6 @@
   (major1) == 1 && (major2) == 2 && (minor) <= 3)
 #endif /* MIN_VERSION_text */
 
-/* package vector-0.12.0.2 */
-#ifndef VERSION_vector
-#define VERSION_vector "0.12.0.2"
-#endif /* VERSION_vector */
-#ifndef MIN_VERSION_vector
-#define MIN_VERSION_vector(major1,major2,minor) (\
-  (major1) <  0 || \
-  (major1) == 0 && (major2) <  12 || \
-  (major1) == 0 && (major2) == 12 && (minor) <= 0)
-#endif /* MIN_VERSION_vector */
-
 /* tool gcc-7.4.0 */
 #ifndef TOOL_VERSION_gcc
 #define TOOL_VERSION_gcc "7.4.0"

@@ -24,7 +24,6 @@ library tickGameLib
       , tasty-hunit
       , tasty-quickcheck
       , text
-      , vector
 
 executable tickGame
     main-is: Main.hs
@@ -54,4 +53,3 @@ test-suite test-foo
       , tasty-hunit
       , tasty-quickcheck
       , tickGameLib
-      , vector
