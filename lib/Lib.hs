@@ -11,6 +11,9 @@ import Mod
 nextTick :: MyState -> MyState
 nextTick (MyState as es p h t s True) = MyState as es (p+h*2) h t (succ s) True
 
+createPC :: MyState -> MyState
+createPC (MyState as el p h t s True) = MyState as el (succ p) h t s True
+
 buyHelper :: MyState -> MyState
 buyHelper (MyState as es p h t s True) =
   let price = 10 in

@@ -14,13 +14,13 @@ import GI.Gtk (Box(..), Button(..)
 import GI.Gtk.Declarative
 import GI.Gtk.Declarative.App.Simple
 
-import Lib (buyHelper, nextTick, viewHelpers, viewPaperclips, viewSeconds, viewTreeSeeds, plantASeed, MyEvent(..), MyState(..))
+import Lib (buyHelper, createPC, nextTick, viewErrorLog, viewHelpers, viewPaperclips, viewSeconds, viewTreeSeeds, plantASeed, MyEvent(..), MyState(..))
 
 main :: IO ()
 main = void $ run app
 
 view' :: MyState -> AppView Window MyEvent
-view' state@(MyState actions errorlog paperclips helpers treeSeeds seconds isStarted) = bin Window
+view' state = bin Window
       [ #title := "Hello"
       , on #deleteEvent (const (True, ExitApplication))
       , #widthRequest := 600
@@ -32,7 +32,7 @@ view' state@(MyState actions errorlog paperclips helpers treeSeeds seconds isSta
           [ buttons
           , margin
           , stats state]
-        , container ListBox [] (fromList errorlog <&> \name -> bin ListBoxRow [#activatable := False, #selectable := False] $ widget Label [#label := name])
+        , container ListBox [] (fromList (viewErrorLog state) <&> \name -> bin ListBoxRow [#activatable := False, #selectable := False] $ widget Label [#label := name])
         , container Box [#orientation := OrientationVertical] [widget Label [#label := "here"]]]
 
 buttons :: BoxChild MyEvent
@@ -62,11 +62,11 @@ ticker = fmap (const (Just Tick)) (threadDelay 1000000)
 
 update' :: MyState -> MyEvent -> Transition MyState MyEvent
 update' (MyState as el p h t s False) Start = Transition (MyState as el p h t s True) ticker
-update' (MyState as el p h t s True) CreatePC = Transition (MyState as el (succ p) h t s True) (pure Nothing)
+update' state CreatePC = Transition (createPC state) (pure Nothing)
 update' state CreateHelper = Transition (buyHelper state) (pure Nothing)
 update' state PlantASeed = Transition (plantASeed state) (pure Nothing)
 update' state Tick = Transition (nextTick state) ticker
-update' state ExitApplication = Exit
+update' _ ExitApplication = Exit
 update' state _ = Transition state (pure Nothing)
 
 app :: App Window MyState MyEvent
@@ -74,4 +74,4 @@ app = App
   { view = view'
   , update = update'
   , inputs = []
-  , initialState = MyState [] [] 0 0 10 0 False}
+  , initialState = MyState [] [] 0 0 10 0 False }
