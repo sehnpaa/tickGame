@@ -14,13 +14,13 @@ import GI.Gtk (Box(..), Button(..)
 import GI.Gtk.Declarative
 import GI.Gtk.Declarative.App.Simple
 
-import Lib (buyHelper, nextTick, MyEvent(..), MyState(..))
+import Lib (buyHelper, nextTick, plantASeed, MyEvent(..), MyState(..))
 
 main :: IO ()
 main = void $ run app
 
 view' :: MyState -> AppView Window MyEvent
-view' state@(MyState actions errorlog paperclips helpers seconds isStarted) = bin Window
+view' state@(MyState actions errorlog paperclips helpers treeSeeds seconds isStarted) = bin Window
       [ #title := "Hello"
       , on #deleteEvent (const (True, ExitApplication))
       , #widthRequest := 600
@@ -40,6 +40,7 @@ buttons = container Box [#orientation := OrientationVertical, #widthRequest := 1
   [ widget Button [#label := "Start game", on #clicked Start]
   , widget Button [#label := "Create paperclip", on #clicked CreatePC]
   , widget Button [#label := "Create helper", on #clicked CreateHelper]
+  , widget Button [#label := "Plant a seed", on #clicked PlantASeed]
   , widget Button [#label := "Exit", on #clicked ExitApplication]]
 
 margin :: BoxChild MyEvent
@@ -49,6 +50,7 @@ stats :: MyState -> BoxChild MyEvent
 stats state = container Box [#orientation := OrientationVertical]
   [ statProperty "Paperclips" (paperclips state)
   , statProperty "Helpers" (helpers state)
+  , statProperty "Tree seeds" (treeSeeds state)
   , statProperty "Seconds" (seconds state) ]
 
 statProperty :: Show a => Text -> a -> BoxChild MyEvent
@@ -60,9 +62,10 @@ ticker :: IO (Maybe MyEvent)
 ticker = fmap (const (Just Tick)) (threadDelay 1000000)
 
 update' :: MyState -> MyEvent -> Transition MyState MyEvent
-update' (MyState as el p h s False) Start = Transition (MyState as el p h s True) ticker
-update' (MyState as el p h s True) CreatePC = Transition (MyState as el (succ p) h s True) (pure Nothing)
+update' (MyState as el p h t s False) Start = Transition (MyState as el p h t s True) ticker
+update' (MyState as el p h t s True) CreatePC = Transition (MyState as el (succ p) h t s True) (pure Nothing)
 update' state CreateHelper = Transition (buyHelper state) (pure Nothing)
+update' state PlantASeed = Transition (plantASeed state) (pure Nothing)
 update' state Tick = Transition (nextTick state) ticker
 update' state ExitApplication = Exit
 update' state _ = Transition state (pure Nothing)
@@ -72,4 +75,4 @@ app = App
   { view = view'
   , update = update'
   , inputs = []
-  , initialState = MyState [] [] 0 0 0 False}
+  , initialState = MyState [] [] 0 0 10 0 False}
