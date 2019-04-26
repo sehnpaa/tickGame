@@ -9,7 +9,15 @@ import Lens.Micro.Platform
 import Mod
 
 nextTick :: MyState -> MyState
-nextTick (MyState as es p h t s True) = MyState as es (p+h*2) h t (succ s) True
+nextTick = addSecond . helperWork
+
+helperWork :: MyState -> MyState
+helperWork state =
+  let h = view helpers state
+  in over paperclips (\p -> p+h*2) state
+
+addSecond :: MyState -> MyState
+addSecond = over seconds (+1)
 
 createPC :: MyState -> MyState
 createPC (MyState as el p h t s True) = MyState as el (succ p) h t s True
