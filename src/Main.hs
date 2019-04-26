@@ -64,7 +64,6 @@ update' (MyState as el p h s False) Start = Transition (MyState as el p h s True
 update' (MyState as el p h s True) CreatePC = Transition (MyState as el (succ p) h s True) (pure Nothing)
 update' state CreateHelper = Transition (buyHelper state) (pure Nothing)
 update' state Tick = Transition (nextTick state) ticker
-update' (MyState as el p h s _) Dec = Exit
 update' state ExitApplication = Exit
 update' state _ = Transition state (pure Nothing)
 

@@ -18,7 +18,6 @@ data MyEvent
   = Start
   | CreatePC
   | CreateHelper
-  | Dec
   | ExitApplication
   | Tick
   deriving (Eq, Show)
