@@ -20,7 +20,7 @@ addSecond :: MyState -> MyState
 addSecond = over seconds (+1)
 
 createPC :: MyState -> MyState
-createPC (MyState as el p h t s True) = MyState as el (succ p) h t s True
+createPC = over paperclips (+1)
 
 buyHelper :: MyState -> MyState
 buyHelper (MyState as es p h t s True) =
