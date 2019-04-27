@@ -2,19 +2,26 @@
 
 module Mod where
 
-import Data.Text (concat, pack, Text)
+import Data.Text (Text)
 import Lens.Micro.Platform
 
 data MyState = MyState
   { _actions :: [Action]
-  , _errorLog :: [Text]
+  , _errorLog :: [ErrorLogLine]
   , _paperclips :: Paperclips
   , _helpers :: Helpers
-  , _treeSeeds :: Integer
-  , _seconds :: Integer
-  , _isStarted :: Bool } deriving (Eq, Show)
+  , _treeSeeds :: TreeSeeds
+  , _seconds :: Seconds
+  , _isStarted :: IsStarted } deriving (Eq, Show)
 
-newtype Paperclips = Paperclips { unPaperclips :: Integer } deriving (Eq, Num, Ord)
+data Action = CreateHelperAction deriving (Eq, Show)
+
+newtype ErrorLogLine = ErrorLogLine { unErrorLogLine :: Text } deriving (Eq)
+
+instance Show ErrorLogLine where
+  show (ErrorLogLine a) = show a
+
+newtype Paperclips = Paperclips { unPaperclips :: Integer } deriving (Enum, Eq, Num, Ord)
 
 instance Show Paperclips where
   show (Paperclips a) = show a
@@ -24,16 +31,31 @@ newtype Helpers = Helpers { unHelpers :: Integer } deriving (Enum, Eq, Num, Ord)
 instance Show Helpers where
   show (Helpers a) = show a
 
+newtype TreeSeeds = TreeSeeds { unTreeSeeds :: Integer } deriving (Enum, Eq, Num)
+
+instance Show TreeSeeds where
+  show (TreeSeeds a) = show a
+
+newtype Seconds = Seconds { unSeconds :: Integer } deriving (Enum, Eq, Num)
+
+instance Show Seconds where
+  show (Seconds a) = show a
+
+newtype IsStarted = IsStarted { unIsStarted :: Bool } deriving (Eq)
+
+instance Show IsStarted where
+  show (IsStarted a) = show a
+
 actions :: Lens' MyState [Action]
 actions f state = (\actions' -> state { _actions = actions'}) <$> f (_actions state)
 
 viewActions :: MyState -> [Action]
 viewActions = view actions
 
-errorLog :: Lens' MyState [Text]
+errorLog :: Lens' MyState [ErrorLogLine]
 errorLog f state = (\errorLog' -> state { _errorLog = errorLog'}) <$> f (_errorLog state)
 
-viewErrorLog :: MyState -> [Text]
+viewErrorLog :: MyState -> [ErrorLogLine]
 viewErrorLog = view errorLog
 
 paperclips :: Lens' MyState Paperclips
@@ -48,22 +70,22 @@ helpers f state = (\helpers' -> state { _helpers = helpers'}) <$> f (_helpers st
 viewHelpers :: MyState -> Helpers
 viewHelpers = view helpers
 
-treeSeeds :: Lens' MyState Integer
+treeSeeds :: Lens' MyState TreeSeeds
 treeSeeds f state = (\treeSeeds' -> state { _treeSeeds = treeSeeds'}) <$> f (_treeSeeds state)
 
-viewTreeSeeds :: MyState -> Integer
+viewTreeSeeds :: MyState -> TreeSeeds
 viewTreeSeeds = view treeSeeds
 
-seconds :: Lens' MyState Integer
+seconds :: Lens' MyState Seconds
 seconds f state = (\seconds' -> state { _seconds = seconds'}) <$> f (_seconds state)
 
-viewSeconds :: MyState -> Integer
+viewSeconds :: MyState -> Seconds
 viewSeconds = view seconds
 
-isStarted :: Lens' MyState Bool
+isStarted :: Lens' MyState IsStarted
 isStarted f state = (\isStarted' -> state { _isStarted = isStarted'}) <$> f (_isStarted state)
 
-viewIsStarted :: MyState -> Bool
+viewIsStarted :: MyState -> IsStarted
 viewIsStarted = view isStarted
 
 data MyEvent
@@ -74,5 +96,3 @@ data MyEvent
   | ExitApplication
   | Tick
   deriving (Eq, Show)
-
-data Action = CreateHelperAction deriving (Eq, Show)
