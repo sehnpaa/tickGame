@@ -14,7 +14,10 @@ nextTick = addSecond . helperWork
 helperWork :: MyState -> MyState
 helperWork state =
   let h = view helpers state
-  in over paperclips (\p -> p+h*2) state
+  in over paperclips (addHelperWork h) state
+
+addHelperWork :: Helpers -> Paperclips -> Paperclips
+addHelperWork h p = Paperclips $ (unPaperclips p) + (unHelpers h) * 2
 
 addSecond :: MyState -> MyState
 addSecond = over seconds (+1)

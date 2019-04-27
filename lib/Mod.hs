@@ -1,3 +1,5 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+
 module Mod where
 
 import Data.Text (concat, pack, Text)
@@ -6,11 +8,21 @@ import Lens.Micro.Platform
 data MyState = MyState
   { _actions :: [Action]
   , _errorLog :: [Text]
-  , _paperclips :: Integer
-  , _helpers :: Integer
+  , _paperclips :: Paperclips
+  , _helpers :: Helpers
   , _treeSeeds :: Integer
   , _seconds :: Integer
   , _isStarted :: Bool } deriving (Eq, Show)
+
+newtype Paperclips = Paperclips { unPaperclips :: Integer } deriving (Eq, Num, Ord)
+
+instance Show Paperclips where
+  show (Paperclips a) = show a
+
+newtype Helpers = Helpers { unHelpers :: Integer } deriving (Enum, Eq, Num, Ord)
+
+instance Show Helpers where
+  show (Helpers a) = show a
 
 actions :: Lens' MyState [Action]
 actions f state = (\actions' -> state { _actions = actions'}) <$> f (_actions state)
@@ -24,16 +36,16 @@ errorLog f state = (\errorLog' -> state { _errorLog = errorLog'}) <$> f (_errorL
 viewErrorLog :: MyState -> [Text]
 viewErrorLog = view errorLog
 
-paperclips :: Lens' MyState Integer
+paperclips :: Lens' MyState Paperclips
 paperclips f state = (\paperclips' -> state { _paperclips = paperclips'}) <$> f (_paperclips state)
 
-viewPaperclips :: MyState -> Integer
+viewPaperclips :: MyState -> Paperclips
 viewPaperclips = view paperclips
 
-helpers :: Lens' MyState Integer
+helpers :: Lens' MyState Helpers
 helpers f state = (\helpers' -> state { _helpers = helpers'}) <$> f (_helpers state)
 
-viewHelpers :: MyState -> Integer
+viewHelpers :: MyState -> Helpers
 viewHelpers = view helpers
 
 treeSeeds :: Lens' MyState Integer

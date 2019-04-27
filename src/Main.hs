@@ -13,7 +13,9 @@ import GI.Gtk (Box(..), Button(..), Label(..), ListBox(..), ListBoxRow(..), Orie
 import GI.Gtk.Declarative
 import GI.Gtk.Declarative.App.Simple
 
-import Lib (buyHelper, createPC, nextTick, viewErrorLog, viewHelpers, viewPaperclips, viewSeconds, viewTreeSeeds, plantASeed, MyEvent(..), MyState(..))
+import Lib (buyHelper, createPC, nextTick, viewErrorLog, viewHelpers
+  , viewPaperclips, viewSeconds, viewTreeSeeds, plantASeed, MyEvent(..)
+  , MyState(..))
 
 main :: IO ()
 main = void $ run app
