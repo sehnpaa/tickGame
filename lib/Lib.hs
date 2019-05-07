@@ -29,7 +29,7 @@ buyHelper state =
   let paperclips' = view paperclips state
       price = view (config.prices.helperPrices) state
       s' = view seconds state
-    in if paperclips' < price
+    in if price > paperclips'
       then over errorLog (addToErrorLog (lineNeedMorePaperclips s')) state
       else over helpers succ $ over paperclips (decPaperclipsWith price) state
 
@@ -43,7 +43,7 @@ lineNeedMorePaperclips :: Seconds -> ErrorLogLine
 lineNeedMorePaperclips s = ErrorLogLine $ Data.Text.concat ["Tick ", pack (show s), ": You need more paperclips."]
 
 plantASeed :: MyState -> MyState
-plantASeed (MyState conf as es p h t s (IsStarted True)) = MyState conf as es p h (pred t) s (IsStarted True)
+plantASeed = over treeSeeds pred
 
 getInitialState :: MyState
 getInitialState = MyState (Config (Prices (Paperclips 10))) [] [] 0 0 10 0 (IsStarted False)
