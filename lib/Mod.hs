@@ -6,13 +6,20 @@ import Data.Text (Text)
 import Lens.Micro.Platform
 
 data MyState = MyState
-  { _actions :: [Action]
+  { _config :: Config
+  , _actions :: [Action]
   , _errorLog :: [ErrorLogLine]
   , _paperclips :: Paperclips
   , _helpers :: Helpers
   , _treeSeeds :: TreeSeeds
   , _seconds :: Seconds
   , _isStarted :: IsStarted } deriving (Eq, Show)
+
+data Config = Config
+  { _prices :: Prices } deriving (Eq, Show)
+
+data Prices = Prices
+  { _helperPrice :: Paperclips } deriving (Eq, Show)
 
 data Action = CreateHelperAction deriving (Eq, Show)
 
@@ -45,6 +52,15 @@ newtype IsStarted = IsStarted { unIsStarted :: Bool } deriving (Eq)
 
 instance Show IsStarted where
   show (IsStarted a) = show a
+
+config :: Lens' MyState Config
+config f state = (\config' -> state { _config = config'}) <$> f (_config state)
+
+prices :: Lens' Config Prices
+prices f state = (\prices' -> state { _prices = prices'}) <$> f (_prices state)
+
+helperPrices :: Lens' Prices Paperclips
+helperPrices f state = (\helperPrice' -> state { _helperPrice = helperPrice'}) <$> f (_helperPrice state)
 
 actions :: Lens' MyState [Action]
 actions f state = (\actions' -> state { _actions = actions'}) <$> f (_actions state)

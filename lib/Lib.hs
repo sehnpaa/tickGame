@@ -25,11 +25,22 @@ createPC :: MyState -> MyState
 createPC = over paperclips succ
 
 buyHelper :: MyState -> MyState
-buyHelper (MyState as es p h t s (IsStarted True)) =
-  let price = 10 in
-    if p < price
-      then MyState as (es ++ [ErrorLogLine $ Data.Text.concat ["Tick ", pack (show s), ": You need more paperclips."]]) p h t s (IsStarted True)
-      else MyState as es (p - price) (succ h) t s (IsStarted True)
+buyHelper state@(MyState conf as es p h t s (IsStarted True)) =
+  let price = view (config.prices.helperPrices) state
+      s' = view seconds state
+    in if p < price
+      then over errorLog (addToErrorLog (lineNeedMorePaperclips s')) state
+      else MyState conf as es (p - price) (succ h) t s (IsStarted True)
+
+addToErrorLog :: ErrorLogLine -> [ErrorLogLine] -> [ErrorLogLine]
+addToErrorLog new existing = existing ++ [new]
+
+lineNeedMorePaperclips :: Seconds -> ErrorLogLine
+lineNeedMorePaperclips s = ErrorLogLine $ Data.Text.concat ["Tick ", pack (show s), ": You need more paperclips."]
+
 
 plantASeed :: MyState -> MyState
-plantASeed (MyState as es p h t s (IsStarted True)) = MyState as es p h (pred t) s (IsStarted True)
+plantASeed (MyState conf as es p h t s (IsStarted True)) = MyState conf as es p h (pred t) s (IsStarted True)
+
+getInitialState :: MyState
+getInitialState = MyState (Config (Prices (Paperclips 10))) [] [] 0 0 10 0 (IsStarted False)

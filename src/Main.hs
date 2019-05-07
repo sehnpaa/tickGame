@@ -15,7 +15,7 @@ import GI.Gtk.Declarative.App.Simple
 
 import Lib (buyHelper, createPC, nextTick, viewErrorLog, viewHelpers
   , viewPaperclips, viewSeconds, viewTreeSeeds, unErrorLogLine, plantASeed, IsStarted(..), MyEvent(..)
-  , MyState(..))
+  , MyState(..), getInitialState)
 
 main :: IO ()
 main = void $ run app
@@ -62,7 +62,7 @@ ticker :: IO (Maybe MyEvent)
 ticker = fmap (const (Just Tick)) (threadDelay 1000000)
 
 update' :: MyState -> MyEvent -> Transition MyState MyEvent
-update' (MyState as el p h t s (IsStarted False)) Start = Transition (MyState as el p h t s (IsStarted True)) ticker
+update' (MyState conf as el p h t s (IsStarted False)) Start = Transition (MyState conf as el p h t s (IsStarted True)) ticker
 update' state CreatePC = Transition (createPC state) (pure Nothing)
 update' state CreateHelper = Transition (buyHelper state) (pure Nothing)
 update' state PlantASeed = Transition (plantASeed state) (pure Nothing)
@@ -75,4 +75,4 @@ app = App
   { view = view'
   , update = update'
   , inputs = []
-  , initialState = MyState [] [] 0 0 10 0 (IsStarted False) }
+  , initialState = getInitialState }
