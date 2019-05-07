@@ -25,19 +25,22 @@ createPC :: MyState -> MyState
 createPC = over paperclips succ
 
 buyHelper :: MyState -> MyState
-buyHelper state@(MyState conf as es p h t s (IsStarted True)) =
-  let price = view (config.prices.helperPrices) state
+buyHelper state =
+  let paperclips' = view paperclips state
+      price = view (config.prices.helperPrices) state
       s' = view seconds state
-    in if p < price
+    in if paperclips' < price
       then over errorLog (addToErrorLog (lineNeedMorePaperclips s')) state
-      else MyState conf as es (p - price) (succ h) t s (IsStarted True)
+      else over helpers succ $ over paperclips (decPaperclipsWith price) state
+
+decPaperclipsWith :: HelperPrice -> Paperclips -> Paperclips
+decPaperclipsWith price paperclips = paperclips - price
 
 addToErrorLog :: ErrorLogLine -> [ErrorLogLine] -> [ErrorLogLine]
 addToErrorLog new existing = existing ++ [new]
 
 lineNeedMorePaperclips :: Seconds -> ErrorLogLine
 lineNeedMorePaperclips s = ErrorLogLine $ Data.Text.concat ["Tick ", pack (show s), ": You need more paperclips."]
-
 
 plantASeed :: MyState -> MyState
 plantASeed (MyState conf as es p h t s (IsStarted True)) = MyState conf as es p h (pred t) s (IsStarted True)

@@ -19,7 +19,9 @@ data Config = Config
   { _prices :: Prices } deriving (Eq, Show)
 
 data Prices = Prices
-  { _helperPrice :: Paperclips } deriving (Eq, Show)
+  { _helperPrice :: HelperPrice } deriving (Eq, Show)
+
+type HelperPrice = Paperclips
 
 data Action = CreateHelperAction deriving (Eq, Show)
 
