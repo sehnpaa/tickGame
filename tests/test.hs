@@ -1,6 +1,7 @@
 module Main where
 
 import Control.Lens
+import Data.List (nub, permutations)
 import Test.Tasty
 import Test.Tasty.HUnit
 import qualified Test.Tasty.QuickCheck as QC
@@ -25,4 +26,9 @@ qcTests = testGroup "QuickCheck tests"
   [ QC.testProperty "addSecond" $ QC.withMaxSuccess 1000 $ \state ->
       let before = view seconds state
           after = view seconds (addSecond state)
-          in after == before + 1]
+          in after == before + 1
+  , QC.testProperty "Commutative features" $ QC.withMaxSuccess 1000 $ \state ->
+      isCommutative state [addSecond, helperWork] ]
+
+isCommutative :: Eq a => a -> [a -> a] -> Bool
+isCommutative empty = (\x -> length x == 1) . nub . map (foldr id empty) . permutations
