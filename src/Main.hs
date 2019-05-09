@@ -62,7 +62,8 @@ ticker :: IO (Maybe MyEvent)
 ticker = fmap (const (Just Tick)) (threadDelay 1000000)
 
 update' :: MyState -> MyEvent -> Transition MyState MyEvent
-update' (MyState conf as el p h t s (IsStarted False)) Start = Transition (MyState conf as el p h t s (IsStarted True)) ticker
+update' (MyState conf as el p h t s (IsStarted False)) Start =
+  Transition (MyState conf as el p h t s (IsStarted True)) ticker
 update' state CreatePC = Transition (createPC state) (pure Nothing)
 update' state CreateHelper = Transition (buyHelper state) (pure Nothing)
 update' state PlantASeed = Transition (plantASeed state) (pure Nothing)

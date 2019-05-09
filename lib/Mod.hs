@@ -2,8 +2,9 @@
 
 module Mod where
 
-import Data.Text (Text)
+import Data.Text (pack, Text)
 import Lens.Micro.Platform
+import Test.Tasty.QuickCheck
 
 data MyState = MyState
   { _config :: Config
@@ -15,15 +16,52 @@ data MyState = MyState
   , _seconds :: Seconds
   , _isStarted :: IsStarted } deriving (Eq, Show)
 
+instance Arbitrary MyState where
+  arbitrary = MyState <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
+                      <*> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
+
+instance Arbitrary Config where
+  arbitrary = Config <$> arbitrary
+
+instance Arbitrary Prices where
+  arbitrary = Prices <$> arbitrary
+
+instance Arbitrary HelperPrice where
+  arbitrary = HelperPrice <$> arbitrary
+
+instance Arbitrary Helpers where
+  arbitrary = Helpers <$> arbitrary
+
+instance Arbitrary Action where
+  arbitrary = Action <$> arbitrary
+
+instance Arbitrary ErrorLogLine where
+  arbitrary = ErrorLogLine <$> arbitrary
+
+instance Arbitrary Paperclips where
+  arbitrary = Paperclips <$> arbitrary
+
+instance Arbitrary TreeSeeds where
+  arbitrary = TreeSeeds <$> arbitrary
+
+instance Arbitrary Seconds where
+  arbitrary = Seconds <$> arbitrary
+
+instance Arbitrary IsStarted where
+  arbitrary = IsStarted <$> arbitrary
+
+instance Arbitrary Text where
+  arbitrary = pack <$> arbitrary
+
 data Config = Config
   { _prices :: Prices } deriving (Eq, Show)
 
 data Prices = Prices
   { _helperPrice :: HelperPrice } deriving (Eq, Show)
 
-type HelperPrice = Paperclips
+newtype HelperPrice = HelperPrice { unHelperPrice :: Paperclips } deriving (Eq, Show)
 
-data Action = CreateHelperAction deriving (Eq, Show)
+newtype Action = Action { unAction :: ()} deriving (Eq, Show)
 
 newtype ErrorLogLine = ErrorLogLine { unErrorLogLine :: Text } deriving (Eq)
 
@@ -61,7 +99,7 @@ config f state = (\config' -> state { _config = config'}) <$> f (_config state)
 prices :: Lens' Config Prices
 prices f state = (\prices' -> state { _prices = prices'}) <$> f (_prices state)
 
-helperPrices :: Lens' Prices Paperclips
+helperPrices :: Lens' Prices HelperPrice
 helperPrices f state = (\helperPrice' -> state { _helperPrice = helperPrice'}) <$> f (_helperPrice state)
 
 actions :: Lens' MyState [Action]
