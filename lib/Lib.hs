@@ -2,8 +2,8 @@
 
 module Lib (module Lib, module Mod) where
 
+import Control.Lens
 import Data.Text (concat, pack)
-import Lens.Micro.Platform
 
 import Mod
 

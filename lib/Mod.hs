@@ -2,8 +2,8 @@
 
 module Mod where
 
+import Control.Lens
 import Data.Text (pack, Text)
-import Lens.Micro.Platform
 import Test.Tasty.QuickCheck
 
 data MyState = MyState
