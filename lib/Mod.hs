@@ -10,15 +10,13 @@ data MyState = MyState
   { _config :: Config
   , _actions :: [Action]
   , _errorLog :: [ErrorLogLine]
-  , _paperclips :: Paperclips
-  , _helpers :: Helpers
-  , _treeSeeds :: TreeSeeds
+  , _resources :: Resources
   , _seconds :: Seconds
   , _isStarted :: IsStarted } deriving (Eq, Show)
 
 instance Arbitrary MyState where
-  arbitrary = MyState <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
-                      <*> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
+  arbitrary = MyState <$> arbitrary <*> arbitrary <*> arbitrary
+                      <*> arbitrary <*> arbitrary <*> arbitrary
 
 instance Arbitrary Config where
   arbitrary = Config <$> arbitrary
@@ -37,6 +35,9 @@ instance Arbitrary Action where
 
 instance Arbitrary ErrorLogLine where
   arbitrary = ErrorLogLine <$> arbitrary
+
+instance Arbitrary Resources where
+  arbitrary = Resources <$> arbitrary <*> arbitrary <*> arbitrary
 
 instance Arbitrary Paperclips where
   arbitrary = Paperclips <$> arbitrary
@@ -67,6 +68,11 @@ newtype ErrorLogLine = ErrorLogLine { unErrorLogLine :: Text } deriving (Eq)
 
 instance Show ErrorLogLine where
   show (ErrorLogLine a) = show a
+
+data Resources = Resources
+  { _paperclips :: Paperclips
+  , _helpers :: Helpers
+  , _treeSeeds :: TreeSeeds } deriving (Eq, Show)
 
 newtype Paperclips = Paperclips { unPaperclips :: Integer } deriving (Enum, Eq, Num, Ord)
 
@@ -111,26 +117,29 @@ viewActions = view actions
 errorLog :: Lens' MyState [ErrorLogLine]
 errorLog f state = (\errorLog' -> state { _errorLog = errorLog'}) <$> f (_errorLog state)
 
+resources :: Lens' MyState Resources
+resources f state = (\resources' -> state { _resources = resources'}) <$> f (_resources state)
+
 viewErrorLog :: MyState -> [ErrorLogLine]
 viewErrorLog = view errorLog
 
-paperclips :: Lens' MyState Paperclips
+paperclips :: Lens' Resources Paperclips
 paperclips f state = (\paperclips' -> state { _paperclips = paperclips'}) <$> f (_paperclips state)
 
 viewPaperclips :: MyState -> Paperclips
-viewPaperclips = view paperclips
+viewPaperclips = view (resources.paperclips)
 
-helpers :: Lens' MyState Helpers
+helpers :: Lens' Resources Helpers
 helpers f state = (\helpers' -> state { _helpers = helpers'}) <$> f (_helpers state)
 
 viewHelpers :: MyState -> Helpers
-viewHelpers = view helpers
+viewHelpers = view (resources.helpers)
 
-treeSeeds :: Lens' MyState TreeSeeds
+treeSeeds :: Lens' Resources TreeSeeds
 treeSeeds f state = (\treeSeeds' -> state { _treeSeeds = treeSeeds'}) <$> f (_treeSeeds state)
 
 viewTreeSeeds :: MyState -> TreeSeeds
-viewTreeSeeds = view treeSeeds
+viewTreeSeeds = view (resources.treeSeeds)
 
 seconds :: Lens' MyState Seconds
 seconds f state = (\seconds' -> state { _seconds = seconds'}) <$> f (_seconds state)
