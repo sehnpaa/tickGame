@@ -46,4 +46,4 @@ plantASeed :: MyState -> MyState
 plantASeed = over (resources.treeSeeds) pred
 
 getInitialState :: MyState
-getInitialState = MyState (Config (Prices (HelperPrice $ Paperclips 10))) [] [] (Resources 0 0 10) 0 (IsStarted False)
+getInitialState = MyState (Config (Prices (HelperPrice $ Paperclips 10))) [] [] (Resources 0 0 0 10) 0 (IsStarted False)

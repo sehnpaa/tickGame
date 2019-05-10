@@ -37,10 +37,13 @@ instance Arbitrary ErrorLogLine where
   arbitrary = ErrorLogLine <$> arbitrary
 
 instance Arbitrary Resources where
-  arbitrary = Resources <$> arbitrary <*> arbitrary <*> arbitrary
+  arbitrary = Resources <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
 
 instance Arbitrary Paperclips where
   arbitrary = Paperclips <$> arbitrary
+
+instance Arbitrary Trees where
+  arbitrary = Trees <$> arbitrary
 
 instance Arbitrary TreeSeeds where
   arbitrary = TreeSeeds <$> arbitrary
@@ -72,6 +75,7 @@ instance Show ErrorLogLine where
 data Resources = Resources
   { _paperclips :: Paperclips
   , _helpers :: Helpers
+  , _trees :: Trees
   , _treeSeeds :: TreeSeeds } deriving (Eq, Show)
 
 newtype Paperclips = Paperclips { unPaperclips :: Integer } deriving (Enum, Eq, Num, Ord)
@@ -83,6 +87,11 @@ newtype Helpers = Helpers { unHelpers :: Integer } deriving (Enum, Eq, Num, Ord)
 
 instance Show Helpers where
   show (Helpers a) = show a
+
+newtype Trees = Trees { unTrees :: Integer } deriving (Enum, Eq, Num, Ord)
+
+instance Show Trees where
+  show (Trees a) = show a
 
 newtype TreeSeeds = TreeSeeds { unTreeSeeds :: Integer } deriving (Enum, Eq, Num)
 
@@ -134,6 +143,12 @@ helpers f state = (\helpers' -> state { _helpers = helpers'}) <$> f (_helpers st
 
 viewHelpers :: MyState -> Helpers
 viewHelpers = view (resources.helpers)
+
+trees :: Lens' Resources Trees
+trees f state = (\trees' -> state { _trees = trees'}) <$> f (_trees state)
+
+viewTrees :: MyState -> Trees
+viewTrees = view (resources.trees)
 
 treeSeeds :: Lens' Resources TreeSeeds
 treeSeeds f state = (\treeSeeds' -> state { _treeSeeds = treeSeeds'}) <$> f (_treeSeeds state)
