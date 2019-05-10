@@ -1,7 +1,7 @@
 { nixpkgs ? import (fetchTarball {
     url = https://github.com/NixOS/nixpkgs-channels/archive/7defc47944fe6d1da4c3a08c60c8332ca660a680.tar.gz;
     sha256 = "100mh7ir6cca2yjv89nr4wkns3567v9kz6dnc6ysyvd579fw03a7";
-  }) {} , compiler ? "ghc844", doBenchmark ? false }:
+  }) {} , compiler ? "ghc864", doBenchmark ? false }:
 
 let
 
