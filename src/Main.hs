@@ -69,7 +69,6 @@ update' state CreateHelper = Transition (buyHelper state) (pure Nothing)
 update' state PlantASeed = Transition (plantASeed state) (pure Nothing)
 update' state Tick = Transition (nextTick state) ticker
 update' _ ExitApplication = Exit
-update' state _ = Transition state (pure Nothing)
 
 app :: App Window MyState MyEvent
 app = App
