@@ -22,10 +22,13 @@ instance Arbitrary Config where
   arbitrary = Config <$> arbitrary
 
 instance Arbitrary Prices where
-  arbitrary = Prices <$> arbitrary
+  arbitrary = Prices <$> arbitrary <*> arbitrary
 
 instance Arbitrary HelperPrice where
   arbitrary = HelperPrice <$> arbitrary
+
+instance Arbitrary TreePrice where
+  arbitrary = TreePrice <$> arbitrary
 
 instance Arbitrary Helpers where
   arbitrary = Helpers <$> arbitrary
@@ -61,9 +64,12 @@ data Config = Config
   { _prices :: Prices } deriving (Eq, Show)
 
 data Prices = Prices
-  { _helperPrice :: HelperPrice } deriving (Eq, Show)
+  { _helperPrice :: HelperPrice
+  , _treePrice :: TreePrice } deriving (Eq, Show)
 
 newtype HelperPrice = HelperPrice { unHelperPrice :: Paperclips } deriving (Eq, Show)
+
+newtype TreePrice = TreePrice { unTreePrice :: TreeSeeds } deriving (Eq, Show)
 
 newtype Action = Action { unAction :: ()} deriving (Eq, Show)
 

@@ -43,10 +43,22 @@ lineNeedMorePaperclips :: Seconds -> ErrorLogLine
 lineNeedMorePaperclips s = ErrorLogLine $ Data.Text.concat ["Tick ", pack (show s), ": You need more paperclips."]
 
 plantASeed :: MyState -> MyState
-plantASeed = over (resources.treeSeeds) pred
+plantASeed state =
+  let seeds = view (resources.treeSeeds) state
+      s' = view seconds state
+    in
+      if 1 > (unTreeSeeds seeds)
+        then over errorLog (addToErrorLog (lineNeedMoreSeeds s')) state
+        else over (resources.trees) succ $ over (resources.treeSeeds) pred state
+
+lineNeedMoreSeeds :: Seconds -> ErrorLogLine
+lineNeedMoreSeeds s = ErrorLogLine $ Data.Text.concat ["Tick ", pack (show s), ": You need more seeds."]
 
 setStarted :: MyState -> MyState
 setStarted = over isStarted (const $ IsStarted True)
 
+initialPrices :: Prices
+initialPrices = Prices (HelperPrice $ Paperclips 10) (TreePrice $ TreeSeeds 1)
+
 getInitialState :: MyState
-getInitialState = MyState (Config (Prices (HelperPrice $ Paperclips 10))) [] [] (Resources 0 0 0 10) 0 (IsStarted False)
+getInitialState = MyState (Config initialPrices) [] [] (Resources 0 0 0 10) 0 (IsStarted False)
