@@ -28,7 +28,7 @@ qcTests = testGroup "QuickCheck tests"
           after = view seconds (addSecond state)
           in after == before + 1
   , QC.testProperty "Commutative features" $ QC.withMaxSuccess 1000 $ \state ->
-      isCommutative state [addSecond, helperWork] ]
+      isCommutative state [addSecond, createPC, helperWork, plantASeed] ]
 
 isCommutative :: Eq a => a -> [a -> a] -> Bool
 isCommutative empty = (\x -> length x == 1) . nub . map (foldr id empty) . permutations
