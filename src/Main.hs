@@ -63,12 +63,15 @@ ticker :: IO (Maybe MyEvent)
 ticker = fmap (const (Just Tick)) (threadDelay 1000000)
 
 update' :: MyState -> MyEvent -> Transition MyState MyEvent
-update' state Start = Transition (setStarted state) ticker
-update' state CreatePC = Transition (createPC state) (pure Nothing)
-update' state CreateHelper = Transition (buyHelper state) (pure Nothing)
-update' state PlantASeed = Transition (plantASeed state) (pure Nothing)
-update' state Tick = Transition (nextTick state) ticker
-update' _ ExitApplication = Exit
+update' state event = case (unIsStarted (viewIsStarted state), event) of
+  (False, Start) -> Transition (setStarted state) ticker
+  (True, CreatePC) -> Transition (createPC state) (pure Nothing)
+  (True, CreateHelper) -> Transition (buyHelper state) (pure Nothing)
+  (True, ExitApplication) -> Exit
+  (True, PlantASeed) -> Transition (plantASeed state) (pure Nothing)
+  (True, Start) -> Transition state (pure Nothing)
+  (True, Tick) -> Transition (nextTick state) ticker
+  (False, _) -> Transition state (pure Nothing)
 
 app :: App Window MyState MyEvent
 app = App
