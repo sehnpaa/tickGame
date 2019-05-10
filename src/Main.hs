@@ -13,7 +13,7 @@ import GI.Gtk (Box(..), Button(..), Label(..), ListBox(..), ListBoxRow(..), Orie
 import GI.Gtk.Declarative
 import GI.Gtk.Declarative.App.Simple
 
-import Lib (buyHelper, createPC, nextTick, viewErrorLog, viewHelpers
+import Lib (buyHelper, createPC, nextTick, setStarted, viewErrorLog, viewHelpers, viewIsStarted
   , viewPaperclips, viewSeconds, viewTrees, viewTreeSeeds, unErrorLogLine, plantASeed, IsStarted(..), MyEvent(..)
   , MyState(..), getInitialState)
 
@@ -63,8 +63,7 @@ ticker :: IO (Maybe MyEvent)
 ticker = fmap (const (Just Tick)) (threadDelay 1000000)
 
 update' :: MyState -> MyEvent -> Transition MyState MyEvent
-update' (MyState conf as el r s (IsStarted False)) Start =
-  Transition (MyState conf as el r s (IsStarted True)) ticker
+update' state Start = Transition (setStarted state) ticker
 update' state CreatePC = Transition (createPC state) (pure Nothing)
 update' state CreateHelper = Transition (buyHelper state) (pure Nothing)
 update' state PlantASeed = Transition (plantASeed state) (pure Nothing)

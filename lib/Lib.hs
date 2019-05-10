@@ -45,5 +45,8 @@ lineNeedMorePaperclips s = ErrorLogLine $ Data.Text.concat ["Tick ", pack (show 
 plantASeed :: MyState -> MyState
 plantASeed = over (resources.treeSeeds) pred
 
+setStarted :: MyState -> MyState
+setStarted = over isStarted (const $ IsStarted True)
+
 getInitialState :: MyState
 getInitialState = MyState (Config (Prices (HelperPrice $ Paperclips 10))) [] [] (Resources 0 0 0 10) 0 (IsStarted False)
