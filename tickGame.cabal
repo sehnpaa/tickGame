@@ -43,7 +43,7 @@ executable tickGame
       , text
       , tickGameLib
       , vector
-    ghc-options: -Wall
+    ghc-options: -threaded -Wall
 
 test-suite test-foo
     main-is: test.hs
