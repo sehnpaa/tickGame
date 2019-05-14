@@ -1,7 +1,6 @@
 module Lib (module Lib, module Mod) where
 
 import Control.Lens
-import Data.Text (concat, pack)
 
 import qualified BusinessLogic as BL
 import LensUtils
@@ -64,4 +63,4 @@ initialPrices :: Prices
 initialPrices = Prices (HelperPrice $ Paperclips 10) (TreePrice $ TreeSeeds 1)
 
 getInitialState :: MyState
-getInitialState = MyState (Config initialPrices) [] [] (Resources 0 0 0 10) 0 (IsStarted False)
+getInitialState = MyState (Config initialPrices) [] [] (Research NotResearched) (Resources 0 0 0 10) 0 (IsStarted False)

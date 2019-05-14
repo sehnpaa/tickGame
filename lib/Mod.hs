@@ -10,12 +10,13 @@ data MyState = MyState
   { _config :: Config
   , _actions :: [Action]
   , _errorLog :: [ErrorLogLine]
+  , _research :: Research
   , _resources :: Resources
   , _seconds :: Seconds
   , _isStarted :: IsStarted } deriving (Eq, Show)
 
 instance Arbitrary MyState where
-  arbitrary = MyState <$> arbitrary <*> arbitrary <*> arbitrary
+  arbitrary = MyState <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
                       <*> arbitrary <*> arbitrary <*> arbitrary
 
 instance Arbitrary Config where
@@ -53,6 +54,17 @@ instance Arbitrary TreeSeeds where
 
 instance Arbitrary Seconds where
   arbitrary = Seconds <$> arbitrary
+
+instance Arbitrary Research where
+  arbitrary = Research <$> arbitrary
+
+instance Arbitrary ResearchProgress where
+  arbitrary = do
+    r <- Test.Tasty.QuickCheck.elements [NotResearched, ResearchInProgress undefined, ResearchDone]
+    case r of
+      NotResearched -> return NotResearched
+      ResearchInProgress _ -> ResearchInProgress <$> arbitrary
+      ResearchDone -> return ResearchDone
 
 instance Arbitrary IsStarted where
   arbitrary = IsStarted <$> arbitrary
@@ -103,6 +115,15 @@ newtype TreeSeeds = TreeSeeds { unTreeSeeds :: Integer } deriving (Enum, Eq, Num
 
 instance Show TreeSeeds where
   show (TreeSeeds a) = show a
+
+data ResearchProgress = NotResearched | ResearchInProgress Int | ResearchDone
+  deriving (Eq, Show)
+
+data Research = Research
+  { _advancedHelperReseach :: ResearchProgress } deriving Eq
+
+instance Show Research where
+  show (Research a) = show a
 
 newtype Seconds = Seconds { unSeconds :: Integer } deriving (Enum, Eq, Num)
 
