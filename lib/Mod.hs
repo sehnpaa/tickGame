@@ -99,7 +99,7 @@ newtype Trees = Trees { unTrees :: Integer } deriving (Enum, Eq, Num, Ord)
 instance Show Trees where
   show (Trees a) = show a
 
-newtype TreeSeeds = TreeSeeds { unTreeSeeds :: Integer } deriving (Enum, Eq, Num)
+newtype TreeSeeds = TreeSeeds { unTreeSeeds :: Integer } deriving (Enum, Eq, Num, Ord)
 
 instance Show TreeSeeds where
   show (TreeSeeds a) = show a
@@ -122,6 +122,9 @@ prices f state = (\prices' -> state { _prices = prices'}) <$> f (_prices state)
 
 helperPrices :: Lens' Prices HelperPrice
 helperPrices f state = (\helperPrice' -> state { _helperPrice = helperPrice'}) <$> f (_helperPrice state)
+
+treePrice :: Lens' Prices TreePrice
+treePrice f state = (\treePrice' -> state { _treePrice = treePrice'}) <$> f (_treePrice state)
 
 actions :: Lens' MyState [Action]
 actions f state = (\actions' -> state { _actions = actions'}) <$> f (_actions state)

@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Lib (module Lib, module Mod) where
 
 import Control.Lens
@@ -44,16 +42,20 @@ buyHelper' (s, hp, pc, helpers, errs )= case BL.buyHelper s hp pc helpers errs o
   Right (hp', pc') -> (pc', hp', errs)
 
 plantASeed :: MyState -> MyState
-plantASeed state =
-  let seeds = view (resources.treeSeeds) state
-      s' = view seconds state
-    in
-      if 1 > (unTreeSeeds seeds)
-        then over errorLog (BL.addToErrorLog (lineNeedMoreSeeds s')) state
-        else over (resources.trees) succ $ over (resources.treeSeeds) pred state
+plantASeed state = setOutput state $ plantASeed' $ getInput state
+  where
+    getInput = getInput5
+      seconds
+      (config.prices.treePrice)
+      (resources.treeSeeds)
+      (resources.trees)
+      errorLog
+    setOutput = setOutput3 errorLog (resources.treeSeeds) (resources.trees)
 
-lineNeedMoreSeeds :: Seconds -> ErrorLogLine
-lineNeedMoreSeeds s = ErrorLogLine $ Data.Text.concat ["Tick ", pack (show s), ": You need more seeds."]
+plantASeed' :: (Seconds, TreePrice, TreeSeeds, Trees, [ErrorLogLine]) -> ([ErrorLogLine], TreeSeeds, Trees)
+plantASeed' (s, price, seeds, trees, errs) = case BL.plantASeed s price seeds trees errs of
+  Left errs' -> (errs', seeds, trees)
+  Right (seeds', trees') -> (errs, seeds', trees')
 
 setStarted :: MyState -> MyState
 setStarted = over isStarted (const $ IsStarted True)
