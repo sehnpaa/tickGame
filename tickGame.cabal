@@ -13,7 +13,9 @@ library tickGameLib
     hs-source-dirs: lib
     default-language: Haskell2010
     exposed-modules: Lib
-    other-modules: Mod
+    other-modules:
+      LensUtils
+      Mod
     build-depends:
         base >=4.11 && <5
       , gi-gtk
