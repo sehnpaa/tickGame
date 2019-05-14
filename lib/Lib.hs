@@ -5,6 +5,7 @@ module Lib (module Lib, module Mod) where
 import Control.Lens
 import Data.Text (concat, pack)
 
+import qualified BusinessLogic as BL
 import LensUtils
 import Mod
 
@@ -37,25 +38,10 @@ buyHelper state =
       errorLog
     setOutput = setOutput3 (resources.paperclips) (resources.helpers) errorLog
 
-buyHelper'' :: Seconds -> HelperPrice -> Paperclips -> Helpers -> [ErrorLogLine] -> Either [ErrorLogLine] (Helpers, Paperclips)
-buyHelper'' s price p helpers log =
-  if unHelperPrice price > p
-    then Left $ addToErrorLog (lineNeedMorePaperclips s) log
-    else Right (succ helpers, decPaperclipsWith price p)
-
 buyHelper' :: (Seconds, HelperPrice, Paperclips, Helpers, [ErrorLogLine]) -> (Paperclips, Helpers, [ErrorLogLine])
-buyHelper' (s, hp, pc, helpers, errs )= case buyHelper'' s hp pc helpers errs of
+buyHelper' (s, hp, pc, helpers, errs )= case BL.buyHelper s hp pc helpers errs of
   Left errs' -> (pc, helpers, errs')
   Right (hp', pc') -> (pc', hp', errs)
-
-decPaperclipsWith :: HelperPrice -> Paperclips -> Paperclips
-decPaperclipsWith price paperclips = paperclips - (unHelperPrice price)
-
-addToErrorLog :: ErrorLogLine -> [ErrorLogLine] -> [ErrorLogLine]
-addToErrorLog new existing = existing ++ [new]
-
-lineNeedMorePaperclips :: Seconds -> ErrorLogLine
-lineNeedMorePaperclips s = ErrorLogLine $ Data.Text.concat ["Tick ", pack (show s), ": You need more paperclips."]
 
 plantASeed :: MyState -> MyState
 plantASeed state =
@@ -63,7 +49,7 @@ plantASeed state =
       s' = view seconds state
     in
       if 1 > (unTreeSeeds seeds)
-        then over errorLog (addToErrorLog (lineNeedMoreSeeds s')) state
+        then over errorLog (BL.addToErrorLog (lineNeedMoreSeeds s')) state
         else over (resources.trees) succ $ over (resources.treeSeeds) pred state
 
 lineNeedMoreSeeds :: Seconds -> ErrorLogLine
