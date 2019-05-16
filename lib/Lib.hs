@@ -7,12 +7,20 @@ import LensUtils
 import Mod
 
 nextTick :: MyState -> MyState
-nextTick = addSecond . helperWork
+nextTick = addSecond . helperWork . researchWork
 
 helperWork :: MyState -> MyState
 helperWork state =
   let h = view (resources.helpers) state
   in over (resources.paperclips) (addHelperWork h) state
+
+researchWork :: MyState -> MyState
+researchWork state =
+  case view (research.advancedHelperResearch) state of
+    NotResearched -> state
+    ResearchInProgress 1 -> set (research.advancedHelperResearch) ResearchDone state
+    ResearchInProgress n -> set (research.advancedHelperResearch) (ResearchInProgress (n-1)) state
+    ResearchDone -> state
 
 addHelperWork :: Helpers -> Paperclips -> Paperclips
 addHelperWork h p = Paperclips $ (unPaperclips p) + (unHelpers h) * 2
@@ -24,8 +32,7 @@ createPC :: MyState -> MyState
 createPC = over (resources.paperclips) succ
 
 buyHelper :: MyState -> MyState
-buyHelper state =
-  setOutput state $ buyHelper' $ getInput state
+buyHelper state = setOutput state $ buyHelper' $ getInput state
   where
     getInput = getInput5
       seconds
@@ -39,6 +46,24 @@ buyHelper' :: (Seconds, HelperPrice, Paperclips, Helpers, [ErrorLogLine]) -> (Pa
 buyHelper' (s, hp, pc, helpers, errs )= case BL.buyHelper s hp pc helpers errs of
   Left errs' -> (pc, helpers, errs')
   Right (hp', pc') -> (pc', hp', errs)
+
+researchAdvancedHelper :: MyState -> MyState
+researchAdvancedHelper state = setOutput state $ researchAdvancedHelper' $ getInput state
+  where
+    getInput = getInput4
+      seconds
+      (resources.paperclips)
+      (research.advancedHelperResearch)
+      errorLog
+    setOutput = setOutput3
+      (resources.paperclips)
+      (research.advancedHelperResearch)
+      errorLog
+
+researchAdvancedHelper' :: (Seconds, Paperclips, ResearchProgress, [ErrorLogLine]) -> (Paperclips, ResearchProgress, [ErrorLogLine])
+researchAdvancedHelper' (s, pc, progress, errs)= case BL.researchAdvancedHelper s pc progress errs of
+  Left errs' -> (pc, progress, errs')
+  Right (pc', progress') -> (pc', progress', errs)
 
 plantASeed :: MyState -> MyState
 plantASeed state = setOutput state $ plantASeed' $ getInput state

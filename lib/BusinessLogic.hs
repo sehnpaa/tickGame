@@ -21,6 +21,17 @@ addToErrorLog new existing = existing ++ [new]
 lineNeedMorePaperclips :: Seconds -> ErrorLogLine
 lineNeedMorePaperclips s = ErrorLogLine $ Data.Text.concat ["Tick ", pack (show s), ": You need more paperclips."]
 
+researchAdvancedHelper :: Seconds -> Paperclips -> ResearchProgress -> [ErrorLogLine] -> Either [ErrorLogLine] (Paperclips, ResearchProgress)
+researchAdvancedHelper s p progress errs = let price = 5 in
+  case (price > p, progress) of
+    (True, NotResearched) -> Left $ addToErrorLog (ErrorLogLine "Not enough paperclips") errs
+    (False, NotResearched) -> Right (decPaperclipsWith' price p, ResearchInProgress 20)
+    (_, ResearchInProgress x) -> Left $ addToErrorLog (ErrorLogLine "Already in progress") errs
+    (_, ResearchDone) -> Left $ addToErrorLog (ErrorLogLine "Already done") errs
+
+decPaperclipsWith' :: Paperclips -> Paperclips -> Paperclips
+decPaperclipsWith' price paperclips = paperclips - price
+
 plantASeed :: Seconds -> TreePrice -> TreeSeeds -> Trees -> [ErrorLogLine] -> Either [ErrorLogLine] (TreeSeeds, Trees)
 plantASeed s price seeds trees errs =
   if unTreePrice price > seeds

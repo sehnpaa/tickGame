@@ -219,6 +219,7 @@ data MyEvent
   = Start
   | CreatePC
   | CreateHelper
+  | ResearchAdvancedHelper
   | PlantASeed
   | ExitApplication
   | Tick
