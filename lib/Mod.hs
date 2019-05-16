@@ -117,10 +117,18 @@ instance Show TreeSeeds where
   show (TreeSeeds a) = show a
 
 data ResearchProgress = NotResearched | ResearchInProgress Int | ResearchDone
-  deriving (Eq, Show)
+  deriving (Eq)
+
+instance Show ResearchProgress where
+  show NotResearched = "Not researched"
+  show (ResearchInProgress n) = "Research in progress - " ++ show n ++ " " ++ noun n ++ " left."
+    where
+      noun 1 = "tick"
+      noun n = "ticks"
+  show ResearchDone = "Research done"
 
 data Research = Research
-  { _advancedHelperReseach :: ResearchProgress } deriving Eq
+  { _advancedHelperResearch :: ResearchProgress } deriving Eq
 
 instance Show Research where
   show (Research a) = show a
@@ -185,6 +193,15 @@ treeSeeds f state = (\treeSeeds' -> state { _treeSeeds = treeSeeds'}) <$> f (_tr
 
 viewTreeSeeds :: MyState -> TreeSeeds
 viewTreeSeeds = view (resources.treeSeeds)
+
+research :: Lens' MyState Research
+research f state = (\research' -> state { _research = research'}) <$> f (_research state)
+
+advancedHelperResearch :: Lens' Research ResearchProgress
+advancedHelperResearch f state = (\a -> state { _advancedHelperResearch = a}) <$> f (_advancedHelperResearch state)
+
+viewAdvancedHelperResearch :: MyState -> ResearchProgress
+viewAdvancedHelperResearch = view (research.advancedHelperResearch)
 
 seconds :: Lens' MyState Seconds
 seconds f state = (\seconds' -> state { _seconds = seconds'}) <$> f (_seconds state)
