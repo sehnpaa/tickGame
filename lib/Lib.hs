@@ -88,4 +88,4 @@ initialPrices :: Prices
 initialPrices = Prices (HelperPrice $ Paperclips 10) (TreePrice $ TreeSeeds 1)
 
 getInitialState :: MyState
-getInitialState = MyState (Config initialPrices) [] [] (Research NotResearched) (Resources 0 0 0 10) 0 (IsStarted False)
+getInitialState = MyState (Config initialPrices) [] [] (ResearchAreas NotResearched) (Resources 0 0 0 10) 0 (IsStarted False)

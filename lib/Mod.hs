@@ -10,7 +10,7 @@ data MyState = MyState
   { _config :: Config
   , _actions :: [Action]
   , _errorLog :: [ErrorLogLine]
-  , _research :: Research
+  , _research :: ResearchAreas
   , _resources :: Resources
   , _seconds :: Seconds
   , _isStarted :: IsStarted } deriving (Eq, Show)
@@ -55,8 +55,8 @@ instance Arbitrary TreeSeeds where
 instance Arbitrary Seconds where
   arbitrary = Seconds <$> arbitrary
 
-instance Arbitrary Research where
-  arbitrary = Research <$> arbitrary
+instance Arbitrary ResearchAreas where
+  arbitrary = ResearchAreas <$> arbitrary
 
 instance Arbitrary ResearchProgress where
   arbitrary = do
@@ -127,11 +127,11 @@ instance Show ResearchProgress where
       noun n = "ticks"
   show ResearchDone = "Research done"
 
-data Research = Research
+data ResearchAreas = ResearchAreas
   { _advancedHelperResearch :: ResearchProgress } deriving Eq
 
-instance Show Research where
-  show (Research a) = show a
+instance Show ResearchAreas where
+  show (ResearchAreas a) = show a
 
 newtype Seconds = Seconds { unSeconds :: Integer } deriving (Enum, Eq, Num)
 
@@ -194,10 +194,10 @@ treeSeeds f state = (\treeSeeds' -> state { _treeSeeds = treeSeeds'}) <$> f (_tr
 viewTreeSeeds :: MyState -> TreeSeeds
 viewTreeSeeds = view (resources.treeSeeds)
 
-research :: Lens' MyState Research
+research :: Lens' MyState ResearchAreas
 research f state = (\research' -> state { _research = research'}) <$> f (_research state)
 
-advancedHelperResearch :: Lens' Research ResearchProgress
+advancedHelperResearch :: Lens' ResearchAreas ResearchProgress
 advancedHelperResearch f state = (\a -> state { _advancedHelperResearch = a}) <$> f (_advancedHelperResearch state)
 
 viewAdvancedHelperResearch :: MyState -> ResearchProgress
