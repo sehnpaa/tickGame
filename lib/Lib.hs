@@ -50,18 +50,19 @@ buyHelper' (s, hp, pc, helpers, errs )= case BL.buyHelper s hp pc helpers errs o
 researchAdvancedHelper :: MyState -> MyState
 researchAdvancedHelper state = setOutput state $ researchAdvancedHelper' $ getInput state
   where
-    getInput = getInput4
+    getInput = getInput5
       seconds
       (resources.paperclips)
       (researchAreas.advancedHelperResearch.researchCompProgress)
+      (researchAreas.advancedHelperResearch.researchCompDuration)
       errorLog
     setOutput = setOutput3
       (resources.paperclips)
       (researchAreas.advancedHelperResearch.researchCompProgress)
       errorLog
 
-researchAdvancedHelper' :: (Seconds, Paperclips, ResearchProgress, [ErrorLogLine]) -> (Paperclips, ResearchProgress, [ErrorLogLine])
-researchAdvancedHelper' (s, pc, progress, errs)= case BL.researchAdvancedHelper s pc progress errs of
+researchAdvancedHelper' :: (Seconds, Paperclips, ResearchProgress, Duration, [ErrorLogLine]) -> (Paperclips, ResearchProgress, [ErrorLogLine])
+researchAdvancedHelper' (s, pc, progress, duration, errs) = case BL.researchAdvancedHelper s pc progress duration errs of
   Left errs' -> (pc, progress, errs')
   Right (pc', progress') -> (pc', progress', errs)
 
@@ -88,4 +89,4 @@ initialPrices :: Prices
 initialPrices = Prices (HelperPrice $ Paperclips 10) (TreePrice $ TreeSeeds 1)
 
 getInitialState :: MyState
-getInitialState = MyState (Config initialPrices) [] [] (ResearchAreas (ResearchComp (Duration 20) NotResearched)) (Resources 0 0 0 10) 0 (IsStarted False)
+getInitialState = MyState (Config initialPrices) [] [] (ResearchAreas (ResearchComp (Duration 30) NotResearched)) (Resources 0 0 0 10) 0 (IsStarted False)

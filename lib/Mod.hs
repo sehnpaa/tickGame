@@ -122,7 +122,7 @@ newtype TreeSeeds = TreeSeeds { unTreeSeeds :: Integer } deriving (Enum, Eq, Num
 instance Show TreeSeeds where
   show (TreeSeeds a) = show a
 
-data ResearchProgress = NotResearched | ResearchInProgress Int | ResearchDone
+data ResearchProgress = NotResearched | ResearchInProgress Integer | ResearchDone
   deriving (Eq)
 
 instance Show ResearchProgress where
@@ -215,6 +215,9 @@ researchCompProgress f state = (\progress' -> state { _researchCompProgress = pr
 advancedHelperResearch :: Lens' ResearchAreas ResearchComp
 advancedHelperResearch f state = (\a -> state { _advancedHelperResearch = a}) <$> f (_advancedHelperResearch state)
 
+researchCompDuration :: Lens' ResearchComp Duration
+researchCompDuration f state = (\duration -> state { _researchCompDuration = duration}) <$> f (_researchCompDuration state)
+
 viewAdvancedHelperResearch :: MyState -> ResearchProgress
 viewAdvancedHelperResearch = view (researchAreas.advancedHelperResearch.researchCompProgress)
 
@@ -239,3 +242,6 @@ data MyEvent
   | ExitApplication
   | Tick
   deriving (Eq, Show)
+
+startResearch :: Duration -> ResearchProgress
+startResearch (Duration n) = ResearchInProgress n
