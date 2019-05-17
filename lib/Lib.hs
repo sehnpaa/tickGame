@@ -16,10 +16,10 @@ helperWork state =
 
 researchWork :: MyState -> MyState
 researchWork state =
-  case view (research.advancedHelperResearch) state of
+  case view (researchAreas.advancedHelperResearch.researchCompProgress) state of
     NotResearched -> state
-    ResearchInProgress 1 -> set (research.advancedHelperResearch) ResearchDone state
-    ResearchInProgress n -> set (research.advancedHelperResearch) (ResearchInProgress (n-1)) state
+    ResearchInProgress 1 -> set (researchAreas.advancedHelperResearch.researchCompProgress) ResearchDone state
+    ResearchInProgress n -> set (researchAreas.advancedHelperResearch.researchCompProgress) (ResearchInProgress (n-1)) state
     ResearchDone -> state
 
 addHelperWork :: Helpers -> Paperclips -> Paperclips
@@ -53,11 +53,11 @@ researchAdvancedHelper state = setOutput state $ researchAdvancedHelper' $ getIn
     getInput = getInput4
       seconds
       (resources.paperclips)
-      (research.advancedHelperResearch)
+      (researchAreas.advancedHelperResearch.researchCompProgress)
       errorLog
     setOutput = setOutput3
       (resources.paperclips)
-      (research.advancedHelperResearch)
+      (researchAreas.advancedHelperResearch.researchCompProgress)
       errorLog
 
 researchAdvancedHelper' :: (Seconds, Paperclips, ResearchProgress, [ErrorLogLine]) -> (Paperclips, ResearchProgress, [ErrorLogLine])
@@ -88,4 +88,4 @@ initialPrices :: Prices
 initialPrices = Prices (HelperPrice $ Paperclips 10) (TreePrice $ TreeSeeds 1)
 
 getInitialState :: MyState
-getInitialState = MyState (Config initialPrices) [] [] (ResearchAreas NotResearched) (Resources 0 0 0 10) 0 (IsStarted False)
+getInitialState = MyState (Config initialPrices) [] [] (ResearchAreas (ResearchComp (Duration 20) NotResearched)) (Resources 0 0 0 10) 0 (IsStarted False)

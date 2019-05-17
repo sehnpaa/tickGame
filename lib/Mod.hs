@@ -10,7 +10,7 @@ data MyState = MyState
   { _config :: Config
   , _actions :: [Action]
   , _errorLog :: [ErrorLogLine]
-  , _research :: ResearchAreas
+  , _researchAreas :: ResearchAreas
   , _resources :: Resources
   , _seconds :: Seconds
   , _isStarted :: IsStarted } deriving (Eq, Show)
@@ -57,6 +57,12 @@ instance Arbitrary Seconds where
 
 instance Arbitrary ResearchAreas where
   arbitrary = ResearchAreas <$> arbitrary
+
+instance Arbitrary ResearchComp where
+  arbitrary = ResearchComp <$> arbitrary <*> arbitrary
+
+instance Arbitrary Duration where
+  arbitrary = Duration <$> arbitrary
 
 instance Arbitrary ResearchProgress where
   arbitrary = do
@@ -128,10 +134,16 @@ instance Show ResearchProgress where
   show ResearchDone = "Research done"
 
 data ResearchAreas = ResearchAreas
-  { _advancedHelperResearch :: ResearchProgress } deriving Eq
+  { _advancedHelperResearch :: ResearchComp } deriving Eq
 
 instance Show ResearchAreas where
   show (ResearchAreas a) = show a
+
+data ResearchComp = ResearchComp
+  { _researchCompDuration :: Duration
+  , _researchCompProgress :: ResearchProgress } deriving (Eq, Show)
+
+newtype Duration = Duration { unDuration :: Integer } deriving (Eq, Show)
 
 newtype Seconds = Seconds { unSeconds :: Integer } deriving (Enum, Eq, Num)
 
@@ -194,14 +206,17 @@ treeSeeds f state = (\treeSeeds' -> state { _treeSeeds = treeSeeds'}) <$> f (_tr
 viewTreeSeeds :: MyState -> TreeSeeds
 viewTreeSeeds = view (resources.treeSeeds)
 
-research :: Lens' MyState ResearchAreas
-research f state = (\research' -> state { _research = research'}) <$> f (_research state)
+researchAreas :: Lens' MyState ResearchAreas
+researchAreas f state = (\areas' -> state { _researchAreas = areas'}) <$> f (_researchAreas state)
 
-advancedHelperResearch :: Lens' ResearchAreas ResearchProgress
+researchCompProgress :: Lens' ResearchComp ResearchProgress
+researchCompProgress f state = (\progress' -> state { _researchCompProgress = progress'}) <$> f (_researchCompProgress state)
+
+advancedHelperResearch :: Lens' ResearchAreas ResearchComp
 advancedHelperResearch f state = (\a -> state { _advancedHelperResearch = a}) <$> f (_advancedHelperResearch state)
 
 viewAdvancedHelperResearch :: MyState -> ResearchProgress
-viewAdvancedHelperResearch = view (research.advancedHelperResearch)
+viewAdvancedHelperResearch = view (researchAreas.advancedHelperResearch.researchCompProgress)
 
 seconds :: Lens' MyState Seconds
 seconds f state = (\seconds' -> state { _seconds = seconds'}) <$> f (_seconds state)

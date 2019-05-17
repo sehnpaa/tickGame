@@ -14,13 +14,13 @@ defaultConfig :: Config
 defaultConfig = Config (Prices (HelperPrice $ Paperclips 10) (TreePrice $ TreeSeeds 1))
 
 state1 :: MyState
-state1 = MyState defaultConfig [] [] (ResearchAreas NotResearched) (Resources 0 2 0 100) 0 (IsStarted True)
+state1 = MyState defaultConfig [] [] (ResearchAreas (ResearchComp (Duration 20) NotResearched)) (Resources 0 2 0 100) 0 (IsStarted True)
 
 tests :: TestTree
 tests = testGroup "Tests" [unitTests, qcTests]
 
 unitTests = testGroup "Unit tests"
-  [ testCase "first" $ assertEqual "" (MyState defaultConfig [] [] (ResearchAreas NotResearched) (Resources 4 2 0 100) 1 (IsStarted True)) (nextTick state1)]
+  [ testCase "first" $ assertEqual "" (MyState defaultConfig [] [] (ResearchAreas (ResearchComp (Duration 20) NotResearched)) (Resources 4 2 0 100) 1 (IsStarted True)) (nextTick state1)]
 
 qcTests = testGroup "QuickCheck tests"
   [ QC.testProperty "addSecond" $ QC.withMaxSuccess 1000 $ \state ->
