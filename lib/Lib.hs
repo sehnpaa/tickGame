@@ -12,18 +12,19 @@ nextTick = addSecond . helperWork . researchWork
 helperWork :: MyState -> MyState
 helperWork state =
   let h = view (resources.helpers) state
-  in over (resources.paperclips) (addHelperWork h) state
+      inc = view (config.constants.helperInc) state
+  in over (resources.paperclips) (addHelperWork inc h) state
 
 researchWork :: MyState -> MyState
 researchWork state =
   case view (researchAreas.advancedHelperResearch.researchCompProgress) state of
     NotResearched -> state
-    ResearchInProgress 1 -> set (researchAreas.advancedHelperResearch.researchCompProgress) ResearchDone state
+    ResearchInProgress 1 -> set (researchAreas.advancedHelperResearch.researchCompProgress) ResearchDone $ over (config.constants.helperInc) (\(HelperInc inc) -> HelperInc (inc * 2)) state
     ResearchInProgress n -> set (researchAreas.advancedHelperResearch.researchCompProgress) (ResearchInProgress (n-1)) state
     ResearchDone -> state
 
-addHelperWork :: Helpers -> Paperclips -> Paperclips
-addHelperWork h p = Paperclips $ (unPaperclips p) + (unHelpers h) * 2
+addHelperWork :: HelperInc -> Helpers -> Paperclips -> Paperclips
+addHelperWork inc h p = Paperclips $ (unPaperclips p) + (unHelpers h) * (unHelpers $ unHelperInc inc)
 
 addSecond :: MyState -> MyState
 addSecond = over seconds succ
@@ -34,17 +35,16 @@ createPC = over (resources.paperclips) succ
 buyHelper :: MyState -> MyState
 buyHelper state = setOutput state $ buyHelper' $ getInput state
   where
-    getInput = getInput6
+    getInput = getInput5
       seconds
-      (config.constants.helperInc)
       (config.prices.helperPrices)
       (resources.paperclips)
       (resources.helpers)
       errorLog
     setOutput = setOutput3 (resources.paperclips) (resources.helpers) errorLog
 
-buyHelper' :: (Seconds, HelperInc, HelperPrice, Paperclips, Helpers, [ErrorLogLine]) -> (Paperclips, Helpers, [ErrorLogLine])
-buyHelper' (s, inc, hp, pc, helpers, errs )= case BL.buyHelper s inc hp pc helpers errs of
+buyHelper' :: (Seconds, HelperPrice, Paperclips, Helpers, [ErrorLogLine]) -> (Paperclips, Helpers, [ErrorLogLine])
+buyHelper' (s, hp, pc, helpers, errs )= case BL.buyHelper s hp pc helpers errs of
   Left errs' -> (pc, helpers, errs')
   Right (hp', pc') -> (pc', hp', errs)
 
@@ -91,4 +91,4 @@ initialPrices :: Prices
 initialPrices = Prices (AdvancedHelperPrice $ Paperclips 5) (HelperPrice $ Paperclips 10) (TreePrice $ TreeSeeds 1)
 
 getInitialState :: MyState
-getInitialState = MyState (Config (Constants (HelperInc 1)) initialPrices) [] [] (ResearchAreas (ResearchComp (Duration 30) NotResearched)) (Resources 0 0 0 10) 0 (IsStarted False)
+getInitialState = MyState (Config (Constants (HelperInc 1)) initialPrices) [] [] (ResearchAreas (ResearchComp (Duration 10) NotResearched)) (Resources 0 0 0 10) 0 (IsStarted False)

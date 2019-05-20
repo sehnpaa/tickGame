@@ -6,11 +6,11 @@ import Data.Text (concat, pack)
 
 import Mod
 
-buyHelper :: Seconds -> HelperInc -> HelperPrice -> Paperclips -> Helpers -> [ErrorLogLine] -> Either [ErrorLogLine] (Helpers, Paperclips)
-buyHelper s (HelperInc inc) (HelperPrice price) p helpers log =
+buyHelper :: Seconds -> HelperPrice -> Paperclips -> Helpers -> [ErrorLogLine] -> Either [ErrorLogLine] (Helpers, Paperclips)
+buyHelper s (HelperPrice price) p helpers log =
   if price > p
     then Left $ addToErrorLog (lineNeedMorePaperclips s) log
-    else Right (incHelpersWith inc helpers, decPaperclipsWith price p)
+    else Right (succ helpers, decPaperclipsWith price p)
 
 addToErrorLog :: ErrorLogLine -> [ErrorLogLine] -> [ErrorLogLine]
 addToErrorLog new existing = existing ++ [new]
@@ -28,9 +28,6 @@ researchAdvancedHelper s p (AdvancedHelperPrice price) progress duration errs =
 
 decPaperclipsWith :: Paperclips -> Paperclips -> Paperclips
 decPaperclipsWith price paperclips = paperclips - price
-
-incHelpersWith :: Helpers -> Helpers -> Helpers
-incHelpersWith inc helpers = helpers + inc
 
 plantASeed :: Seconds -> TreePrice -> TreeSeeds -> Trees -> [ErrorLogLine] -> Either [ErrorLogLine] (TreeSeeds, Trees)
 plantASeed s price seeds trees errs =
