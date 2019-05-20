@@ -20,7 +20,13 @@ instance Arbitrary MyState where
                       <*> arbitrary <*> arbitrary <*> arbitrary
 
 instance Arbitrary Config where
-  arbitrary = Config <$> arbitrary
+  arbitrary = Config <$> arbitrary <*> arbitrary
+
+instance Arbitrary Constants where
+  arbitrary = Constants <$> arbitrary
+
+instance Arbitrary HelperInc where
+  arbitrary = HelperInc <$> arbitrary
 
 instance Arbitrary Prices where
   arbitrary = Prices <$> arbitrary <*> arbitrary <*> arbitrary
@@ -82,7 +88,13 @@ instance Arbitrary Text where
   arbitrary = pack <$> arbitrary
 
 data Config = Config
-  { _prices :: Prices } deriving (Eq, Show)
+  { _constants :: Constants
+  , _prices :: Prices } deriving (Eq, Show)
+
+data Constants = Constants
+  { _helperInc :: HelperInc } deriving (Eq, Show)
+
+newtype HelperInc = HelperInc { unHelperInc :: Helpers } deriving (Eq, Show)
 
 data Prices = Prices
   { _advancedHelperPrice :: AdvancedHelperPrice
@@ -163,6 +175,12 @@ instance Show IsStarted where
 
 config :: Lens' MyState Config
 config f state = (\config' -> state { _config = config'}) <$> f (_config state)
+
+constants :: Lens' Config Constants
+constants f state = (\constants' -> state { _constants = constants'}) <$> f (_constants state)
+
+helperInc :: Lens' Constants HelperInc
+helperInc f state = (\inc' -> state { _helperInc = inc'}) <$> f (_helperInc state)
 
 prices :: Lens' Config Prices
 prices f state = (\prices' -> state { _prices = prices'}) <$> f (_prices state)

@@ -34,16 +34,17 @@ createPC = over (resources.paperclips) succ
 buyHelper :: MyState -> MyState
 buyHelper state = setOutput state $ buyHelper' $ getInput state
   where
-    getInput = getInput5
+    getInput = getInput6
       seconds
+      (config.constants.helperInc)
       (config.prices.helperPrices)
       (resources.paperclips)
       (resources.helpers)
       errorLog
     setOutput = setOutput3 (resources.paperclips) (resources.helpers) errorLog
 
-buyHelper' :: (Seconds, HelperPrice, Paperclips, Helpers, [ErrorLogLine]) -> (Paperclips, Helpers, [ErrorLogLine])
-buyHelper' (s, hp, pc, helpers, errs )= case BL.buyHelper s hp pc helpers errs of
+buyHelper' :: (Seconds, HelperInc, HelperPrice, Paperclips, Helpers, [ErrorLogLine]) -> (Paperclips, Helpers, [ErrorLogLine])
+buyHelper' (s, inc, hp, pc, helpers, errs )= case BL.buyHelper s inc hp pc helpers errs of
   Left errs' -> (pc, helpers, errs')
   Right (hp', pc') -> (pc', hp', errs)
 
@@ -90,4 +91,4 @@ initialPrices :: Prices
 initialPrices = Prices (AdvancedHelperPrice $ Paperclips 5) (HelperPrice $ Paperclips 10) (TreePrice $ TreeSeeds 1)
 
 getInitialState :: MyState
-getInitialState = MyState (Config initialPrices) [] [] (ResearchAreas (ResearchComp (Duration 30) NotResearched)) (Resources 0 0 0 10) 0 (IsStarted False)
+getInitialState = MyState (Config (Constants (HelperInc 1)) initialPrices) [] [] (ResearchAreas (ResearchComp (Duration 30) NotResearched)) (Resources 0 0 0 10) 0 (IsStarted False)

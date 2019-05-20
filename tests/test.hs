@@ -11,7 +11,7 @@ import Lib
 main = defaultMain tests
 
 defaultConfig :: Config
-defaultConfig = Config (Prices (AdvancedHelperPrice $ Paperclips 5) (HelperPrice $ Paperclips 10) (TreePrice $ TreeSeeds 1))
+defaultConfig = Config (Constants (HelperInc 1)) (Prices (AdvancedHelperPrice $ Paperclips 5) (HelperPrice $ Paperclips 10) (TreePrice $ TreeSeeds 1))
 
 state1 :: MyState
 state1 = MyState defaultConfig [] [] (ResearchAreas (ResearchComp (Duration 20) NotResearched)) (Resources 0 2 0 100) 0 (IsStarted True)
