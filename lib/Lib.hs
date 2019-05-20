@@ -10,10 +10,17 @@ nextTick :: MyState -> MyState
 nextTick = addSecond . helperWork . researchWork
 
 helperWork :: MyState -> MyState
-helperWork state =
-  let h = view (resources.helpers) state
-      inc = view (config.constants.helperInc) state
-  in over (resources.paperclips) (addHelperWork inc h) state
+helperWork state = setOutput state $ helperWork' $ getInput state
+  where
+    getInput = getInput4
+      (resources.paperclips)
+      (resources.helpers)
+      (config.constants.helperInc)
+      (resources.storage)
+    setOutput = setOutput1 (resources.paperclips)
+
+helperWork' :: (Paperclips, Helpers, HelperInc, Storage) -> Paperclips
+helperWork' (p, h, inc, storage) = BL.helperWork p h inc storage
 
 researchWork :: MyState -> MyState
 researchWork state =
@@ -22,9 +29,6 @@ researchWork state =
     ResearchInProgress 1 -> set (researchAreas.advancedHelperResearch.researchCompProgress) ResearchDone $ over (config.constants.helperInc) (\(HelperInc inc) -> HelperInc (inc * 2)) state
     ResearchInProgress n -> set (researchAreas.advancedHelperResearch.researchCompProgress) (ResearchInProgress (n-1)) state
     ResearchDone -> state
-
-addHelperWork :: HelperInc -> Helpers -> Paperclips -> Paperclips
-addHelperWork inc h p = Paperclips $ (unPaperclips p) + (unHelpers h) * (unHelpers $ unHelperInc inc)
 
 addSecond :: MyState -> MyState
 addSecond = over seconds succ
@@ -44,7 +48,7 @@ buyHelper state = setOutput state $ buyHelper' $ getInput state
     setOutput = setOutput3 (resources.paperclips) (resources.helpers) errorLog
 
 buyHelper' :: (Seconds, HelperPrice, Paperclips, Helpers, [ErrorLogLine]) -> (Paperclips, Helpers, [ErrorLogLine])
-buyHelper' (s, hp, pc, helpers, errs )= case BL.buyHelper s hp pc helpers errs of
+buyHelper' (s, hp, pc, helpers, errs) = case BL.buyHelper s hp pc helpers errs of
   Left errs' -> (pc, helpers, errs')
   Right (hp', pc') -> (pc', hp', errs)
 
@@ -91,4 +95,4 @@ initialPrices :: Prices
 initialPrices = Prices (AdvancedHelperPrice $ Paperclips 5) (HelperPrice $ Paperclips 10) (TreePrice $ TreeSeeds 1)
 
 getInitialState :: MyState
-getInitialState = MyState (Config (Constants (HelperInc 1)) initialPrices) [] [] (ResearchAreas (ResearchComp (Duration 10) NotResearched)) (Resources 0 0 0 10) 0 (IsStarted False)
+getInitialState = MyState (Config (Constants (HelperInc 1)) initialPrices) [] [] (ResearchAreas (ResearchComp (Duration 10) NotResearched)) (Resources 0 0 (Storage 1000) 0 10) 0 (IsStarted False)

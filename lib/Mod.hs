@@ -50,10 +50,13 @@ instance Arbitrary ErrorLogLine where
   arbitrary = ErrorLogLine <$> arbitrary
 
 instance Arbitrary Resources where
-  arbitrary = Resources <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
+  arbitrary = Resources <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
 
 instance Arbitrary Paperclips where
   arbitrary = Paperclips <$> arbitrary
+
+instance Arbitrary Storage where
+  arbitrary = Storage <$> arbitrary
 
 instance Arbitrary Trees where
   arbitrary = Trees <$> arbitrary
@@ -117,6 +120,7 @@ instance Show ErrorLogLine where
 data Resources = Resources
   { _paperclips :: Paperclips
   , _helpers :: Helpers
+  , _storage :: Storage
   , _trees :: Trees
   , _treeSeeds :: TreeSeeds } deriving (Eq, Show)
 
@@ -129,6 +133,11 @@ newtype Helpers = Helpers { unHelpers :: Integer } deriving (Enum, Eq, Num, Ord)
 
 instance Show Helpers where
   show (Helpers a) = show a
+
+newtype Storage = Storage { unStorage :: Integer } deriving (Eq)
+
+instance Show Storage where
+  show (Storage a) = show a
 
 newtype Trees = Trees { unTrees :: Integer } deriving (Enum, Eq, Num, Ord)
 
@@ -148,7 +157,7 @@ instance Show ResearchProgress where
   show (ResearchInProgress n) = "Research in progress - " ++ show n ++ " " ++ noun n ++ " left."
     where
       noun 1 = "tick"
-      noun n = "ticks"
+      noun _ = "ticks"
   show ResearchDone = "Research done"
 
 data ResearchAreas = ResearchAreas
@@ -220,6 +229,12 @@ helpers f state = (\helpers' -> state { _helpers = helpers'}) <$> f (_helpers st
 
 viewHelpers :: MyState -> Helpers
 viewHelpers = view (resources.helpers)
+
+storage :: Lens' Resources Storage
+storage f state = (\storage' -> state { _storage = storage'}) <$> f (_storage state)
+
+viewStorage :: MyState -> Storage
+viewStorage = view (resources.storage)
 
 trees :: Lens' Resources Trees
 trees f state = (\trees' -> state { _trees = trees'}) <$> f (_trees state)

@@ -6,6 +6,12 @@ import Data.Text (concat, pack)
 
 import Mod
 
+helperWork :: Paperclips -> Helpers -> HelperInc -> Storage -> Paperclips
+helperWork p h inc storage = Paperclips $ min (unStorage storage) $ (unPaperclips $ addHelperWork inc h p)
+
+addHelperWork :: HelperInc -> Helpers -> Paperclips -> Paperclips
+addHelperWork inc h p = Paperclips $ (unPaperclips p) + (unHelpers h) * (unHelpers $ unHelperInc inc)
+
 buyHelper :: Seconds -> HelperPrice -> Paperclips -> Helpers -> [ErrorLogLine] -> Either [ErrorLogLine] (Helpers, Paperclips)
 buyHelper s (HelperPrice price) p helpers log =
   if price > p
