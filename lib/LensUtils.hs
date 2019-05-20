@@ -47,6 +47,23 @@ getInput5 f1 f2 f3 f4 f5 s =
   , view f4 s
   , view f5 s )
 
+getInput6
+  :: Getting a s a
+  -> Getting b s b
+  -> Getting c s c
+  -> Getting d s d
+  -> Getting e s e
+  -> Getting f s f
+  -> s
+  -> (a, b, c, d, e, f)
+getInput6 f1 f2 f3 f4 f5 f6 s =
+  ( view f1 s
+  , view f2 s
+  , view f3 s
+  , view f4 s
+  , view f5 s
+  , view f6 s )
+
 setOutput1 :: ASetter' s a -> s -> a -> s
 setOutput1 f1 s a = set f1 a s
 

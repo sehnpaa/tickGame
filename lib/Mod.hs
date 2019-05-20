@@ -23,7 +23,10 @@ instance Arbitrary Config where
   arbitrary = Config <$> arbitrary
 
 instance Arbitrary Prices where
-  arbitrary = Prices <$> arbitrary <*> arbitrary
+  arbitrary = Prices <$> arbitrary <*> arbitrary <*> arbitrary
+
+instance Arbitrary AdvancedHelperPrice where
+  arbitrary = AdvancedHelperPrice <$> arbitrary
 
 instance Arbitrary HelperPrice where
   arbitrary = HelperPrice <$> arbitrary
@@ -82,8 +85,11 @@ data Config = Config
   { _prices :: Prices } deriving (Eq, Show)
 
 data Prices = Prices
-  { _helperPrice :: HelperPrice
+  { _advancedHelperPrice :: AdvancedHelperPrice
+  , _helperPrice :: HelperPrice
   , _treePrice :: TreePrice } deriving (Eq, Show)
+
+newtype AdvancedHelperPrice = AdvancedHelperPrice { unAdvancedHelperPrice :: Paperclips } deriving (Eq, Show)
 
 newtype HelperPrice = HelperPrice { unHelperPrice :: Paperclips } deriving (Eq, Show)
 
@@ -160,6 +166,9 @@ config f state = (\config' -> state { _config = config'}) <$> f (_config state)
 
 prices :: Lens' Config Prices
 prices f state = (\prices' -> state { _prices = prices'}) <$> f (_prices state)
+
+advancedHelperPrice :: Lens' Prices AdvancedHelperPrice
+advancedHelperPrice f state = (\price' -> state { _advancedHelperPrice = price'}) <$> f (_advancedHelperPrice state)
 
 helperPrices :: Lens' Prices HelperPrice
 helperPrices f state = (\helperPrice' -> state { _helperPrice = helperPrice'}) <$> f (_helperPrice state)
