@@ -44,7 +44,11 @@ instance Arbitrary Helpers where
   arbitrary = Helpers <$> arbitrary
 
 instance Arbitrary Action where
-  arbitrary = Action <$> arbitrary
+  arbitrary = do
+    r <- Test.Tasty.QuickCheck.elements [SetHP undefined, SetP undefined]
+    case r of
+      SetHP _ -> SetHP <$> arbitrary
+      SetP _ -> SetP <$> arbitrary
 
 instance Arbitrary ErrorLogLine where
   arbitrary = ErrorLogLine <$> arbitrary
@@ -53,19 +57,19 @@ instance Arbitrary Resources where
   arbitrary = Resources <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
 
 instance Arbitrary Paperclips where
-  arbitrary = Paperclips <$> arbitrary
+  arbitrary = Paperclips . getNonNegative <$> arbitrary
 
 instance Arbitrary Storage where
-  arbitrary = Storage <$> arbitrary
+  arbitrary = Storage . getNonNegative <$> arbitrary
 
 instance Arbitrary Trees where
-  arbitrary = Trees <$> arbitrary
+  arbitrary = Trees . getNonNegative <$> arbitrary
 
 instance Arbitrary TreeSeeds where
-  arbitrary = TreeSeeds <$> arbitrary
+  arbitrary = TreeSeeds . getNonNegative <$> arbitrary
 
 instance Arbitrary Seconds where
-  arbitrary = Seconds <$> arbitrary
+  arbitrary = Seconds . getNonNegative <$> arbitrary
 
 instance Arbitrary ResearchAreas where
   arbitrary = ResearchAreas <$> arbitrary
@@ -74,7 +78,7 @@ instance Arbitrary ResearchComp where
   arbitrary = ResearchComp <$> arbitrary <*> arbitrary
 
 instance Arbitrary Duration where
-  arbitrary = Duration <$> arbitrary
+  arbitrary = Duration . getNonNegative <$> arbitrary
 
 instance Arbitrary ResearchProgress where
   arbitrary = do
@@ -110,7 +114,12 @@ newtype HelperPrice = HelperPrice { unHelperPrice :: Paperclips } deriving (Eq, 
 
 newtype TreePrice = TreePrice { unTreePrice :: TreeSeeds } deriving (Eq, Show)
 
-newtype Action = Action { unAction :: ()} deriving (Eq, Show)
+-- newtype Action = Action { unAction :: ()} deriving (Eq, Show)
+
+data Action
+  = SetHP (Helpers, Paperclips)
+  | SetP Paperclips
+  deriving (Eq, Show)
 
 newtype ErrorLogLine = ErrorLogLine { unErrorLogLine :: Text } deriving (Eq)
 

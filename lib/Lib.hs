@@ -7,20 +7,32 @@ import LensUtils
 import Mod
 
 nextTick :: MyState -> MyState
-nextTick = addSecond . helperWork . researchWork
+nextTick = handleActions . addSecond . helperWork . researchWork
+
+handleActions :: MyState -> MyState
+handleActions state = let as = view actions state
+  in
+    set actions [] $ foldr applyAction state as
+
+applyAction :: Action -> MyState -> MyState
+applyAction (SetHP (h, p)) state = set (resources.paperclips) p $ set (resources.helpers) h state
+applyAction (SetP p) state = set (resources.paperclips) p state
 
 helperWork :: MyState -> MyState
-helperWork state = setOutput state $ helperWork' $ getInput state
+helperWork state = setOutput state $ gg SetP (view actions state) $ helperWork' $ getInput state
   where
     getInput = getInput4
       (resources.paperclips)
       (resources.helpers)
       (config.constants.helperInc)
       (resources.storage)
-    setOutput = setOutput1 (resources.paperclips)
+    setOutput = setOutput1 actions
 
 helperWork' :: (Paperclips, Helpers, HelperInc, Storage) -> Paperclips
 helperWork' (p, h, inc, storage) = BL.helperWork p h inc storage
+
+gg :: (a -> Action) -> [Action] -> a -> [Action]
+gg f as p = f p : as
 
 researchWork :: MyState -> MyState
 researchWork state =
@@ -37,7 +49,7 @@ createPC :: MyState -> MyState
 createPC = over (resources.paperclips) succ
 
 buyHelper :: MyState -> MyState
-buyHelper state = setOutput state $ buyHelper' $ getInput state
+buyHelper state = handleActions $ setOutput state $ ggWithErrs SetHP (view actions state) $ buyHelper' $ getInput state
   where
     getInput = getInput5
       seconds
@@ -45,12 +57,15 @@ buyHelper state = setOutput state $ buyHelper' $ getInput state
       (resources.paperclips)
       (resources.helpers)
       errorLog
-    setOutput = setOutput3 (resources.paperclips) (resources.helpers) errorLog
+    -- setOutput = setOutput3 (resources.paperclips) (resources.helpers) errorLog
+    setOutput = setOutput2 actions errorLog
 
-buyHelper' :: (Seconds, HelperPrice, Paperclips, Helpers, [ErrorLogLine]) -> (Paperclips, Helpers, [ErrorLogLine])
+ggWithErrs f as (x,errs) = (f x : as, errs)
+
+buyHelper' :: (Seconds, HelperPrice, Paperclips, Helpers, [ErrorLogLine]) -> ((Helpers, Paperclips), [ErrorLogLine])
 buyHelper' (s, hp, pc, helpers, errs) = case BL.buyHelper s hp pc helpers errs of
-  Left errs' -> (pc, helpers, errs')
-  Right (hp', pc') -> (pc', hp', errs)
+  Left errs' -> ((helpers, pc), errs')
+  Right actions' -> (actions', errs)
 
 researchAdvancedHelper :: MyState -> MyState
 researchAdvancedHelper state = setOutput state $ researchAdvancedHelper' $ getInput state
