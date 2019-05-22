@@ -12,10 +12,10 @@ helperWork p h inc storage = Paperclips $ min (unStorage storage) $ (unPaperclip
 addHelperWork :: HelperInc -> Helpers -> Paperclips -> Paperclips
 addHelperWork inc h p = Paperclips $ (unPaperclips p) + (unHelpers h) * (unHelpers $ unHelperInc inc)
 
-buyHelper :: Seconds -> HelperPrice -> Paperclips -> Helpers -> [ErrorLogLine] -> Either [ErrorLogLine] (Helpers, Paperclips)
-buyHelper s (HelperPrice price) p helpers log =
+buyHelper :: Seconds -> HelperPrice -> Paperclips -> Helpers -> Either ErrorLogLine (Helpers, Paperclips)
+buyHelper s (HelperPrice price) p helpers =
   if price > p
-    then Left $ addToErrorLog (lineNeedMorePaperclips s) log
+    then Left (lineNeedMorePaperclips s)
     else Right (succ helpers, decPaperclipsWith price p)
 
 addToErrorLog :: ErrorLogLine -> [ErrorLogLine] -> [ErrorLogLine]
