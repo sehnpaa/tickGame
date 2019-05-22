@@ -64,6 +64,36 @@ getInput6 f1 f2 f3 f4 f5 f6 s =
   , view f5 s
   , view f6 s )
 
+arg4
+  :: (a -> b -> c -> d -> e)
+  -> Getting a s a
+  -> Getting b s b
+  -> Getting c s c
+  -> Getting d s d
+  -> s
+  -> e
+arg4 f f1 f2 f3 f4 s = uncurry4 f $ getInput4 f1 f2 f3 f4 s
+
+arg5
+  :: (a -> b -> c -> d -> e -> f)
+  -> Getting a s a
+  -> Getting b s b
+  -> Getting c s c
+  -> Getting d s d
+  -> Getting e s e
+  -> s
+  -> f
+arg5 f f1 f2 f3 f4 f5 s = uncurry5 f $ getInput5 f1 f2 f3 f4 f5 s
+
+uncurry3 :: (a -> b -> c -> d) -> ((a, b, c) -> d)
+uncurry3 f (a,b,c) = f a b c
+
+uncurry4 :: (a -> b -> c -> d -> e) -> ((a, b, c, d) -> e)
+uncurry4 f (a,b,c,d) = f a b c d
+
+uncurry5 :: (a -> b -> c -> d -> e -> f) -> ((a, b, c, d, e) -> f)
+uncurry5 f (a,b,c,d,e) = f a b c d e
+
 setOutput1 :: ASetter' s a -> s -> a -> s
 setOutput1 f1 s a = set f1 a s
 

@@ -20,27 +20,22 @@ applyAction (SetP p) state = set (resources.paperclips) p state
 applyAction (SetH h) state = set (resources.helpers) h state
 applyAction (SetE err) state = over errorLog (\errs -> err : errs) state
 applyAction (SetR r) state = set (researchAreas.advancedHelperResearch.researchCompProgress) r state
+applyAction (SetTreeSeeds s) state = set (resources.treeSeeds) s state
+applyAction (SetTrees t) state = set (resources.trees) t state
 
 helperWork :: MyState -> MyState
-helperWork state = addActions state $ (singleton . SetP) $ uncurry4 BL.helperWork $ getInput state
-  where
-    getInput = getInput4
+helperWork state
+  = addActions state
+  $ (singleton . SetP)
+  $ arg4 BL.helperWork
       (resources.paperclips)
       (resources.helpers)
       (config.constants.helperInc)
       (resources.storage)
+      state
 
 singleton :: a -> [a]
 singleton = (:[])
-
-uncurry3 :: (a -> b -> c -> d) -> ((a, b, c) -> d)
-uncurry3 f (a,b,c) = f a b c
-
-uncurry4 :: (a -> b -> c -> d -> e) -> ((a, b, c, d) -> e)
-uncurry4 f (a,b,c,d) = f a b c d
-
-uncurry5 :: (a -> b -> c -> d -> e -> f) -> ((a, b, c, d, e) -> f)
-uncurry5 f (a,b,c,d,e) = f a b c d e
 
 researchWork :: MyState -> MyState
 researchWork state =
@@ -57,35 +52,39 @@ createPC :: MyState -> MyState
 createPC = over (resources.paperclips) succ
 
 buyHelper :: MyState -> MyState
-buyHelper state = handleActions $ addActions state $ bifoldMap (singleton . SetE) (\(h,p) -> SetH h : SetP p : []) $ uncurry4 BL.buyHelper $ getInput state
-  where
-    getInput = getInput4
+buyHelper state
+  = handleActions
+  $ addActions state
+  $ bifoldMap (singleton . SetE) (\(h,p) -> SetH h : SetP p : [])
+  $ arg4 BL.buyHelper
       seconds
       (config.prices.helperPrices)
       (resources.paperclips)
       (resources.helpers)
+      state
 
 addActions :: MyState -> [Action] -> MyState
 addActions state newActions = over actions (\as -> newActions ++ as) state
 
 researchAdvancedHelper :: MyState -> MyState
-researchAdvancedHelper state = handleActions $ addActions state $ bifoldMap (singleton . SetE) (\(p,r) -> SetP p : SetR r : []) $ uncurry5 BL.researchAdvancedHelper $ getInput state
-  where
-    getInput = getInput5
+researchAdvancedHelper state
+  = handleActions
+  $ addActions state
+  $ bifoldMap (singleton . SetE) (\(p,r) -> SetP p : SetR r : [])
+  $ arg5 BL.researchAdvancedHelper
       seconds
       (resources.paperclips)
       (config.prices.advancedHelperPrice)
       (researchAreas.advancedHelperResearch.researchCompProgress)
       (researchAreas.advancedHelperResearch.researchCompDuration)
+      state
 
 plantASeed :: MyState -> MyState
-plantASeed state = handleActions $ addActions state $ bifoldMap (singleton . SetE) (\(s,t) -> SetTreeSeeds s : SetTrees t : []) $ uncurry4 BL.plantASeed $ getInput state
-  where
-    getInput = getInput4
-      seconds
-      (config.prices.treePrice)
-      (resources.treeSeeds)
-      (resources.trees)
+plantASeed state
+  = handleActions
+  $ addActions state
+  $ bifoldMap (singleton . SetE) (\(s,t) -> SetTreeSeeds s : SetTrees t : [])
+  $ arg4 BL.plantASeed seconds (config.prices.treePrice) (resources.treeSeeds) (resources.trees) state
 
 setStarted :: MyState -> MyState
 setStarted = over isStarted (const $ IsStarted True)
