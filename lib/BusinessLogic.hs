@@ -18,27 +18,24 @@ buyHelper s (HelperPrice price) p helpers =
     then Left (lineNeedMorePaperclips s)
     else Right (succ helpers, decPaperclipsWith price p)
 
-addToErrorLog :: ErrorLogLine -> [ErrorLogLine] -> [ErrorLogLine]
-addToErrorLog new existing = existing ++ [new]
-
 lineNeedMorePaperclips :: Seconds -> ErrorLogLine
 lineNeedMorePaperclips s = ErrorLogLine $ Data.Text.concat ["Tick ", pack (show s), ": You need more paperclips."]
 
-researchAdvancedHelper :: Seconds -> Paperclips -> AdvancedHelperPrice -> ResearchProgress -> Duration -> [ErrorLogLine] -> Either [ErrorLogLine] (Paperclips, ResearchProgress)
-researchAdvancedHelper s p (AdvancedHelperPrice price) progress duration errs =
+researchAdvancedHelper :: Seconds -> Paperclips -> AdvancedHelperPrice -> ResearchProgress -> Duration -> Either ErrorLogLine (Paperclips, ResearchProgress)
+researchAdvancedHelper s p (AdvancedHelperPrice price) progress duration =
   case (price > p, progress) of
-    (True, NotResearched) -> Left $ addToErrorLog (ErrorLogLine "Not enough paperclips") errs
+    (True, NotResearched) -> Left $ ErrorLogLine "Not enough paperclips"
     (False, NotResearched) -> Right (decPaperclipsWith price p, startResearch duration)
-    (_, ResearchInProgress x) -> Left $ addToErrorLog (ErrorLogLine "Already in progress") errs
-    (_, ResearchDone) -> Left $ addToErrorLog (ErrorLogLine "Already done") errs
+    (_, ResearchInProgress x) -> Left $ ErrorLogLine "Already in progress"
+    (_, ResearchDone) -> Left $ ErrorLogLine "Already done"
 
 decPaperclipsWith :: Paperclips -> Paperclips -> Paperclips
 decPaperclipsWith price paperclips = paperclips - price
 
-plantASeed :: Seconds -> TreePrice -> TreeSeeds -> Trees -> [ErrorLogLine] -> Either [ErrorLogLine] (TreeSeeds, Trees)
-plantASeed s price seeds trees errs =
+plantASeed :: Seconds -> TreePrice -> TreeSeeds -> Trees -> Either ErrorLogLine (TreeSeeds, Trees)
+plantASeed s price seeds trees =
   if unTreePrice price > seeds
-    then Left $ addToErrorLog (lineNeedMoreSeeds s) errs
+    then Left $ lineNeedMoreSeeds s
     else Right (decSeedsWith price seeds, succ trees)
 
 lineNeedMoreSeeds :: Seconds -> ErrorLogLine

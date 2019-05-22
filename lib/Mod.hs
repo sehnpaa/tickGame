@@ -45,11 +45,14 @@ instance Arbitrary Helpers where
 
 instance Arbitrary Action where
   arbitrary = do
-    r <- Test.Tasty.QuickCheck.elements [SetP undefined, SetH undefined, SetP undefined]
+    r <- Test.Tasty.QuickCheck.elements [SetP undefined, SetH undefined, SetE undefined, SetR undefined, SetTreeSeeds undefined, SetTrees undefined]
     case r of
       SetP _ -> SetP <$> arbitrary
       SetH _ -> SetH <$> arbitrary
       SetE _ -> SetE <$> arbitrary
+      SetR _ -> SetR <$> arbitrary
+      SetTreeSeeds _ -> SetTreeSeeds <$> arbitrary
+      SetTrees _ -> SetTrees <$> arbitrary
 
 instance Arbitrary ErrorLogLine where
   arbitrary = ErrorLogLine <$> arbitrary
@@ -115,13 +118,13 @@ newtype HelperPrice = HelperPrice { unHelperPrice :: Paperclips } deriving (Eq, 
 
 newtype TreePrice = TreePrice { unTreePrice :: TreeSeeds } deriving (Eq, Show)
 
--- newtype Action = Action { unAction :: ()} deriving (Eq, Show)
-
 data Action
-  -- = SetHP (Helpers, Paperclips)
   = SetP Paperclips
   | SetH Helpers
   | SetE ErrorLogLine
+  | SetR ResearchProgress
+  | SetTreeSeeds TreeSeeds
+  | SetTrees Trees
   deriving (Eq, Show)
 
 newtype ErrorLogLine = ErrorLogLine { unErrorLogLine :: Text } deriving (Eq)
