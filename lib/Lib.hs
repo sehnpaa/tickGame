@@ -1,5 +1,6 @@
 module Lib (module Lib, module Mod) where
 
+import Data.Bifoldable (bifoldMap)
 import Control.Lens
 
 import qualified BusinessLogic as BL
@@ -20,23 +21,19 @@ applyAction (SetH h) state = set (resources.helpers) h state
 applyAction (SetE err) state = over errorLog (\errs -> err : errs) state
 
 helperWork :: MyState -> MyState
-helperWork state = setOutput state $ gg SetP (view actions state) $ uncurry4 BL.helperWork $ getInput state
+helperWork state = addActions state $ (:[]) $ SetP $ uncurry4 BL.helperWork $ getInput state
   where
     getInput = getInput4
       (resources.paperclips)
       (resources.helpers)
       (config.constants.helperInc)
       (resources.storage)
-    setOutput = setOutput1 actions
 
 uncurry3 :: (a -> b -> c -> d) -> ((a, b, c) -> d)
 uncurry3 f (a,b,c) = f a b c
 
 uncurry4 :: (a -> b -> c -> d -> e) -> ((a, b, c, d) -> e)
 uncurry4 f (a,b,c,d) = f a b c d
-
-gg :: (a -> Action) -> [Action] -> a -> [Action]
-gg f as p = f p : as
 
 researchWork :: MyState -> MyState
 researchWork state =
@@ -53,18 +50,16 @@ createPC :: MyState -> MyState
 createPC = over (resources.paperclips) succ
 
 buyHelper :: MyState -> MyState
-buyHelper state = handleActions $ setOutput state $ hh (view actions state) $ uncurry4 BL.buyHelper $ getInput state
+buyHelper state = handleActions $ addActions state $ bifoldMap ((:[]) . SetE) (\(h,p) -> SetH h : SetP p : []) $ uncurry4 BL.buyHelper $ getInput state
   where
     getInput = getInput4
       seconds
       (config.prices.helperPrices)
       (resources.paperclips)
       (resources.helpers)
-    setOutput = setOutput1 actions
 
-hh :: [Action] -> Either ErrorLogLine (Helpers, Paperclips) -> [Action]
-hh as (Left err) = SetE err : as
-hh as (Right (h,p)) = SetH h : SetP p : as
+addActions :: MyState -> [Action] -> MyState
+addActions state newActions = over actions (\as -> newActions ++ as) state
 
 researchAdvancedHelper :: MyState -> MyState
 researchAdvancedHelper state = setOutput state $ researchAdvancedHelper' $ getInput state
