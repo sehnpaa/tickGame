@@ -21,6 +21,8 @@ applyAction (SetE err) state = over errorLog (\errs -> err : errs) state
 applyAction (SetR r) state = set (researchAreas.advancedHelperResearch.researchCompProgress) r state
 applyAction (SetTreeSeeds s) state = set (resources.treeSeeds) s state
 applyAction (SetTrees t) state = set (resources.trees) t state
+applyAction (SetAdvancedHelperResearchProgress p) state = set (researchAreas.advancedHelperResearch.researchCompProgress) p state
+applyAction (SetHelperInc i) state = set (config.constants.helperInc) i state
 
 helperWork :: MyState -> MyState
 helperWork state
@@ -32,12 +34,11 @@ singleton :: a -> [a]
 singleton = (:[])
 
 researchWork :: MyState -> MyState
-researchWork state =
-  case view (researchAreas.advancedHelperResearch.researchCompProgress) state of
-    NotResearched -> state
-    ResearchInProgress 1 -> set (researchAreas.advancedHelperResearch.researchCompProgress) ResearchDone $ over (config.constants.helperInc) (\(HelperInc inc) -> HelperInc (inc * 2)) state
-    ResearchInProgress n -> set (researchAreas.advancedHelperResearch.researchCompProgress) (ResearchInProgress (n-1)) state
-    ResearchDone -> state
+researchWork state
+  = handleActions
+  $ addActions state
+  $ (\(p, h) -> SetAdvancedHelperResearchProgress p : SetHelperInc h : [])
+  $ PBL.researchWork state
 
 addSecond :: MyState -> MyState
 addSecond = over seconds succ

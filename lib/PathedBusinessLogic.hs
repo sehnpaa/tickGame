@@ -11,6 +11,11 @@ helperWork = arg4 BL.helperWork
       (config.constants.helperInc)
       (resources.storage)
 
+researchWork :: MyState -> (ResearchProgress, HelperInc)
+researchWork = arg2 BL.researchWork
+      (researchAreas.advancedHelperResearch.researchCompProgress)
+      (config.constants.helperInc)
+
 buyHelper :: MyState -> Either ErrorLogLine (Helpers, Paperclips)
 buyHelper = arg4 BL.buyHelper
       seconds

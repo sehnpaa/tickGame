@@ -2,6 +2,7 @@
 
 module BusinessLogic where
 
+import Control.Lens
 import Data.Text (concat, pack)
 
 import Mod
@@ -11,6 +12,17 @@ helperWork p h inc storage = Paperclips $ min (unStorage storage) $ (unPaperclip
 
 addHelperWork :: HelperInc -> Helpers -> Paperclips -> Paperclips
 addHelperWork inc h p = Paperclips $ (unPaperclips p) + (unHelpers h) * (unHelpers $ unHelperInc inc)
+
+researchWork :: ResearchProgress -> HelperInc -> (ResearchProgress, HelperInc)
+researchWork progress c =
+  case progress of
+    NotResearched -> (progress, c)
+    ResearchInProgress 1 -> (ResearchDone, under isoHelperInc (*2) c)
+    ResearchInProgress n -> (ResearchInProgress (n-1), c)
+    ResearchDone -> (progress, c)
+
+isoHelperInc :: (Profunctor p, Functor f) => p HelperInc (f HelperInc) -> p Helpers (f Helpers)
+isoHelperInc = iso HelperInc unHelperInc
 
 buyHelper :: Seconds -> HelperPrice -> Paperclips -> Helpers -> Either ErrorLogLine (Helpers, Paperclips)
 buyHelper s (HelperPrice price) p h =

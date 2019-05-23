@@ -64,6 +64,14 @@ getInput6 f1 f2 f3 f4 f5 f6 s =
   , view f5 s
   , view f6 s )
 
+arg2
+  :: (a -> b -> c)
+  -> Getting a s a
+  -> Getting b s b
+  -> s
+  -> c
+arg2 f f1 f2 s = uncurry2 f $ getInput2 f1 f2 s
+
 arg4
   :: (a -> b -> c -> d -> e)
   -> Getting a s a
@@ -84,6 +92,9 @@ arg5
   -> s
   -> f
 arg5 f f1 f2 f3 f4 f5 s = uncurry5 f $ getInput5 f1 f2 f3 f4 f5 s
+
+uncurry2 :: (a -> b -> c) -> ((a, b) -> c)
+uncurry2 f (a,b) = f a b
 
 uncurry3 :: (a -> b -> c -> d) -> ((a, b, c) -> d)
 uncurry3 f (a,b,c) = f a b c
