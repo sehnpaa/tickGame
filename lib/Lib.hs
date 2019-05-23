@@ -1,11 +1,10 @@
 module Lib (module Lib, module Mod) where
 
-import Data.Bifoldable (bifoldMap)
+import Data.Bifoldable (Bifoldable, bifoldMap)
 import Control.Lens
 
-import qualified BusinessLogic as BL
-import LensUtils
 import Mod
+import qualified PathedBusinessLogic as PBL
 
 nextTick :: MyState -> MyState
 nextTick = handleActions . addSecond . helperWork . researchWork
@@ -27,12 +26,7 @@ helperWork :: MyState -> MyState
 helperWork state
   = addActions state
   $ (singleton . SetP)
-  $ arg4 BL.helperWork
-      (resources.paperclips)
-      (resources.helpers)
-      (config.constants.helperInc)
-      (resources.storage)
-      state
+  $ PBL.helperWork state
 
 singleton :: a -> [a]
 singleton = (:[])
@@ -55,13 +49,11 @@ buyHelper :: MyState -> MyState
 buyHelper state
   = handleActions
   $ addActions state
-  $ bifoldMap (singleton . SetE) (\(h,p) -> SetH h : SetP p : [])
-  $ arg4 BL.buyHelper
-      seconds
-      (config.prices.helperPrices)
-      (resources.paperclips)
-      (resources.helpers)
-      state
+  $ withError (\(h,p) -> SetH h : SetP p : [])
+  $ PBL.buyHelper state
+
+withError :: Bifoldable p => (b -> [Action]) -> p ErrorLogLine b -> [Action]
+withError = bifoldMap (singleton . SetE)
 
 addActions :: MyState -> [Action] -> MyState
 addActions state newActions = over actions (\as -> newActions ++ as) state
@@ -71,20 +63,14 @@ researchAdvancedHelper state
   = handleActions
   $ addActions state
   $ bifoldMap (singleton . SetE) (\(p,r) -> SetP p : SetR r : [])
-  $ arg5 BL.researchAdvancedHelper
-      seconds
-      (resources.paperclips)
-      (config.prices.advancedHelperPrice)
-      (researchAreas.advancedHelperResearch.researchCompProgress)
-      (researchAreas.advancedHelperResearch.researchCompDuration)
-      state
+  $ PBL.researchAdvancedHelper state
 
 plantASeed :: MyState -> MyState
 plantASeed state
   = handleActions
   $ addActions state
-  $ bifoldMap (singleton . SetE) (\(s,t) -> SetTreeSeeds s : SetTrees t : [])
-  $ arg4 BL.plantASeed seconds (config.prices.treePrice) (resources.treeSeeds) (resources.trees) state
+  $ withError (\(s,t) -> SetTreeSeeds s : SetTrees t : [])
+  $ PBL.plantASeed state
 
 setStarted :: MyState -> MyState
 setStarted = over isStarted (const $ IsStarted True)

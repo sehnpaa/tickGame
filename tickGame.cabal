@@ -17,6 +17,7 @@ library tickGameLib
       BusinessLogic
       LensUtils
       Mod
+      PathedBusinessLogic
     build-depends:
         base >=4.11 && <5
       , gi-gtk
