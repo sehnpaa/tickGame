@@ -14,7 +14,7 @@ import GI.Gtk.Declarative
 import GI.Gtk.Declarative.App.Simple
 
 import Lib (buyHelper, createPC, nextTick, researchAdvancedHelper, setStarted, viewAdvancedHelperResearch, viewErrorLog, viewHelpers, viewIsStarted
-  , viewPaperclips, viewSeconds, viewStorage, viewTrees, viewTreeSeeds, unErrorLogLine, plantASeed, IsStarted(..), MyEvent(..)
+  , viewPaperclips, viewSeconds, viewStorage, viewTrees, viewTreeSeeds, viewWood, unErrorLogLine, plantASeed, IsStarted(..), MyEvent(..)
   , MyState(..), getInitialState)
 
 main :: IO ()
@@ -55,6 +55,7 @@ stats state = container Box [#orientation := OrientationVertical]
   , statProperty "Storage" (viewStorage state)
   , statProperty "Tree seeds" (viewTreeSeeds state)
   , statProperty "Trees" (viewTrees state)
+  , statProperty "Wood" (viewWood state)
   , statProperty "Advanced helper research" (viewAdvancedHelperResearch state)
   , statProperty "Seconds" (viewSeconds state) ]
 

@@ -28,7 +28,7 @@ library tickGameLib
       , tasty-hunit
       , tasty-quickcheck
       , text
-    ghc-options: -threaded -Wall
+    ghc-options: -Wall
 
 executable tickGame
     main-is: Main.hs

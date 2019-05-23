@@ -14,13 +14,13 @@ defaultConfig :: Config
 defaultConfig = Config (Constants (HelperInc 1)) (Prices (AdvancedHelperPrice $ Paperclips 5) (HelperPrice $ Paperclips 10) (TreePrice $ TreeSeeds 1))
 
 state1 :: MyState
-state1 = MyState defaultConfig [] [] (ResearchAreas (ResearchComp (Duration 20) NotResearched)) (Resources 0 2 (Storage 1000) 0 100) 0 (IsStarted True)
+state1 = MyState defaultConfig [] [] (ResearchAreas (ResearchComp (Duration 20) NotResearched)) (Resources (Paperclips 0) (Helpers 2) (Storage 1000) (Trees 0) (TreeSeeds 100) (Wood 0)) (Seconds 0) (IsStarted True)
 
 tests :: TestTree
 tests = testGroup "Tests" [unitTests, qcTests]
 
 unitTests = testGroup "Unit tests"
-  [ testCase "first" $ assertEqual "" (MyState defaultConfig [] [] (ResearchAreas (ResearchComp (Duration 20) NotResearched)) (Resources 2 2 (Storage 1000) 0 100) 1 (IsStarted True)) (nextTick state1)]
+  [ testCase "first" $ assertEqual "" (MyState defaultConfig [] [] (ResearchAreas (ResearchComp (Duration 20) NotResearched)) (Resources (Paperclips 2) (Helpers 2) (Storage 1000) (Trees 0) (TreeSeeds 100) (Wood 0)) (Seconds 1) (IsStarted True)) (nextTick state1)]
 
 qcTests = testGroup "QuickCheck tests"
   [ QC.testProperty "addSecond" $ QC.withMaxSuccess 1000 $ \state ->

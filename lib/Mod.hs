@@ -58,7 +58,8 @@ instance Arbitrary ErrorLogLine where
   arbitrary = ErrorLogLine <$> arbitrary
 
 instance Arbitrary Resources where
-  arbitrary = Resources <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
+  arbitrary = Resources
+    <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
 
 instance Arbitrary Paperclips where
   arbitrary = Paperclips . getNonNegative <$> arbitrary
@@ -71,6 +72,9 @@ instance Arbitrary Trees where
 
 instance Arbitrary TreeSeeds where
   arbitrary = TreeSeeds . getNonNegative <$> arbitrary
+
+instance Arbitrary Wood where
+  arbitrary = Wood . getNonNegative <$> arbitrary
 
 instance Arbitrary Seconds where
   arbitrary = Seconds . getNonNegative <$> arbitrary
@@ -137,7 +141,8 @@ data Resources = Resources
   , _helpers :: Helpers
   , _storage :: Storage
   , _trees :: Trees
-  , _treeSeeds :: TreeSeeds } deriving (Eq, Show)
+  , _treeSeeds :: TreeSeeds
+  , _wood :: Wood } deriving (Eq, Show)
 
 newtype Paperclips = Paperclips { unPaperclips :: Integer } deriving (Enum, Eq, Num, Ord)
 
@@ -163,6 +168,11 @@ newtype TreeSeeds = TreeSeeds { unTreeSeeds :: Integer } deriving (Enum, Eq, Num
 
 instance Show TreeSeeds where
   show (TreeSeeds a) = show a
+
+newtype Wood = Wood { unWood :: Integer } deriving (Enum, Eq, Num, Ord)
+
+instance Show Wood where
+  show (Wood a) = show a
 
 data ResearchProgress = NotResearched | ResearchInProgress Integer | ResearchDone
   deriving (Eq)
@@ -283,6 +293,12 @@ seconds f state = (\seconds' -> state { _seconds = seconds'}) <$> f (_seconds st
 
 viewSeconds :: MyState -> Seconds
 viewSeconds = view seconds
+
+wood :: Lens' Resources Wood
+wood f state = (\wood' -> state { _wood = wood'}) <$> f (_wood state)
+
+viewWood :: MyState -> Wood
+viewWood = view (resources.wood)
 
 isStarted :: Lens' MyState IsStarted
 isStarted f state = (\isStarted' -> state { _isStarted = isStarted'}) <$> f (_isStarted state)
