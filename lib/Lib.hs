@@ -1,8 +1,9 @@
-module Lib (module Lib, module Mod) where
+module Lib (module Lib, module Mod, module Lenses) where
 
 import Data.Bifoldable (Bifoldable, bifoldMap)
 import Control.Lens
 
+import Lenses
 import Mod
 import qualified PathedBusinessLogic as PBL
 
@@ -61,8 +62,7 @@ addActions state newActions = over actions (\as -> newActions ++ as) state
 
 researchAdvancedHelper :: MyState -> MyState
 researchAdvancedHelper state
-  = handleActions
-  $ addActions state
+  = addActions state
   $ bifoldMap (singleton . SetE) (\(p,r) -> SetP p : SetR r : [])
   $ PBL.researchAdvancedHelper state
 

@@ -13,9 +13,9 @@ import GI.Gtk (Box(..), Button(..), Label(..), ListBox(..), ListBoxRow(..), Orie
 import GI.Gtk.Declarative
 import GI.Gtk.Declarative.App.Simple
 
-import Lib (buyHelper, createPC, nextTick, researchAdvancedHelper, setStarted, viewAdvancedHelperResearch, viewErrorLog, viewHelpers, viewIsStarted
-  , viewPaperclips, viewSeconds, viewStorage, viewTrees, viewTreeSeeds, viewWood, unErrorLogLine, plantASeed, IsStarted(..), MyEvent(..)
+import Lib (buyHelper, createPC, nextTick, researchAdvancedHelper, setStarted, unErrorLogLine, plantASeed, IsStarted(..), MyEvent(..)
   , MyState(..), getInitialState)
+import qualified View as View
 
 main :: IO ()
 main = void $ run app
@@ -33,7 +33,7 @@ view' state = bin Window
           [ buttons
           , margin
           , stats state]
-        , container ListBox [] (fromList (viewErrorLog state) <&> \name -> bin ListBoxRow [#activatable := False, #selectable := False] $ widget Label [#label := unErrorLogLine name])
+        , container ListBox [] (fromList (View.viewErrorLog state) <&> \name -> bin ListBoxRow [#activatable := False, #selectable := False] $ widget Label [#label := unErrorLogLine name])
         , container Box [#orientation := OrientationVertical] [widget Label [#label := "here"]]]
 
 buttons :: BoxChild MyEvent
@@ -50,14 +50,14 @@ margin = container Box [#widthRequest := 10] []
 
 stats :: MyState -> BoxChild MyEvent
 stats state = container Box [#orientation := OrientationVertical]
-  [ statProperty "Paperclips" (viewPaperclips state)
-  , statProperty "Helpers" (viewHelpers state)
-  , statProperty "Storage" (viewStorage state)
-  , statProperty "Tree seeds" (viewTreeSeeds state)
-  , statProperty "Trees" (viewTrees state)
-  , statProperty "Wood" (viewWood state)
-  , statProperty "Advanced helper research" (viewAdvancedHelperResearch state)
-  , statProperty "Seconds" (viewSeconds state) ]
+  [ statProperty "Paperclips" (View.viewPaperclips state)
+  , statProperty "Helpers" (View.viewHelpers state)
+  , statProperty "Storage" (View.viewStorage state)
+  , statProperty "Tree seeds" (View.viewTreeSeeds state)
+  , statProperty "Trees" (View.viewTrees state)
+  , statProperty "Wood" (View.viewWood state)
+  , statProperty "Advanced helper research" (View.viewAdvancedHelperResearch state)
+  , statProperty "Seconds" (View.viewSeconds state) ]
 
 statProperty :: Show a => Text -> a -> BoxChild MyEvent
 statProperty labelText n = container Box [#orientation := OrientationHorizontal]
@@ -67,7 +67,7 @@ ticker :: IO (Maybe MyEvent)
 ticker = fmap (const (Just Tick)) (threadDelay 1000000)
 
 update' :: MyState -> MyEvent -> Transition MyState MyEvent
-update' state event = case (unIsStarted (viewIsStarted state), event) of
+update' state event = case (unIsStarted (View.viewIsStarted state), event) of
   (False, Start) -> Transition (setStarted state) ticker
   (_, ExitApplication) -> Exit
   (True, CreatePC) -> Transition (createPC state) (pure Nothing)
