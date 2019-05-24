@@ -5,6 +5,7 @@ module BusinessLogic where
 import Control.Lens
 import Data.Text (concat, pack)
 
+import qualified Iso as Iso
 import Mod
 
 helperWork :: Paperclips -> Helpers -> HelperInc -> Storage -> Paperclips
@@ -22,10 +23,7 @@ researchWork progress c =
     ResearchDone -> (progress, c)
 
 incHelperIncWith :: HelperInc -> HelperInc -> HelperInc
-incHelperIncWith = withIso (isoHelpers . isoHelperInc) (\_ elim inc -> under (isoHelpers . isoHelperInc) (\h -> h + elim inc))
-
-isoHelperInc :: (Profunctor p, Functor f) => p HelperInc (f HelperInc) -> p Helpers (f Helpers)
-isoHelperInc = iso HelperInc unHelperInc
+incHelperIncWith = withIso (Iso.helpers . Iso.helperInc) (\_ elim inc -> under (Iso.helpers . Iso.helperInc) (\h -> h + elim inc))
 
 buyHelper :: Seconds -> HelperPrice -> Paperclips -> Helpers -> Either ErrorLogLine (Helpers, Paperclips)
 buyHelper s price p h =
@@ -45,10 +43,10 @@ researchAdvancedHelper s p price progress duration =
     (_, ResearchDone) -> Left $ ErrorLogLine "Already done"
 
 decPaperclipsWith :: HelperPrice -> Paperclips -> Paperclips
-decPaperclipsWith = withIso (isoPaperclips . isoHelperPrice) (\_ elim price -> under isoPaperclips (\p -> p - elim price))
+decPaperclipsWith = withIso (Iso.paperclips . Iso.helperPrice) (\_ elim price -> under Iso.paperclips (\p -> p - elim price))
 
 decPaperclipsWith' :: AdvancedHelperPrice -> Paperclips -> Paperclips
-decPaperclipsWith' = withIso (isoPaperclips . isoAdvancedHelperPrice) (\_ elim price -> under isoPaperclips (\p -> p - elim price))
+decPaperclipsWith' = withIso (Iso.paperclips . Iso.advancedHelperPrice) (\_ elim price -> under Iso.paperclips (\p -> p - elim price))
 
 plantASeed :: Seconds -> TreePrice -> TreeSeeds -> Trees -> Either ErrorLogLine (TreeSeeds, Trees)
 plantASeed s price seeds t =
@@ -60,25 +58,7 @@ lineNeedMoreSeeds :: Seconds -> ErrorLogLine
 lineNeedMoreSeeds s = ErrorLogLine $ Data.Text.concat ["Tick ", pack (show s), ": You need more seeds."]
 
 decSeedsWith :: TreePrice -> TreeSeeds -> TreeSeeds
-decSeedsWith = withIso (isoTreeSeeds . isoTreePrice) (\_ elim price -> under isoTreeSeeds (\s -> s - elim price))
-
-isoHelperPrice :: (Profunctor p, Functor f) => p HelperPrice (f HelperPrice) -> p Paperclips (f Paperclips)
-isoHelperPrice = iso HelperPrice unHelperPrice
-
-isoHelpers :: (Profunctor p, Functor f) => p Helpers (f Helpers) -> p Integer (f Integer)
-isoHelpers = iso Helpers unHelpers
-
-isoAdvancedHelperPrice :: (Profunctor p, Functor f) => p AdvancedHelperPrice (f AdvancedHelperPrice) -> p Paperclips (f Paperclips)
-isoAdvancedHelperPrice = iso AdvancedHelperPrice unAdvancedHelperPrice
-
-isoTreeSeeds :: (Profunctor p, Functor f) => p TreeSeeds (f TreeSeeds) -> p Integer (f Integer)
-isoTreeSeeds = iso TreeSeeds unTreeSeeds
-
-isoTreePrice :: (Profunctor p, Functor f) => p TreePrice (f TreePrice) -> p TreeSeeds (f TreeSeeds)
-isoTreePrice = iso TreePrice unTreePrice
+decSeedsWith = withIso (Iso.treeSeeds . Iso.treePrice) (\_ elim price -> under Iso.treeSeeds (\s -> s - elim price))
 
 createPaperclip :: Paperclips -> Paperclips
-createPaperclip = under isoPaperclips succ
-
-isoPaperclips :: (Profunctor p, Functor f) => p Paperclips (f Paperclips) -> p Integer (f Integer)
-isoPaperclips = iso Paperclips unPaperclips
+createPaperclip = under Iso.paperclips succ
