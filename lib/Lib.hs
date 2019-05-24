@@ -66,7 +66,8 @@ addActions state newActions = over actions (\as -> newActions ++ as) state
 
 researchAdvancedHelper :: MyState -> MyState
 researchAdvancedHelper state
-  = addActions state
+  = handleActions
+  $ addActions state
   $ withError (\(p,r) -> SetP p : SetR r : [])
   $ PBL.researchAdvancedHelper state
 
