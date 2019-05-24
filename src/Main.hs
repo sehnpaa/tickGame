@@ -13,7 +13,7 @@ import GI.Gtk (Box(..), Button(..), Label(..), ListBox(..), ListBoxRow(..), Orie
 import GI.Gtk.Declarative
 import GI.Gtk.Declarative.App.Simple
 
-import Lib (buyHelper, createPC, nextTick, researchAdvancedHelper, setStarted, unErrorLogLine, plantASeed, IsStarted(..), MyEvent(..)
+import Lib (buyHelper, createPaperclip, nextTick, researchAdvancedHelper, setStarted, unErrorLogLine, plantASeed, IsStarted(..), MyEvent(..)
   , MyState(..), getInitialState)
 import View
 
@@ -39,7 +39,7 @@ view' state = bin Window
 buttons :: BoxChild MyEvent
 buttons = container Box [#orientation := OrientationVertical, #widthRequest := 150]
   [ widget Button [#label := "Start game", on #clicked Start]
-  , widget Button [#label := "Create paperclip", on #clicked CreatePC]
+  , widget Button [#label := "Create paperclip", on #clicked CreatePaperclip]
   , widget Button [#label := "Create helper", on #clicked CreateHelper]
   , widget Button [#label := "Research advanced helper", on #clicked ResearchAdvancedHelper]
   , widget Button [#label := "Plant a seed", on #clicked PlantASeed]
@@ -70,7 +70,7 @@ update' :: MyState -> MyEvent -> Transition MyState MyEvent
 update' state event = case (unIsStarted (viewIsStarted state), event) of
   (False, Start) -> Transition (setStarted state) ticker
   (_, ExitApplication) -> Exit
-  (True, CreatePC) -> Transition (createPC state) (pure Nothing)
+  (True, CreatePaperclip) -> Transition (createPaperclip state) (pure Nothing)
   (True, CreateHelper) -> Transition (buyHelper state) (pure Nothing)
   (True, ResearchAdvancedHelper) -> Transition (researchAdvancedHelper state) (pure Nothing)
   (True, PlantASeed) -> Transition (plantASeed state) (pure Nothing)

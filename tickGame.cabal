@@ -12,14 +12,13 @@ extra-source-files:
 library tickGameLib
     hs-source-dirs: lib
     default-language: Haskell2010
-    exposed-modules: Lib
+    exposed-modules: Lib, View
     other-modules:
       BusinessLogic
       Lenses
       LensUtils
       Mod
       PathedBusinessLogic
-      View
     build-depends:
         base >=4.11 && <5
       , gi-gtk

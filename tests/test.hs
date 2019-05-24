@@ -11,7 +11,7 @@ import Lib
 main = defaultMain tests
 
 defaultConfig :: Config
-defaultConfig = Config (Constants (HelperInc 1)) (Prices (AdvancedHelperPrice $ Paperclips 5) (HelperPrice $ Paperclips 10) (TreePrice $ TreeSeeds 1))
+defaultConfig = Config (Constants (HelperInc (Helpers 1))) (Prices (AdvancedHelperPrice $ Paperclips 5) (HelperPrice $ Paperclips 10) (TreePrice $ TreeSeeds 1))
 
 state1 :: MyState
 state1 = MyState defaultConfig [] [] (ResearchAreas (ResearchComp (Duration 20) NotResearched)) (Resources (Paperclips 0) (Helpers 2) (Storage 1000) (Trees 0) (TreeSeeds 100) (Wood 0)) (Seconds 0) (IsStarted True)
@@ -28,7 +28,7 @@ qcTests = testGroup "QuickCheck tests"
           after = view seconds (addSecond state)
           in after == before + 1
   , QC.testProperty "Commutative features" $ QC.withMaxSuccess 1000 $ \state ->
-      isCommutative state [addSecond, createPC, helperWork] ]
+      isCommutative state [addSecond, createPaperclip, helperWork] ]
 
 isCommutative :: Eq a => a -> [a -> a] -> Bool
 isCommutative empty = (\x -> length x == 1) . nub . map (foldr id empty) . permutations

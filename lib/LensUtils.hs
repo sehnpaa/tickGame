@@ -64,6 +64,13 @@ getInput6 f1 f2 f3 f4 f5 f6 s =
   , view f5 s
   , view f6 s )
 
+arg1
+  :: (a -> b)
+  -> Getting a s a
+  -> s
+  -> b
+arg1 f f1 s = f $ getInput1 f1 s
+
 arg2
   :: (a -> b -> c)
   -> Getting a s a

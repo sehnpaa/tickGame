@@ -38,3 +38,7 @@ plantASeed = arg4 BL.plantASeed
       (config.prices.treePrice)
       (resources.treeSeeds)
       (resources.trees)
+
+createPaperclip :: MyState -> Paperclips
+createPaperclip = arg1 BL.createPaperclip
+      (resources.paperclips)

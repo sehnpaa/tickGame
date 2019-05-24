@@ -44,8 +44,12 @@ researchWork state
 addSecond :: MyState -> MyState
 addSecond = over seconds succ
 
-createPC :: MyState -> MyState
-createPC = over (resources.paperclips) succ
+createPaperclip :: MyState -> MyState
+createPaperclip state
+  = handleActions
+  $ addActions state
+  $ (\p -> SetP p : []) --over (resources.paperclips) succ
+  $ PBL.createPaperclip state
 
 buyHelper :: MyState -> MyState
 buyHelper state
@@ -63,7 +67,7 @@ addActions state newActions = over actions (\as -> newActions ++ as) state
 researchAdvancedHelper :: MyState -> MyState
 researchAdvancedHelper state
   = addActions state
-  $ bifoldMap (singleton . SetE) (\(p,r) -> SetP p : SetR r : [])
+  $ withError (\(p,r) -> SetP p : SetR r : [])
   $ PBL.researchAdvancedHelper state
 
 plantASeed :: MyState -> MyState
@@ -80,4 +84,4 @@ initialPrices :: Prices
 initialPrices = Prices (AdvancedHelperPrice $ Paperclips 5) (HelperPrice $ Paperclips 10) (TreePrice $ TreeSeeds 1)
 
 getInitialState :: MyState
-getInitialState = MyState (Config (Constants (HelperInc 1)) initialPrices) [] [] (ResearchAreas (ResearchComp (Duration 10) NotResearched)) (Resources (Paperclips 0) (Helpers 0) (Storage 1000) (Trees 0) (TreeSeeds 10) (Wood 0)) (Seconds 0) (IsStarted False)
+getInitialState = MyState (Config (Constants (HelperInc (Helpers 1))) initialPrices) [] [] (ResearchAreas (ResearchComp (Duration 10) NotResearched)) (Resources (Paperclips 0) (Helpers 0) (Storage 1000) (Trees 0) (TreeSeeds 10) (Wood 0)) (Seconds 0) (IsStarted False)

@@ -2,7 +2,6 @@
 
 module Mod where
 
-import Control.Lens
 import Data.Text (pack, Text)
 import Test.Tasty.QuickCheck
 
@@ -156,12 +155,12 @@ data Resources = Resources
   , _treeSeeds :: TreeSeeds
   , _wood :: Wood } deriving (Eq, Show)
 
-newtype Paperclips = Paperclips { unPaperclips :: Integer } deriving (Enum, Eq, Num, Ord)
+newtype Paperclips = Paperclips { unPaperclips :: Integer } deriving (Enum, Eq, Ord)
 
 instance Show Paperclips where
   show (Paperclips a) = show a
 
-newtype Helpers = Helpers { unHelpers :: Integer } deriving (Enum, Eq, Num, Ord)
+newtype Helpers = Helpers { unHelpers :: Integer } deriving (Enum, Eq, Ord)
 
 instance Show Helpers where
   show (Helpers a) = show a
@@ -176,7 +175,7 @@ newtype Trees = Trees { unTrees :: Integer } deriving (Enum, Eq, Num, Ord)
 instance Show Trees where
   show (Trees a) = show a
 
-newtype TreeSeeds = TreeSeeds { unTreeSeeds :: Integer } deriving (Enum, Eq, Num, Ord)
+newtype TreeSeeds = TreeSeeds { unTreeSeeds :: Integer } deriving (Enum, Eq, Ord)
 
 instance Show TreeSeeds where
   show (TreeSeeds a) = show a
@@ -222,7 +221,7 @@ instance Show IsStarted where
 
 data MyEvent
   = Start
-  | CreatePC
+  | CreatePaperclip
   | CreateHelper
   | ResearchAdvancedHelper
   | PlantASeed
