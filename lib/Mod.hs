@@ -80,7 +80,7 @@ instance Arbitrary Trees where
   arbitrary = Trees . getNonNegative <$> arbitrary
 
 instance Arbitrary TreeSeeds where
-  arbitrary = TreeSeeds . getNonNegative <$> arbitrary
+  arbitrary = elements []
 
 instance Arbitrary Wood where
   arbitrary = Wood . getNonNegative <$> arbitrary
@@ -129,7 +129,7 @@ newtype AdvancedHelperPrice = AdvancedHelperPrice { unAdvancedHelperPrice :: Pap
 
 newtype HelperPrice = HelperPrice { unHelperPrice :: Paperclips } deriving (Eq, Show)
 
-newtype TreePrice = TreePrice { unTreePrice :: TreeSeeds } deriving (Eq, Show)
+newtype TreePrice = TreePrice { unTreePrice :: Integer } deriving (Eq, Show)
 
 data Action
   = SetP Paperclips
@@ -175,10 +175,12 @@ newtype Trees = Trees { unTrees :: Integer } deriving (Enum, Eq, Num, Ord)
 instance Show Trees where
   show (Trees a) = show a
 
-newtype TreeSeeds = TreeSeeds { unTreeSeeds :: Integer } deriving (Enum, Eq, Ord)
+newtype TreeSeeds = TreeSeeds { unTreeSeeds :: [Prog]} deriving (Eq)
 
 instance Show TreeSeeds where
-  show (TreeSeeds a) = show a
+  show (TreeSeeds a) = show $ length a
+
+data Prog = NotGrowing | Growing Int | GrowingDone deriving (Eq)
 
 newtype Wood = Wood { unWood :: Integer } deriving (Enum, Eq, Num, Ord)
 

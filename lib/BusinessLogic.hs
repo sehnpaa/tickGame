@@ -50,15 +50,28 @@ decPaperclipsWith' = withIso (Iso.paperclips . Iso.advancedHelperPrice) (\_ elim
 
 plantASeed :: Seconds -> TreePrice -> TreeSeeds -> Trees -> Either ErrorLogLine (TreeSeeds, Trees)
 plantASeed s price seeds t =
-  if unTreePrice price > seeds
+  if unTreePrice price > countNotGrowingSeeds seeds
     then Left $ lineNeedMoreSeeds s
     else Right (decSeedsWith price seeds, succ t)
+
+countNotGrowingSeeds :: TreeSeeds -> Integer
+countNotGrowingSeeds = toInteger . length . filter isNotGrowing . unTreeSeeds
+
+isNotGrowing :: Prog -> Bool
+isNotGrowing a = case a of
+  NotGrowing -> True
+  _ -> False
 
 lineNeedMoreSeeds :: Seconds -> ErrorLogLine
 lineNeedMoreSeeds s = ErrorLogLine $ Data.Text.concat ["Tick ", pack (show s), ": You need more seeds."]
 
 decSeedsWith :: TreePrice -> TreeSeeds -> TreeSeeds
-decSeedsWith = withIso (Iso.treeSeeds . Iso.treePrice) (\_ elim price -> under Iso.treeSeeds (\s -> s - elim price))
+decSeedsWith = withIso (Iso.treePrice) (\_ elim price -> under Iso.treeSeeds (\s -> removeNby s (elim price) isNotGrowing))
+
+removeNby :: Eq a => [a] -> Integer -> (a -> Bool) -> [a]
+removeNby as 0 _ = as
+removeNby [] _ _ = []
+removeNby (a:as) n g = if g a then removeNby as (n-1) g else a : removeNby as n g
 
 createPaperclip :: Paperclips -> Paperclips
 createPaperclip = under Iso.paperclips succ

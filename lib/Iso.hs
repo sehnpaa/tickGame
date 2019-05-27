@@ -19,8 +19,8 @@ helpers = iso Helpers unHelpers
 paperclips :: (Profunctor p, Functor f) => p Paperclips (f Paperclips) -> p Integer (f Integer)
 paperclips = iso Paperclips unPaperclips
 
-treePrice :: (Profunctor p, Functor f) => p TreePrice (f TreePrice) -> p TreeSeeds (f TreeSeeds)
+treePrice :: (Profunctor p, Functor f) => p TreePrice (f TreePrice) -> p Integer (f Integer)
 treePrice = iso TreePrice unTreePrice
 
-treeSeeds :: (Profunctor p, Functor f) => p TreeSeeds (f TreeSeeds) -> p Integer (f Integer)
+treeSeeds :: (Profunctor p, Functor f) => p TreeSeeds (f TreeSeeds) -> p [Prog] (f [Prog])
 treeSeeds = iso TreeSeeds unTreeSeeds
