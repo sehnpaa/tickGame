@@ -52,7 +52,8 @@ instance Arbitrary Action where
       , SetTreeSeeds undefined
       , SetTrees undefined
       , SetAdvancedHelperResearchProgress undefined
-      , SetHelperInc undefined]
+      , SetHelperInc undefined
+      , SetProgs undefined]
     case r of
       SetP _ -> SetP <$> arbitrary
       SetH _ -> SetH <$> arbitrary
@@ -62,6 +63,7 @@ instance Arbitrary Action where
       SetTrees _ -> SetTrees <$> arbitrary
       SetAdvancedHelperResearchProgress _ -> SetAdvancedHelperResearchProgress <$> arbitrary
       SetHelperInc _ -> SetHelperInc <$> arbitrary
+      SetProgs _ -> arbitrary
 
 instance Arbitrary ErrorLogLine where
   arbitrary = ErrorLogLine <$> arbitrary
@@ -140,6 +142,7 @@ data Action
   | SetTrees Trees
   | SetAdvancedHelperResearchProgress ResearchProgress
   | SetHelperInc HelperInc
+  | SetProgs [Prog]
   deriving (Eq, Show)
 
 newtype ErrorLogLine = ErrorLogLine { unErrorLogLine :: Text } deriving (Eq)
@@ -178,9 +181,17 @@ instance Show Trees where
 newtype TreeSeeds = TreeSeeds { unTreeSeeds :: [Prog]} deriving (Eq)
 
 instance Show TreeSeeds where
-  show (TreeSeeds a) = show $ length a
+  show (TreeSeeds a) = show a
 
 data Prog = NotGrowing | Growing Int | GrowingDone deriving (Eq)
+
+instance Show Prog where
+  show NotGrowing = show "Not growing"
+  show (Growing n) = show "Growing in progress - " ++ show n ++ " " ++ noun n ++ " left."
+    where
+      noun 1 = "tick"
+      noun _ = "ticks"
+  show GrowingDone = show "Growing done"
 
 newtype Wood = Wood { unWood :: Integer } deriving (Enum, Eq, Num, Ord)
 

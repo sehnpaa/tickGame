@@ -49,6 +49,9 @@ trees f state = (\trees' -> state { _trees = trees'}) <$> f (_trees state)
 treeSeeds :: Lens' Resources TreeSeeds
 treeSeeds f state = (\treeSeeds' -> state { _treeSeeds = treeSeeds'}) <$> f (_treeSeeds state)
 
+progs :: Lens' TreeSeeds [Prog]
+progs f state = (\treeSeeds' -> TreeSeeds treeSeeds') <$> f (unTreeSeeds state )
+
 researchAreas :: Lens' MyState ResearchAreas
 researchAreas f state = (\areas' -> state { _researchAreas = areas'}) <$> f (_researchAreas state)
 

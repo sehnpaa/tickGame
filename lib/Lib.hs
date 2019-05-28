@@ -8,7 +8,7 @@ import Mod
 import qualified PathedBusinessLogic as PBL
 
 nextTick :: MyState -> MyState
-nextTick = handleActions . addSecond . helperWork . researchWork
+nextTick = handleActions . addSecond . helperWork . seedWork . researchWork
 
 handleActions :: MyState -> MyState
 handleActions state = let as = view actions state
@@ -24,6 +24,7 @@ applyAction (SetTreeSeeds s) state = set (resources.treeSeeds) s state
 applyAction (SetTrees t) state = set (resources.trees) t state
 applyAction (SetAdvancedHelperResearchProgress p) state = set (researchAreas.advancedHelperResearch.researchCompProgress) p state
 applyAction (SetHelperInc i) state = set (config.constants.helperInc) i state
+applyAction (SetProgs ps) state = set (resources.treeSeeds.progs) ps state
 
 helperWork :: MyState -> MyState
 helperWork state
@@ -41,6 +42,12 @@ researchWork state
   $ (\(p, h) -> SetAdvancedHelperResearchProgress p : SetHelperInc h : [])
   $ PBL.researchWork state
 
+seedWork :: MyState -> MyState
+seedWork state
+  = addActions state
+  $ (\(p,t) -> SetProgs p : SetTrees t : [])
+  $ PBL.seedWork state
+
 addSecond :: MyState -> MyState
 addSecond = over seconds succ
 
@@ -48,7 +55,7 @@ createPaperclip :: MyState -> MyState
 createPaperclip state
   = handleActions
   $ addActions state
-  $ (\p -> SetP p : []) --over (resources.paperclips) succ
+  $ (\p -> SetP p : [])
   $ PBL.createPaperclip state
 
 buyHelper :: MyState -> MyState
@@ -75,7 +82,7 @@ plantASeed :: MyState -> MyState
 plantASeed state
   = handleActions
   $ addActions state
-  $ withError (\(s,t) -> SetTreeSeeds s : SetTrees t : [])
+  $ withError (\s -> SetTreeSeeds s : [])
   $ PBL.plantASeed state
 
 setStarted :: MyState -> MyState
@@ -85,4 +92,4 @@ initialPrices :: Prices
 initialPrices = Prices (AdvancedHelperPrice $ Paperclips 5) (HelperPrice $ Paperclips 10) (TreePrice 1)
 
 getInitialState :: MyState
-getInitialState = MyState (Config (Constants (HelperInc (Helpers 1))) initialPrices) [] [] (ResearchAreas (ResearchComp (Duration 10) NotResearched)) (Resources (Paperclips 0) (Helpers 0) (Storage 1000) (Trees 0) (TreeSeeds (replicate 10 NotGrowing)) (Wood 0)) (Seconds 0) (IsStarted False)
+getInitialState = MyState (Config (Constants (HelperInc (Helpers 1))) initialPrices) [] [] (ResearchAreas (ResearchComp (Duration 10) NotResearched)) (Resources (Paperclips 0) (Helpers 0) (Storage 1000) (Trees 0) (TreeSeeds (replicate 20 NotGrowing)) (Wood 0)) (Seconds 0) (IsStarted False)

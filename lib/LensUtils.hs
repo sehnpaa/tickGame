@@ -79,6 +79,16 @@ arg2
   -> c
 arg2 f f1 f2 s = uncurry2 f $ getInput2 f1 f2 s
 
+arg3
+  :: (a -> b -> c -> d)
+  -> Getting a s a
+  -> Getting b s b
+  -> Getting c s c
+  -> s
+  -> d
+arg3 f f1 f2 f3 s = uncurry3 f $ getInput3 f1 f2 f3 s
+
+
 arg4
   :: (a -> b -> c -> d -> e)
   -> Getting a s a

@@ -17,6 +17,11 @@ researchWork = arg2 BL.researchWork
       (researchAreas.advancedHelperResearch.researchCompProgress)
       (config.constants.helperInc)
 
+seedWork :: MyState -> ([Prog], Trees)
+seedWork = arg2 BL.seedWork
+      (resources.treeSeeds.progs)
+      (resources.trees)
+
 buyHelper :: MyState -> Either ErrorLogLine (Helpers, Paperclips)
 buyHelper = arg4 BL.buyHelper
       seconds
@@ -32,12 +37,11 @@ researchAdvancedHelper = arg5 BL.researchAdvancedHelper
       (researchAreas.advancedHelperResearch.researchCompProgress)
       (researchAreas.advancedHelperResearch.researchCompDuration)
 
-plantASeed :: MyState -> Either ErrorLogLine (TreeSeeds, Trees)
-plantASeed = arg4 BL.plantASeed
+plantASeed :: MyState -> Either ErrorLogLine TreeSeeds
+plantASeed = arg3 BL.plantASeed
       seconds
       (config.prices.treePrice)
       (resources.treeSeeds)
-      (resources.trees)
 
 createPaperclip :: MyState -> Paperclips
 createPaperclip = arg1 BL.createPaperclip

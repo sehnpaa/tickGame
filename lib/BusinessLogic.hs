@@ -25,6 +25,23 @@ researchWork progress c =
 incHelperIncWith :: HelperInc -> HelperInc -> HelperInc
 incHelperIncWith = withIso (Iso.helpers . Iso.helperInc) (\_ elim inc -> under (Iso.helpers . Iso.helperInc) (\h -> h + elim inc))
 
+seedWork :: [Prog] -> Trees -> ([Prog], Trees)
+seedWork progs ts =
+  let ts' = additionalTrees progs
+      progs' = filter (not . isGrowingDone) $ map (\x -> case x of
+        NotGrowing -> NotGrowing
+        Growing 1 -> GrowingDone
+        Growing n -> Growing (n-1)
+        GrowingDone -> GrowingDone) progs
+    in (progs', ts+ts')
+
+isGrowingDone :: Prog -> Bool
+isGrowingDone GrowingDone = True
+isGrowingDone _ = False
+
+additionalTrees :: [Prog] -> Trees
+additionalTrees = Trees . toInteger . length . filter (\x -> case x of Growing 1 -> True; _ -> False)
+
 buyHelper :: Seconds -> HelperPrice -> Paperclips -> Helpers -> Either ErrorLogLine (Helpers, Paperclips)
 buyHelper s price p h =
   if unHelperPrice price > p
@@ -48,11 +65,18 @@ decPaperclipsWith = withIso (Iso.paperclips . Iso.helperPrice) (\_ elim price ->
 decPaperclipsWith' :: AdvancedHelperPrice -> Paperclips -> Paperclips
 decPaperclipsWith' = withIso (Iso.paperclips . Iso.advancedHelperPrice) (\_ elim price -> under Iso.paperclips (\p -> p - elim price))
 
-plantASeed :: Seconds -> TreePrice -> TreeSeeds -> Trees -> Either ErrorLogLine (TreeSeeds, Trees)
-plantASeed s price seeds t =
+plantASeed :: Seconds -> TreePrice -> TreeSeeds -> Either ErrorLogLine TreeSeeds
+plantASeed s price seeds =
   if unTreePrice price > countNotGrowingSeeds seeds
     then Left $ lineNeedMoreSeeds s
-    else Right (decSeedsWith price seeds, succ t)
+    else Right $ initializeSeed seeds
+
+initializeSeed :: TreeSeeds -> TreeSeeds
+initializeSeed = TreeSeeds . changeFirst (== NotGrowing) (const $ Growing 4) . unTreeSeeds
+
+changeFirst :: Eq a => (a -> Bool) -> (a -> a) -> [a] -> [a]
+changeFirst _ _ [] = []
+changeFirst f g (x:xs) = if f x then g x : xs else x : changeFirst f g xs
 
 countNotGrowingSeeds :: TreeSeeds -> Integer
 countNotGrowingSeeds = toInteger . length . filter isNotGrowing . unTreeSeeds
@@ -64,14 +88,6 @@ isNotGrowing a = case a of
 
 lineNeedMoreSeeds :: Seconds -> ErrorLogLine
 lineNeedMoreSeeds s = ErrorLogLine $ Data.Text.concat ["Tick ", pack (show s), ": You need more seeds."]
-
-decSeedsWith :: TreePrice -> TreeSeeds -> TreeSeeds
-decSeedsWith = withIso (Iso.treePrice) (\_ elim price -> under Iso.treeSeeds (\s -> removeNby s (elim price) isNotGrowing))
-
-removeNby :: Eq a => [a] -> Integer -> (a -> Bool) -> [a]
-removeNby as 0 _ = as
-removeNby [] _ _ = []
-removeNby (a:as) n g = if g a then removeNby as (n-1) g else a : removeNby as n g
 
 createPaperclip :: Paperclips -> Paperclips
 createPaperclip = under Iso.paperclips succ
