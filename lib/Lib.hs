@@ -1,8 +1,9 @@
-module Lib (module Lib, module Mod, module Lenses) where
+module Lib (module Lib, module Mod, module Lenses, Initial.getInitialState) where
 
 import Data.Bifoldable (Bifoldable, bifoldMap)
 import Control.Lens
 
+import qualified Initial as Initial
 import Lenses
 import Mod
 import qualified PathedBusinessLogic as PBL
@@ -87,9 +88,3 @@ plantASeed state
 
 setStarted :: MyState -> MyState
 setStarted = over isStarted (const $ IsStarted True)
-
-initialPrices :: Prices
-initialPrices = Prices (AdvancedHelperPrice $ Paperclips 5) (HelperPrice $ Paperclips 10) (TreePrice 1)
-
-getInitialState :: MyState
-getInitialState = MyState (Config (Constants (HelperInc (Helpers 1))) (Durations (TreeDuration 20)) initialPrices) [] [] (ResearchAreas (ResearchComp (Duration 10) NotResearched)) (Resources (Paperclips 0) (Helpers 0) (Storage 1000) (Trees 0) (TreeSeeds (replicate 20 NotGrowing)) (Wood 0)) (Seconds 0) (IsStarted False)
