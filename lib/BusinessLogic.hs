@@ -3,7 +3,7 @@
 module BusinessLogic where
 
 import Control.Lens
-import Data.Text (concat, pack)
+import Data.Text (concat, pack, Text)
 
 import qualified Iso as Iso
 import Mod
@@ -51,13 +51,16 @@ buyHelper s price p h =
 lineNeedMorePaperclips :: Seconds -> ErrorLogLine
 lineNeedMorePaperclips s = ErrorLogLine $ Data.Text.concat ["Tick ", pack (show s), ": You need more paperclips."]
 
+mkErrorLogLine :: Seconds -> Text -> ErrorLogLine
+mkErrorLogLine s t = ErrorLogLine $ Data.Text.concat ["Tick ", pack (show s), ": ", t]
+
 researchAdvancedHelper :: Seconds -> Paperclips -> AdvancedHelperPrice -> ResearchProgress -> Duration -> Either ErrorLogLine (Paperclips, ResearchProgress)
 researchAdvancedHelper s p price progress duration =
   case (unAdvancedHelperPrice price > p, progress) of
-    (True, NotResearched) -> Left $ ErrorLogLine "Not enough paperclips"
+    (True, NotResearched) -> Left $ mkErrorLogLine s "Not enough paperclips."
     (False, NotResearched) -> Right (decPaperclipsWith' price p, startResearch duration)
-    (_, ResearchInProgress _) -> Left $ ErrorLogLine "Already in progress"
-    (_, ResearchDone) -> Left $ ErrorLogLine "Already done"
+    (_, ResearchInProgress _) -> Left $ mkErrorLogLine s "Already in progress."
+    (_, ResearchDone) -> Left $ mkErrorLogLine s "Already done."
 
 decPaperclipsWith :: HelperPrice -> Paperclips -> Paperclips
 decPaperclipsWith = withIso (Iso.paperclips . Iso.helperPrice) (\_ elim price -> under Iso.paperclips (\p -> p - elim price))

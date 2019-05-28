@@ -8,6 +8,7 @@ import qualified Test.Tasty.QuickCheck as QC
 
 import Lib
 
+main :: IO ()
 main = defaultMain tests
 
 defaultConfig :: Config
@@ -19,9 +20,11 @@ state1 = MyState defaultConfig [] [] (ResearchAreas (ResearchComp (Duration 20) 
 tests :: TestTree
 tests = testGroup "Tests" [unitTests, qcTests]
 
+unitTests :: TestTree
 unitTests = testGroup "Unit tests"
   [ testCase "first" $ assertEqual "" (MyState defaultConfig [] [] (ResearchAreas (ResearchComp (Duration 20) NotResearched)) (Resources (Paperclips 2) (Helpers 2) (Storage 1000) (Trees 0) (TreeSeeds $ replicate 100 NotGrowing) (Wood 0)) (Seconds 1) (IsStarted True)) (nextTick state1)]
 
+qcTests :: TestTree
 qcTests = testGroup "QuickCheck tests"
   [ QC.testProperty "addSecond" $ QC.withMaxSuccess 1000 $ \state ->
       let before = view seconds state
