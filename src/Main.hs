@@ -13,7 +13,7 @@ import GI.Gtk (Box(..), Button(..), Label(..), ListBox(..), ListBoxRow(..), Orie
 import GI.Gtk.Declarative
 import GI.Gtk.Declarative.App.Simple
 
-import Lib (buyHelper, createPaperclip, nextTick, researchAdvancedHelper, setStarted, unErrorLogLine, plantASeed, IsStarted(..), MyEvent(..)
+import Lib (buyHelper, createPaperclip, nextTick, pumpWater, researchAdvancedHelper, setStarted, unErrorLogLine, plantASeed, IsStarted(..), MyEvent(..)
   , MyState(..), getInitialState)
 import View
 
@@ -41,8 +41,9 @@ buttons = container Box [#orientation := OrientationVertical, #widthRequest := 1
   [ widget Button [#label := "Start game", on #clicked Start]
   , widget Button [#label := "Create paperclip", on #clicked CreatePaperclip]
   , widget Button [#label := "Create helper", on #clicked CreateHelper]
-  , widget Button [#label := "Research advanced helper", on #clicked ResearchAdvancedHelper]
+  , widget Button [#label := "Pump water", on #clicked PumpWater]
   , widget Button [#label := "Plant a seed", on #clicked PlantASeed]
+  , widget Button [#label := "Research advanced helper", on #clicked ResearchAdvancedHelper]
   , widget Button [#label := "Exit", on #clicked ExitApplication]]
 
 margin :: BoxChild MyEvent
@@ -53,6 +54,7 @@ stats state = container Box [#orientation := OrientationVertical]
   [ statProperty "Paperclips" (viewPaperclips state)
   , statProperty "Helpers" (viewHelpers state)
   , statProperty "Storage" (viewStorage state)
+  , statProperty "Water" (viewWater state)
   , statProperty "Tree seeds" (viewTreeSeeds state)
   , statProperty "Trees" (viewTrees state)
   , statProperty "Wood" (viewWood state)
@@ -72,8 +74,9 @@ update' state event = case (unIsStarted (viewIsStarted state), event) of
   (_, ExitApplication) -> Exit
   (True, CreatePaperclip) -> Transition (createPaperclip state) (pure Nothing)
   (True, CreateHelper) -> Transition (buyHelper state) (pure Nothing)
-  (True, ResearchAdvancedHelper) -> Transition (researchAdvancedHelper state) (pure Nothing)
+  (True, PumpWater) -> Transition (pumpWater state) (pure Nothing)
   (True, PlantASeed) -> Transition (plantASeed state) (pure Nothing)
+  (True, ResearchAdvancedHelper) -> Transition (researchAdvancedHelper state) (pure Nothing)
   (True, Start) -> Transition state (pure Nothing)
   (True, Tick) -> Transition (nextTick state) ticker
   (False, _) -> Transition state (pure Nothing)

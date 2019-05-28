@@ -49,6 +49,9 @@ helpers f state = (\helpers' -> state { _helpers = helpers'}) <$> f (_helpers st
 storage :: Lens' Resources Storage
 storage f state = (\storage' -> state { _storage = storage'}) <$> f (_storage state)
 
+water :: Lens' Resources Water
+water f state = (\water' -> state { _water = water'}) <$> f (_water state)
+
 trees :: Lens' Resources Trees
 trees f state = (\trees' -> state { _trees = trees'}) <$> f (_trees state)
 

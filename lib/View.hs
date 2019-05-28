@@ -26,14 +26,17 @@ viewTrees = view (resources.trees)
 viewTreeSeeds :: MyState -> TreeSeeds
 viewTreeSeeds = view (resources.treeSeeds)
 
+viewWater :: MyState -> Water
+viewWater = view (resources.water)
+
+viewWood :: MyState -> Wood
+viewWood = view (resources.wood)
+
 viewAdvancedHelperResearch :: MyState -> ResearchProgress
 viewAdvancedHelperResearch = view (researchAreas.advancedHelperResearch.researchCompProgress)
 
 viewSeconds :: MyState -> Seconds
 viewSeconds = view seconds
-
-viewWood :: MyState -> Wood
-viewWood = view (resources.wood)
 
 viewIsStarted :: MyState -> IsStarted
 viewIsStarted = view isStarted

@@ -24,3 +24,6 @@ treePrice = iso TreePrice unTreePrice
 
 treeSeeds :: (Profunctor p, Functor f) => p TreeSeeds (f TreeSeeds) -> p [Prog] (f [Prog])
 treeSeeds = iso TreeSeeds unTreeSeeds
+
+water :: (Profunctor p, Functor f) => p Water (f Water) -> p Integer (f Integer)
+water = iso Water unWater

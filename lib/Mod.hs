@@ -76,7 +76,7 @@ instance Arbitrary ErrorLogLine where
 
 instance Arbitrary Resources where
   arbitrary = Resources
-    <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
+    <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
 
 instance Arbitrary Paperclips where
   arbitrary = Paperclips . getNonNegative <$> arbitrary
@@ -89,6 +89,9 @@ instance Arbitrary Trees where
 
 instance Arbitrary TreeSeeds where
   arbitrary = elements []
+
+instance Arbitrary Water where
+  arbitrary = Water <$> arbitrary
 
 instance Arbitrary Wood where
   arbitrary = Wood . getNonNegative <$> arbitrary
@@ -152,6 +155,7 @@ data Action
   | SetR ResearchProgress
   | SetTreeSeeds TreeSeeds
   | SetTrees Trees
+  | SetWater Water
   | SetAdvancedHelperResearchProgress ResearchProgress
   | SetHelperInc HelperInc
   | SetProgs [Prog]
@@ -168,6 +172,7 @@ data Resources = Resources
   , _storage :: Storage
   , _trees :: Trees
   , _treeSeeds :: TreeSeeds
+  , _water :: Water
   , _wood :: Wood } deriving (Eq, Show)
 
 newtype Paperclips = Paperclips { unPaperclips :: Integer } deriving (Enum, Eq, Ord)
@@ -204,6 +209,11 @@ instance Show Prog where
       noun 1 = "tick"
       noun _ = "ticks"
   show GrowingDone = show "Growing done"
+
+newtype Water = Water { unWater :: Integer } deriving (Eq)
+
+instance Show Water where
+  show (Water a) = show a
 
 newtype Wood = Wood { unWood :: Integer } deriving (Enum, Eq, Num, Ord)
 
@@ -248,8 +258,9 @@ data MyEvent
   = Start
   | CreatePaperclip
   | CreateHelper
-  | ResearchAdvancedHelper
+  | PumpWater
   | PlantASeed
+  | ResearchAdvancedHelper
   | ExitApplication
   | Tick
   deriving (Eq, Show)

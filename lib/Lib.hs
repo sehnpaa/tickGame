@@ -26,6 +26,7 @@ applyAction (SetTrees t) state = set (resources.trees) t state
 applyAction (SetAdvancedHelperResearchProgress p) state = set (researchAreas.advancedHelperResearch.researchCompProgress) p state
 applyAction (SetHelperInc i) state = set (config.constants.helperInc) i state
 applyAction (SetProgs ps) state = set (resources.treeSeeds.progs) ps state
+applyAction (SetWater w) state = set (resources.water) w state
 
 helperWork :: MyState -> MyState
 helperWork state
@@ -68,6 +69,13 @@ buyHelper state
 
 withError :: Bifoldable p => (b -> [Action]) -> p ErrorLogLine b -> [Action]
 withError = bifoldMap (singleton . SetE)
+
+pumpWater :: MyState -> MyState
+pumpWater state
+  = handleActions
+  $ addActions state
+  $ (\w -> SetWater w : [])
+  $ PBL.pumpWater state
 
 addActions :: MyState -> [Action] -> MyState
 addActions state newActions = over actions (\as -> newActions ++ as) state
