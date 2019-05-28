@@ -92,4 +92,4 @@ initialPrices :: Prices
 initialPrices = Prices (AdvancedHelperPrice $ Paperclips 5) (HelperPrice $ Paperclips 10) (TreePrice 1)
 
 getInitialState :: MyState
-getInitialState = MyState (Config (Constants (HelperInc (Helpers 1))) initialPrices) [] [] (ResearchAreas (ResearchComp (Duration 10) NotResearched)) (Resources (Paperclips 0) (Helpers 0) (Storage 1000) (Trees 0) (TreeSeeds (replicate 20 NotGrowing)) (Wood 0)) (Seconds 0) (IsStarted False)
+getInitialState = MyState (Config (Constants (HelperInc (Helpers 1))) (Durations (TreeDuration 20)) initialPrices) [] [] (ResearchAreas (ResearchComp (Duration 10) NotResearched)) (Resources (Paperclips 0) (Helpers 0) (Storage 1000) (Trees 0) (TreeSeeds (replicate 20 NotGrowing)) (Wood 0)) (Seconds 0) (IsStarted False)

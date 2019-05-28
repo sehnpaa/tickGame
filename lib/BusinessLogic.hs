@@ -65,14 +65,14 @@ decPaperclipsWith = withIso (Iso.paperclips . Iso.helperPrice) (\_ elim price ->
 decPaperclipsWith' :: AdvancedHelperPrice -> Paperclips -> Paperclips
 decPaperclipsWith' = withIso (Iso.paperclips . Iso.advancedHelperPrice) (\_ elim price -> under Iso.paperclips (\p -> p - elim price))
 
-plantASeed :: Seconds -> TreePrice -> TreeSeeds -> Either ErrorLogLine TreeSeeds
-plantASeed s price seeds =
+plantASeed :: Seconds -> TreeDuration -> TreePrice -> TreeSeeds -> Either ErrorLogLine TreeSeeds
+plantASeed s dur price seeds =
   if unTreePrice price > countNotGrowingSeeds seeds
     then Left $ lineNeedMoreSeeds s
-    else Right $ initializeSeed seeds
+    else Right $ initializeSeed dur seeds
 
-initializeSeed :: TreeSeeds -> TreeSeeds
-initializeSeed = TreeSeeds . changeFirst (== NotGrowing) (const $ Growing 4) . unTreeSeeds
+initializeSeed :: TreeDuration -> TreeSeeds -> TreeSeeds
+initializeSeed duration = TreeSeeds . changeFirst (== NotGrowing) (const $ Growing $ unTreeDuration duration) . unTreeSeeds
 
 changeFirst :: Eq a => (a -> Bool) -> (a -> a) -> [a] -> [a]
 changeFirst _ _ [] = []

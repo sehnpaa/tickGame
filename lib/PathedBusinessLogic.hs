@@ -38,8 +38,9 @@ researchAdvancedHelper = arg5 BL.researchAdvancedHelper
       (researchAreas.advancedHelperResearch.researchCompDuration)
 
 plantASeed :: MyState -> Either ErrorLogLine TreeSeeds
-plantASeed = arg3 BL.plantASeed
+plantASeed = arg4 BL.plantASeed
       seconds
+      (config.durations.treeDuration)
       (config.prices.treePrice)
       (resources.treeSeeds)
 

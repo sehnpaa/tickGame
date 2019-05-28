@@ -10,6 +10,12 @@ config f state = (\config' -> state { _config = config'}) <$> f (_config state)
 constants :: Lens' Config Constants
 constants f state = (\constants' -> state { _constants = constants'}) <$> f (_constants state)
 
+durations :: Lens' Config Durations
+durations f state = (\durations' -> state { _durations = durations'}) <$> f (_durations state)
+
+treeDuration :: Lens' Durations TreeDuration
+treeDuration f state = (\duration' -> state { _treeDuration = duration'}) <$> f (_treeDuration state)
+
 helperInc :: Lens' Constants HelperInc
 helperInc f state = (\inc' -> state { _helperInc = inc'}) <$> f (_helperInc state)
 

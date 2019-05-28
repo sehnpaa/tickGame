@@ -19,10 +19,16 @@ instance Arbitrary MyState where
                       <*> arbitrary <*> arbitrary <*> arbitrary
 
 instance Arbitrary Config where
-  arbitrary = Config <$> arbitrary <*> arbitrary
+  arbitrary = Config <$> arbitrary <*> arbitrary <*> arbitrary
 
 instance Arbitrary Constants where
   arbitrary = Constants <$> arbitrary
+
+instance Arbitrary Durations where
+  arbitrary = Durations <$> arbitrary
+
+instance Arbitrary TreeDuration where
+  arbitrary = TreeDuration <$> arbitrary
 
 instance Arbitrary HelperInc where
   arbitrary = HelperInc <$> arbitrary
@@ -115,7 +121,13 @@ instance Arbitrary Text where
 
 data Config = Config
   { _constants :: Constants
+  , _durations :: Durations
   , _prices :: Prices } deriving (Eq, Show)
+
+data Durations = Durations
+  { _treeDuration :: TreeDuration } deriving (Eq, Show)
+
+newtype TreeDuration = TreeDuration { unTreeDuration :: Integer } deriving (Eq, Show)
 
 data Constants = Constants
   { _helperInc :: HelperInc } deriving (Eq, Show)
@@ -183,7 +195,7 @@ newtype TreeSeeds = TreeSeeds { unTreeSeeds :: [Prog]} deriving (Eq)
 instance Show TreeSeeds where
   show (TreeSeeds a) = show a
 
-data Prog = NotGrowing | Growing Int | GrowingDone deriving (Eq)
+data Prog = NotGrowing | Growing Integer | GrowingDone deriving (Eq)
 
 instance Show Prog where
   show NotGrowing = show "Not growing"
