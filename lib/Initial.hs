@@ -6,6 +6,7 @@ prices :: Prices
 prices = Prices
     (AdvancedHelperPrice $ Paperclips 5)
     (HelperPrice $ Paperclips 10)
+    (ProgPrice 2)
     (TreePrice 1)
 
 config :: Config
@@ -24,8 +25,8 @@ resources = Resources
     (Helpers 0)
     (Storage 1000)
     (Trees 0)
-    (TreeSeeds (replicate 20 NotGrowing))
-    (Water 0)
+    (TreeSeeds (replicate 10 NotGrowing))
+    (Water 100)
     (Wood 0)
 
 getInitialState :: MyState

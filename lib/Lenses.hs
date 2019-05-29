@@ -31,6 +31,9 @@ helperPrices f state = (\helperPrice' -> state { _helperPrice = helperPrice'}) <
 treePrice :: Lens' Prices TreePrice
 treePrice f state = (\treePrice' -> state { _treePrice = treePrice'}) <$> f (_treePrice state)
 
+progPrice :: Lens' Prices ProgPrice
+progPrice f state = (\price' -> state { _progPrice = price'}) <$> f (_progPrice state)
+
 actions :: Lens' MyState [Action]
 actions f state = (\actions' -> state { _actions = actions'}) <$> f (_actions state)
 

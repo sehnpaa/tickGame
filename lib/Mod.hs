@@ -34,7 +34,7 @@ instance Arbitrary HelperInc where
   arbitrary = HelperInc <$> arbitrary
 
 instance Arbitrary Prices where
-  arbitrary = Prices <$> arbitrary <*> arbitrary <*> arbitrary
+  arbitrary = Prices <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
 
 instance Arbitrary AdvancedHelperPrice where
   arbitrary = AdvancedHelperPrice <$> arbitrary
@@ -44,6 +44,9 @@ instance Arbitrary HelperPrice where
 
 instance Arbitrary TreePrice where
   arbitrary = TreePrice <$> arbitrary
+
+instance Arbitrary ProgPrice where
+  arbitrary = ProgPrice <$> arbitrary
 
 instance Arbitrary Helpers where
   arbitrary = Helpers <$> arbitrary
@@ -59,7 +62,8 @@ instance Arbitrary Action where
       , SetTrees undefined
       , SetAdvancedHelperResearchProgress undefined
       , SetHelperInc undefined
-      , SetProgs undefined]
+      , SetProgs undefined
+      , SetWater undefined]
     case r of
       SetP _ -> SetP <$> arbitrary
       SetH _ -> SetH <$> arbitrary
@@ -70,6 +74,7 @@ instance Arbitrary Action where
       SetAdvancedHelperResearchProgress _ -> SetAdvancedHelperResearchProgress <$> arbitrary
       SetHelperInc _ -> SetHelperInc <$> arbitrary
       SetProgs _ -> arbitrary
+      SetWater _ -> arbitrary
 
 instance Arbitrary ErrorLogLine where
   arbitrary = ErrorLogLine <$> arbitrary
@@ -140,6 +145,7 @@ newtype HelperInc = HelperInc { unHelperInc :: Helpers } deriving (Eq, Show)
 data Prices = Prices
   { _advancedHelperPrice :: AdvancedHelperPrice
   , _helperPrice :: HelperPrice
+  , _progPrice :: ProgPrice
   , _treePrice :: TreePrice } deriving (Eq, Show)
 
 newtype AdvancedHelperPrice = AdvancedHelperPrice { unAdvancedHelperPrice :: Paperclips } deriving (Eq, Show)
@@ -147,6 +153,8 @@ newtype AdvancedHelperPrice = AdvancedHelperPrice { unAdvancedHelperPrice :: Pap
 newtype HelperPrice = HelperPrice { unHelperPrice :: Paperclips } deriving (Eq, Show)
 
 newtype TreePrice = TreePrice { unTreePrice :: Integer } deriving (Eq, Show)
+
+newtype ProgPrice = ProgPrice { unProgPrice :: Integer } deriving (Eq, Show)
 
 data Action
   = SetP Paperclips

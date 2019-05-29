@@ -47,7 +47,7 @@ researchWork state
 seedWork :: MyState -> MyState
 seedWork state
   = addActions state
-  $ (\(p,t) -> SetProgs p : SetTrees t : [])
+  $ withExtendedError (\p -> SetProgs p : []) (\(w,p,t) -> SetWater w : SetProgs p : SetTrees t : [])
   $ PBL.seedWork state
 
 addSecond :: MyState -> MyState
@@ -69,6 +69,9 @@ buyHelper state
 
 withError :: Bifoldable p => (b -> [Action]) -> p ErrorLogLine b -> [Action]
 withError = bifoldMap (singleton . SetE)
+
+withExtendedError :: Bifoldable p => (a -> [Action]) -> (b -> [Action]) -> p (ErrorLogLine, a) b -> [Action]
+withExtendedError f = bifoldMap (\(err, a) -> SetE err : f a)
 
 pumpWater :: MyState -> MyState
 pumpWater state

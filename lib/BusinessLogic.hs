@@ -25,15 +25,35 @@ researchWork progress c =
 incHelperIncWith :: HelperInc -> HelperInc -> HelperInc
 incHelperIncWith = withIso (Iso.helpers . Iso.helperInc) (\_ elim inc -> under (Iso.helpers . Iso.helperInc) (\h -> h + elim inc))
 
-seedWork :: [Prog] -> Trees -> ([Prog], Trees)
-seedWork progs ts =
+seedWork :: Seconds -> Water -> ProgPrice -> [Prog] -> Trees -> Either (ErrorLogLine, [Prog]) (Water, [Prog], Trees)
+seedWork s water price progs ts =
   let ts' = additionalTrees progs
       progs' = filter (not . isGrowingDone) $ map (\x -> case x of
         NotGrowing -> NotGrowing
         Growing 1 -> GrowingDone
         Growing n -> Growing (n-1)
         GrowingDone -> GrowingDone) progs
-    in (progs', ts+ts')
+    in
+      if any isGrowing progs
+        then if unProgPrice price > unWater water
+          then Left (mkErrorLogLine s "Not enough water for the seeds.", removeGrowingSeeds progs)
+          else Right $ (calcWater water price progs, progs', ts+ts')
+        else Right $ (water, progs, ts)
+
+calcWater :: Water -> ProgPrice -> [Prog] -> Water
+calcWater water price progs = Water (max 0 (unWater water - (waterCost progs (unProgPrice price))))
+
+waterCost :: [Prog] -> Integer -> Integer
+waterCost progs waterPerSeed = let numberOfGrowingSeeds = toInteger . length . filter isGrowing $ progs
+      in
+        waterPerSeed * numberOfGrowingSeeds
+
+removeGrowingSeeds :: [Prog] -> [Prog]
+removeGrowingSeeds = filter (not . isGrowing)
+
+isGrowing :: Prog -> Bool
+isGrowing (Growing _) = True
+isGrowing _ = False
 
 isGrowingDone :: Prog -> Bool
 isGrowingDone GrowingDone = True

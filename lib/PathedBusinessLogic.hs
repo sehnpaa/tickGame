@@ -17,8 +17,11 @@ researchWork = arg2 BL.researchWork
       (researchAreas.advancedHelperResearch.researchCompProgress)
       (config.constants.helperInc)
 
-seedWork :: MyState -> ([Prog], Trees)
-seedWork = arg2 BL.seedWork
+seedWork :: MyState -> Either (ErrorLogLine, [Prog]) (Water, [Prog], Trees)
+seedWork = arg5 BL.seedWork
+      seconds
+      (resources.water)
+      (config.prices.progPrice)
       (resources.treeSeeds.progs)
       (resources.trees)
 
