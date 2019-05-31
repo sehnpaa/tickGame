@@ -55,6 +55,7 @@ stats state = container Box [#orientation := OrientationVertical]
   , statProperty "Helpers" (viewHelpers state)
   , statProperty "Storage" (viewStorage state)
   , statProperty "Water" (viewWater state)
+  , statProperty "Water tank" (viewWaterTank state)
   , statProperty "Tree seeds" (viewTreeSeeds state)
   , statProperty "Trees" (viewTrees state)
   , statProperty "Wood" (viewWood state)

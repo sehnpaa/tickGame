@@ -81,7 +81,8 @@ instance Arbitrary ErrorLogLine where
 
 instance Arbitrary Resources where
   arbitrary = Resources
-    <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
+    <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
+    <*> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
 
 instance Arbitrary Paperclips where
   arbitrary = Paperclips . getNonNegative <$> arbitrary
@@ -96,7 +97,10 @@ instance Arbitrary TreeSeeds where
   arbitrary = elements []
 
 instance Arbitrary Water where
-  arbitrary = Water <$> arbitrary
+  arbitrary = Water . getNonNegative <$> arbitrary
+
+instance Arbitrary WaterTank where
+  arbitrary = WaterTank . getNonNegative <$> arbitrary
 
 instance Arbitrary Wood where
   arbitrary = Wood . getNonNegative <$> arbitrary
@@ -181,6 +185,7 @@ data Resources = Resources
   , _trees :: Trees
   , _treeSeeds :: TreeSeeds
   , _water :: Water
+  , _waterTank :: WaterTank
   , _wood :: Wood } deriving (Eq, Show)
 
 newtype Paperclips = Paperclips { unPaperclips :: Integer } deriving (Enum, Eq, Ord)
@@ -222,6 +227,11 @@ newtype Water = Water { unWater :: Integer } deriving (Eq)
 
 instance Show Water where
   show (Water a) = show a
+
+newtype WaterTank = WaterTank { unWaterTank :: Integer } deriving (Eq)
+
+instance Show WaterTank where
+  show (WaterTank a) = show a
 
 newtype Wood = Wood { unWood :: Integer } deriving (Enum, Eq, Num, Ord)
 

@@ -29,6 +29,9 @@ viewTreeSeeds = view (resources.treeSeeds)
 viewWater :: MyState -> Water
 viewWater = view (resources.water)
 
+viewWaterTank :: MyState -> WaterTank
+viewWaterTank = view (resources.waterTank)
+
 viewWood :: MyState -> Wood
 viewWood = view (resources.wood)
 

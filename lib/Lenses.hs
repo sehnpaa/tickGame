@@ -55,6 +55,9 @@ storage f state = (\storage' -> state { _storage = storage'}) <$> f (_storage st
 water :: Lens' Resources Water
 water f state = (\water' -> state { _water = water'}) <$> f (_water state)
 
+waterTank :: Lens' Resources WaterTank
+waterTank f state = (\tank' -> state { _waterTank = tank'}) <$> f (_waterTank state)
+
 trees :: Lens' Resources Trees
 trees f state = (\trees' -> state { _trees = trees'}) <$> f (_trees state)
 

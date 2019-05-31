@@ -33,8 +33,9 @@ buyHelper = arg4 BL.buyHelper
       (resources.helpers)
 
 pumpWater :: MyState -> Water
-pumpWater = arg1 BL.pumpWater
+pumpWater = arg2 BL.pumpWater
       (resources.water)
+      (resources.waterTank)
 
 researchAdvancedHelper :: MyState -> Either ErrorLogLine (Paperclips, ResearchProgress)
 researchAdvancedHelper = arg5 BL.researchAdvancedHelper

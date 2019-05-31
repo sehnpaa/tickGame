@@ -27,6 +27,7 @@ resources = Resources
     (Trees 0)
     (TreeSeeds (replicate 10 NotGrowing))
     (Water 100)
+    (WaterTank 100)
     (Wood 0)
 
 getInitialState :: MyState

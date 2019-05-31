@@ -71,8 +71,8 @@ buyHelper s price p h =
 lineNeedMorePaperclips :: Seconds -> ErrorLogLine
 lineNeedMorePaperclips s = ErrorLogLine $ Data.Text.concat ["Tick ", pack (show s), ": You need more paperclips."]
 
-pumpWater :: Water -> Water
-pumpWater = under Iso.water succ
+pumpWater :: Water -> WaterTank -> Water
+pumpWater w tank = Water $ min (unWaterTank tank) (succ $ unWater w)
 
 mkErrorLogLine :: Seconds -> Text -> ErrorLogLine
 mkErrorLogLine s t = ErrorLogLine $ Data.Text.concat ["Tick ", pack (show s), ": ", t]
