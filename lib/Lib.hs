@@ -1,4 +1,9 @@
-module Lib (module Lib, module Mod, module Lenses, Initial.getInitialState) where
+module Lib
+  ( Initial.getInitialState
+  , module Lenses
+  , module Lib
+  , module Mod
+  , module Resources ) where
 
 import Data.Bifoldable (Bifoldable, bifoldMap)
 import Control.Lens
@@ -7,6 +12,7 @@ import qualified Initial as Initial
 import Lenses
 import Mod
 import qualified PathedBusinessLogic as PBL
+import Resources
 
 nextTick :: MyState -> MyState
 nextTick = handleActions . addSecond . helperWork . seedWork . researchWork
