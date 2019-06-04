@@ -36,18 +36,23 @@ seedWork s water price progs ts =
         GrowingDone -> GrowingDone) progs
     in
       if any isGrowing progs
-        then if unProgPrice price > unWater water
-          then Left (mkErrorLogLine s "Not enough water for the seeds.", removeGrowingSeeds progs)
-          else Right $ (calcWater water price progs, progs', ts+ts')
+        then
+          case calcRemainingWater price progs water of
+            Nothing -> Left (mkErrorLogLine s "Not enough water for the seeds.", removeGrowingSeeds progs)
+            Just water' -> Right $ (water', progs', ts+ts')
         else Right $ (water, progs, ts)
 
-calcWater :: Water -> ProgPrice -> [Prog] -> Water
-calcWater water price progs = Water (max 0 (unWater water - (waterCost progs (unProgPrice price))))
+calcRemainingWater :: ProgPrice -> [Prog] -> Water -> Maybe Water
+calcRemainingWater price progs water =
+  let cost = waterCost progs (unProgPrice price)
+    in case cost > water of
+      True -> Nothing
+      False -> Just $ water - cost
 
-waterCost :: [Prog] -> Integer -> Integer
+waterCost :: [Prog] -> Integer -> Water
 waterCost progs waterPerSeed = let numberOfGrowingSeeds = toInteger . length . filter isGrowing $ progs
       in
-        waterPerSeed * numberOfGrowingSeeds
+        Water $ waterPerSeed * numberOfGrowingSeeds
 
 removeGrowingSeeds :: [Prog] -> [Prog]
 removeGrowingSeeds = filter (not . isGrowing)
