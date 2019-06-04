@@ -1,6 +1,6 @@
 module Iso where
 
-import Control.Lens (Profunctor, iso)
+import Control.Lens (AnIso, Profunctor, iso, withIso)
 
 import Mod
 import Resources
@@ -28,3 +28,13 @@ treeSeeds = iso TreeSeeds unTreeSeeds
 
 water :: (Profunctor p, Functor f) => p Water (f Water) -> p Integer (f Integer)
 water = iso Water unWater
+
+-------------------------
+
+binUnder :: AnIso s t r b -> (t -> t -> s) -> b -> b -> r
+binUnder i g a b = withIso i (\con eli -> con $ g (eli a) (eli b))
+
+-------------------------
+
+underPaperclips :: (Integer -> Integer -> Integer) -> Paperclips -> Paperclips -> Paperclips
+underPaperclips = binUnder paperclips

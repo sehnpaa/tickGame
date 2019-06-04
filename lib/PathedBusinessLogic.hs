@@ -53,6 +53,13 @@ plantASeed = arg4 BL.plantASeed
       (config.prices.treePrice)
       (resources.treeSeeds)
 
+buyASeed :: MyState -> Either ErrorLogLine (TreeSeeds, Paperclips)
+buyASeed = arg4 BL.buyASeed
+      seconds
+      (config.prices.treeSeedPrice)
+      (resources.paperclips)
+      (resources.treeSeeds)
+
 createPaperclip :: MyState -> Paperclips
 createPaperclip = arg1 BL.createPaperclip
       (resources.paperclips)

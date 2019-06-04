@@ -9,6 +9,7 @@ prices = Prices
     (HelperPrice $ Paperclips 10)
     (ProgPrice 2)
     (TreePrice 1)
+    (TreeSeedPrice $ Paperclips 100)
 
 config :: Config
 config = Config

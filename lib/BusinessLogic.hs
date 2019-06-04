@@ -121,5 +121,11 @@ isNotGrowing a = case a of
 lineNeedMoreSeeds :: Seconds -> ErrorLogLine
 lineNeedMoreSeeds s = ErrorLogLine $ Data.Text.concat ["Tick ", pack (show s), ": You need more seeds."]
 
+buyASeed :: Seconds -> TreeSeedPrice -> Paperclips -> TreeSeeds -> Either ErrorLogLine (TreeSeeds, Paperclips)
+buyASeed s (TreeSeedPrice price) p (TreeSeeds seeds) =
+  if price > p
+    then Left $ mkErrorLogLine s "Not enough paperclips."
+    else Right $ (TreeSeeds $ seeds ++ [NotGrowing], Iso.underPaperclips (-) p price)
+
 createPaperclip :: Paperclips -> Paperclips
 createPaperclip = under Iso.paperclips succ

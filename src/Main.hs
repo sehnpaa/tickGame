@@ -13,7 +13,7 @@ import GI.Gtk (Box(..), Button(..), Label(..), ListBox(..), ListBoxRow(..), Orie
 import GI.Gtk.Declarative
 import GI.Gtk.Declarative.App.Simple
 
-import Lib (buyHelper, createPaperclip, nextTick, pumpWater, researchAdvancedHelper, setStarted, unErrorLogLine, plantASeed, IsStarted(..), MyEvent(..)
+import Lib (buyASeed, buyHelper, createPaperclip, nextTick, pumpWater, researchAdvancedHelper, setStarted, unErrorLogLine, plantASeed, IsStarted(..), MyEvent(..)
   , MyState(..), getInitialState)
 import View
 
@@ -42,6 +42,7 @@ buttons = container Box [#orientation := OrientationVertical, #widthRequest := 1
   , widget Button [#label := "Create paperclip", on #clicked CreatePaperclip]
   , widget Button [#label := "Create helper", on #clicked CreateHelper]
   , widget Button [#label := "Pump water", on #clicked PumpWater]
+  , widget Button [#label := "Buy a seed", on #clicked BuyASeed]
   , widget Button [#label := "Plant a seed", on #clicked PlantASeed]
   , widget Button [#label := "Research advanced helper", on #clicked ResearchAdvancedHelper]
   , widget Button [#label := "Exit", on #clicked ExitApplication]]
@@ -73,6 +74,7 @@ update' :: MyState -> MyEvent -> Transition MyState MyEvent
 update' state event = case (unIsStarted (viewIsStarted state), event) of
   (False, Start) -> Transition (setStarted state) ticker
   (_, ExitApplication) -> Exit
+  (True, BuyASeed) -> Transition (buyASeed state) (pure Nothing)
   (True, CreatePaperclip) -> Transition (createPaperclip state) (pure Nothing)
   (True, CreateHelper) -> Transition (buyHelper state) (pure Nothing)
   (True, PumpWater) -> Transition (pumpWater state) (pure Nothing)

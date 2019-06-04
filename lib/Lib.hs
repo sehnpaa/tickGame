@@ -103,5 +103,12 @@ plantASeed state
   $ withError (\s -> SetTreeSeeds s : [])
   $ PBL.plantASeed state
 
+buyASeed :: MyState -> MyState
+buyASeed state
+  = handleActions
+  $ addActions state
+  $ withError (\(s, p) -> SetTreeSeeds s : SetP p : [])
+  $ PBL.buyASeed state
+
 setStarted :: MyState -> MyState
 setStarted = over isStarted (const $ IsStarted True)

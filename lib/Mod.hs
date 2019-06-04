@@ -34,15 +34,18 @@ data Prices = Prices
   { _advancedHelperPrice :: AdvancedHelperPrice
   , _helperPrice :: HelperPrice
   , _progPrice :: ProgPrice
-  , _treePrice :: TreePrice } deriving (Eq, Show)
+  , _treePrice :: TreePrice
+  , _treeSeedPrice :: TreeSeedPrice } deriving (Eq, Show)
 
 newtype AdvancedHelperPrice = AdvancedHelperPrice { unAdvancedHelperPrice :: Paperclips } deriving (Eq, Show)
 
 newtype HelperPrice = HelperPrice { unHelperPrice :: Paperclips } deriving (Eq, Show)
 
+newtype ProgPrice = ProgPrice { unProgPrice :: Integer } deriving (Eq, Show)
+
 newtype TreePrice = TreePrice { unTreePrice :: Integer } deriving (Eq, Show)
 
-newtype ProgPrice = ProgPrice { unProgPrice :: Integer } deriving (Eq, Show)
+newtype TreeSeedPrice = TreeSeedPrice { unTreeSeedPrice :: Paperclips } deriving (Eq, Show)
 
 data Action
   = SetP Paperclips
@@ -102,6 +105,7 @@ data MyEvent
   | CreateHelper
   | PumpWater
   | PlantASeed
+  | BuyASeed
   | ResearchAdvancedHelper
   | ExitApplication
   | Tick
