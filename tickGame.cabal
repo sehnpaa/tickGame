@@ -21,6 +21,7 @@ library tickGameLib
       LensUtils
       Mod
       PathedBusinessLogic
+      Resources
     build-depends:
         base >=4.11 && <5
       , gi-gtk

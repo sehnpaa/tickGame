@@ -3,6 +3,7 @@ module Lenses where
 import Control.Lens
 
 import Mod
+import Resources
 
 config :: Lens' MyState Config
 config f state = (\config' -> state { _config = config'}) <$> f (_config state)

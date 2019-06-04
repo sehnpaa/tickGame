@@ -1,6 +1,7 @@
 module Initial where
 
 import Mod
+import Resources
 
 prices :: Prices
 prices = Prices

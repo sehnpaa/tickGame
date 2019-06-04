@@ -3,6 +3,7 @@ module Iso where
 import Control.Lens (Profunctor, iso)
 
 import Mod
+import Resources
 
 advancedHelperPrice :: (Profunctor p, Functor f) => p AdvancedHelperPrice (f AdvancedHelperPrice) -> p Paperclips (f Paperclips)
 advancedHelperPrice = iso AdvancedHelperPrice unAdvancedHelperPrice

@@ -4,6 +4,7 @@ import qualified BusinessLogic as BL
 import Lenses
 import LensUtils
 import Mod
+import Resources
 
 helperWork :: MyState -> Paperclips
 helperWork = arg4 BL.helperWork

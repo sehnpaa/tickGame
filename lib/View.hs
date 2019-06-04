@@ -4,6 +4,7 @@ import Control.Lens
 
 import Lenses
 import Mod
+import Resources
 
 viewActions :: MyState -> [Action]
 viewActions = view actions

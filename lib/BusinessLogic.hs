@@ -7,6 +7,7 @@ import Data.Text (concat, pack, Text)
 
 import qualified Iso as Iso
 import Mod
+import Resources
 
 helperWork :: Paperclips -> Helpers -> HelperInc -> Storage -> Paperclips
 helperWork p h inc storage = Paperclips $ min (unStorage storage) $ (unPaperclips $ addHelperWork inc h p)
