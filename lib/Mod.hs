@@ -2,8 +2,7 @@
 
 module Mod where
 
-import Data.Text (pack, Text)
-import Test.Tasty.QuickCheck
+import Data.Text (Text)
 
 import Resources
 
@@ -15,123 +14,6 @@ data MyState = MyState
   , _resources :: Resources
   , _seconds :: Seconds
   , _isStarted :: IsStarted } deriving (Eq, Show)
-
-instance Arbitrary MyState where
-  arbitrary = MyState <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
-                      <*> arbitrary <*> arbitrary <*> arbitrary
-
-instance Arbitrary Config where
-  arbitrary = Config <$> arbitrary <*> arbitrary <*> arbitrary
-
-instance Arbitrary Constants where
-  arbitrary = Constants <$> arbitrary
-
-instance Arbitrary Durations where
-  arbitrary = Durations <$> arbitrary
-
-instance Arbitrary TreeDuration where
-  arbitrary = TreeDuration <$> arbitrary
-
-instance Arbitrary HelperInc where
-  arbitrary = HelperInc <$> arbitrary
-
-instance Arbitrary Prices where
-  arbitrary = Prices <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
-
-instance Arbitrary AdvancedHelperPrice where
-  arbitrary = AdvancedHelperPrice <$> arbitrary
-
-instance Arbitrary HelperPrice where
-  arbitrary = HelperPrice <$> arbitrary
-
-instance Arbitrary TreePrice where
-  arbitrary = TreePrice <$> arbitrary
-
-instance Arbitrary ProgPrice where
-  arbitrary = ProgPrice <$> arbitrary
-
-instance Arbitrary Helpers where
-  arbitrary = Helpers <$> arbitrary
-
-instance Arbitrary Action where
-  arbitrary = do
-    r <- Test.Tasty.QuickCheck.elements
-      [ SetP undefined
-      , SetH undefined
-      , SetE undefined
-      , SetR undefined
-      , SetTreeSeeds undefined
-      , SetTrees undefined
-      , SetAdvancedHelperResearchProgress undefined
-      , SetHelperInc undefined
-      , SetProgs undefined
-      , SetWater undefined]
-    case r of
-      SetP _ -> SetP <$> arbitrary
-      SetH _ -> SetH <$> arbitrary
-      SetE _ -> SetE <$> arbitrary
-      SetR _ -> SetR <$> arbitrary
-      SetTreeSeeds _ -> SetTreeSeeds <$> arbitrary
-      SetTrees _ -> SetTrees <$> arbitrary
-      SetAdvancedHelperResearchProgress _ -> SetAdvancedHelperResearchProgress <$> arbitrary
-      SetHelperInc _ -> SetHelperInc <$> arbitrary
-      SetProgs _ -> arbitrary
-      SetWater _ -> arbitrary
-
-instance Arbitrary ErrorLogLine where
-  arbitrary = ErrorLogLine <$> arbitrary
-
-instance Arbitrary Resources where
-  arbitrary = Resources
-    <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
-    <*> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
-
-instance Arbitrary Paperclips where
-  arbitrary = Paperclips . getNonNegative <$> arbitrary
-
-instance Arbitrary Storage where
-  arbitrary = Storage . getNonNegative <$> arbitrary
-
-instance Arbitrary Trees where
-  arbitrary = Trees . getNonNegative <$> arbitrary
-
-instance Arbitrary TreeSeeds where
-  arbitrary = elements []
-
-instance Arbitrary Water where
-  arbitrary = Water . getNonNegative <$> arbitrary
-
-instance Arbitrary WaterTank where
-  arbitrary = WaterTank . getNonNegative <$> arbitrary
-
-instance Arbitrary Wood where
-  arbitrary = Wood . getNonNegative <$> arbitrary
-
-instance Arbitrary Seconds where
-  arbitrary = Seconds . getNonNegative <$> arbitrary
-
-instance Arbitrary ResearchAreas where
-  arbitrary = ResearchAreas <$> arbitrary
-
-instance Arbitrary ResearchComp where
-  arbitrary = ResearchComp <$> arbitrary <*> arbitrary
-
-instance Arbitrary Duration where
-  arbitrary = Duration . getNonNegative <$> arbitrary
-
-instance Arbitrary ResearchProgress where
-  arbitrary = do
-    r <- Test.Tasty.QuickCheck.elements [NotResearched, ResearchInProgress undefined, ResearchDone]
-    case r of
-      NotResearched -> return NotResearched
-      ResearchInProgress _ -> ResearchInProgress <$> arbitrary
-      ResearchDone -> return ResearchDone
-
-instance Arbitrary IsStarted where
-  arbitrary = IsStarted <$> arbitrary
-
-instance Arbitrary Text where
-  arbitrary = pack <$> arbitrary
 
 data Config = Config
   { _constants :: Constants
