@@ -32,6 +32,7 @@ library tickGameLib
       , tasty-hunit
       , tasty-quickcheck
       , text
+      , tuple
     ghc-options: -Wall
 
 executable tickGame

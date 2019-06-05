@@ -47,7 +47,7 @@ instance Show Prog where
       noun _ = "ticks"
   show GrowingDone = show "Growing done"
 
-newtype Water = Water { unWater :: Integer } deriving (Eq, Num, Ord)
+newtype Water = Water { unWater :: Integer } deriving (Eq, Ord)
 
 instance Show Water where
   show (Water a) = show a
@@ -57,7 +57,7 @@ newtype WaterTank = WaterTank { unWaterTank :: Integer } deriving (Eq)
 instance Show WaterTank where
   show (WaterTank a) = show a
 
-newtype Wood = Wood { unWood :: Integer } deriving (Enum, Eq, Num, Ord)
+newtype Wood = Wood { unWood :: Integer } deriving (Enum, Eq, Ord)
 
 instance Show Wood where
   show (Wood a) = show a

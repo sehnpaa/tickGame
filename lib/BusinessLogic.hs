@@ -47,7 +47,7 @@ calcRemainingWater price progs water =
   let cost = waterCost progs (unProgPrice price)
     in case cost > water of
       True -> Nothing
-      False -> Just $ water - cost
+      False -> Just $ Iso.under2 Iso.water (-) water cost
 
 waterCost :: [Prog] -> Integer -> Water
 waterCost progs waterPerSeed = let numberOfGrowingSeeds = toInteger . length . filter isGrowing $ progs
@@ -92,10 +92,10 @@ researchAdvancedHelper s p price progress duration =
     (_, ResearchDone) -> Left $ mkErrorLogLine s "Already done."
 
 decPaperclipsWith :: HelperPrice -> Paperclips -> Paperclips
-decPaperclipsWith = withIso (Iso.paperclips . Iso.helperPrice) (\_ elim price -> under Iso.paperclips (\p -> p - elim price))
+decPaperclipsWith = withIso (Iso.paperclips . Iso.helperPrice) (\_ eli price -> under Iso.paperclips (\p -> p - eli price))
 
 decPaperclipsWith' :: AdvancedHelperPrice -> Paperclips -> Paperclips
-decPaperclipsWith' = withIso (Iso.paperclips . Iso.advancedHelperPrice) (\_ elim price -> under Iso.paperclips (\p -> p - elim price))
+decPaperclipsWith' hp p = withIso Iso.advancedHelperPrice (\_ eli price -> Iso.under2 Iso.paperclips (-) p (eli price)) hp
 
 plantASeed :: Seconds -> TreeDuration -> TreePrice -> TreeSeeds -> Either ErrorLogLine TreeSeeds
 plantASeed s dur price seeds =
@@ -125,7 +125,7 @@ buyASeed :: Seconds -> TreeSeedPrice -> Paperclips -> TreeSeeds -> Either ErrorL
 buyASeed s (TreeSeedPrice price) p (TreeSeeds seeds) =
   if price > p
     then Left $ mkErrorLogLine s "Not enough paperclips."
-    else Right $ (TreeSeeds $ seeds ++ [NotGrowing], Iso.underPaperclips (-) p price)
+    else Right $ (TreeSeeds $ seeds ++ [NotGrowing], Iso.underAp Iso.paperclips (-) (p,price))
 
 createPaperclip :: Paperclips -> Paperclips
 createPaperclip = under Iso.paperclips succ
