@@ -15,7 +15,7 @@ viewErrorLog = view errorLog
 viewPaperclips :: MyState -> Paperclips
 viewPaperclips = view (resources.paperclips)
 
-viewHelpers :: MyState -> Helpers
+viewHelpers :: MyState -> Helpers Integer
 viewHelpers = view (resources.helpers)
 
 viewStorage :: MyState -> Storage

@@ -13,7 +13,7 @@ helperWork = arg4 BL.helperWork
       (config.constants.helperInc)
       (resources.storage)
 
-researchWork :: MyState -> (ResearchProgress, HelperInc)
+researchWork :: MyState -> (ResearchProgress, HelperInc (Helpers Integer))
 researchWork = arg2 BL.researchWork
       (researchAreas.advancedHelperResearch.researchCompProgress)
       (config.constants.helperInc)
@@ -26,7 +26,7 @@ seedWork = arg5 BL.seedWork
       (resources.treeSeeds.progs)
       (resources.trees)
 
-buyHelper :: MyState -> Either ErrorLogLine (Helpers, Paperclips)
+buyHelper :: MyState -> Either ErrorLogLine (Helpers Integer, Paperclips)
 buyHelper = arg4 BL.buyHelper
       seconds
       (config.prices.helperPrices)

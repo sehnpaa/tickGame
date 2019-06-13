@@ -11,13 +11,13 @@ import Resources
 advancedHelperPrice :: (Profunctor p, Functor f) => p AdvancedHelperPrice (f AdvancedHelperPrice) -> p Paperclips (f Paperclips)
 advancedHelperPrice = iso AdvancedHelperPrice unAdvancedHelperPrice
 
-helperInc :: (Profunctor p, Functor f) => p HelperInc (f HelperInc) -> p Helpers (f Helpers)
+helperInc :: (Profunctor p, Functor f) => p (HelperInc (Helpers Integer)) (f (HelperInc (Helpers Integer))) -> p (Helpers Integer) (f (Helpers Integer))
 helperInc = iso HelperInc unHelperInc
 
 helperPrice :: (Profunctor p, Functor f) => p HelperPrice (f HelperPrice) -> p Paperclips (f Paperclips)
 helperPrice = iso HelperPrice unHelperPrice
 
-helpers :: (Profunctor p, Functor f) => p Helpers (f Helpers) -> p Integer (f Integer)
+helpers :: (Profunctor p, Functor f) => p (Helpers Integer) (f (Helpers Integer)) -> p Integer (f Integer)
 helpers = iso Helpers unHelpers
 
 paperclips :: (Profunctor p, Functor f) => p Paperclips (f Paperclips) -> p Integer (f Integer)

@@ -2,6 +2,7 @@
 
 module BusinessLogic where
 
+import Control.Applicative
 import Control.Lens
 import Data.Text (concat, pack, Text)
 
@@ -9,13 +10,13 @@ import qualified Iso as Iso
 import Mod
 import Resources
 
-helperWork :: Paperclips -> Helpers -> HelperInc -> Storage -> Paperclips
+helperWork :: Paperclips -> Helpers Integer -> HelperInc (Helpers Integer) -> Storage -> Paperclips
 helperWork p h inc storage = Paperclips $ min (unStorage storage) $ (unPaperclips $ addHelperWork inc h p)
 
-addHelperWork :: HelperInc -> Helpers -> Paperclips -> Paperclips
+addHelperWork :: HelperInc (Helpers Integer) -> Helpers Integer -> Paperclips -> Paperclips
 addHelperWork inc h p = Paperclips $ (unPaperclips p) + (unHelpers h) * (unHelpers $ unHelperInc inc)
 
-researchWork :: ResearchProgress -> HelperInc -> (ResearchProgress, HelperInc)
+researchWork :: ResearchProgress -> HelperInc (Helpers Integer) -> (ResearchProgress, HelperInc (Helpers Integer))
 researchWork progress c =
   case progress of
     NotResearched -> (progress, c)
@@ -23,8 +24,8 @@ researchWork progress c =
     ResearchInProgress n -> (ResearchInProgress (n-1), c)
     ResearchDone -> (progress, c)
 
-incHelperIncWith :: HelperInc -> HelperInc -> HelperInc
-incHelperIncWith = withIso (Iso.helpers . Iso.helperInc) (\_ elim inc -> under (Iso.helpers . Iso.helperInc) (\h -> h + elim inc))
+incHelperIncWith :: HelperInc (Helpers Integer) -> HelperInc (Helpers Integer) -> HelperInc (Helpers Integer)
+incHelperIncWith = (liftA2 . liftA2) (+)
 
 seedWork :: Seconds -> Water -> ProgPrice -> [Prog] -> Trees -> Either (ErrorLogLine, [Prog]) (Water, [Prog], Trees)
 seedWork s water price progs ts =
@@ -68,7 +69,7 @@ isGrowingDone _ = False
 additionalTrees :: [Prog] -> Trees
 additionalTrees = Trees . toInteger . length . filter (\x -> case x of Growing 1 -> True; _ -> False)
 
-buyHelper :: Seconds -> HelperPrice -> Paperclips -> Helpers -> Either ErrorLogLine (Helpers, Paperclips)
+buyHelper :: Seconds -> HelperPrice -> Paperclips -> Helpers Integer -> Either ErrorLogLine (Helpers Integer, Paperclips)
 buyHelper s price p h =
   if unHelperPrice price > p
     then Left (lineNeedMorePaperclips s)

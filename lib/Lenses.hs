@@ -17,7 +17,7 @@ durations f state = (\durations' -> state { _durations = durations'}) <$> f (_du
 treeDuration :: Lens' Durations TreeDuration
 treeDuration f state = (\duration' -> state { _treeDuration = duration'}) <$> f (_treeDuration state)
 
-helperInc :: Lens' Constants HelperInc
+helperInc :: Lens' Constants (HelperInc (Helpers Integer))
 helperInc f state = (\inc' -> state { _helperInc = inc'}) <$> f (_helperInc state)
 
 prices :: Lens' Config Prices
@@ -50,7 +50,7 @@ resources f state = (\resources' -> state { _resources = resources'}) <$> f (_re
 paperclips :: Lens' Resources Paperclips
 paperclips f state = (\paperclips' -> state { _paperclips = paperclips'}) <$> f (_paperclips state)
 
-helpers :: Lens' Resources Helpers
+helpers :: Lens' Resources (Helpers Integer)
 helpers f state = (\helpers' -> state { _helpers = helpers'}) <$> f (_helpers state)
 
 storage :: Lens' Resources Storage

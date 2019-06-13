@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
 module Mod where
@@ -26,9 +28,16 @@ data Durations = Durations
 newtype TreeDuration = TreeDuration { unTreeDuration :: Integer } deriving (Eq, Show)
 
 data Constants = Constants
-  { _helperInc :: HelperInc } deriving (Eq, Show)
+  { _helperInc :: HelperInc (Helpers Integer) } deriving (Eq, Show)
 
-newtype HelperInc = HelperInc { unHelperInc :: Helpers } deriving (Eq, Show)
+instance Show (HelperInc (Helpers Integer)) where
+  show (HelperInc a) = show a
+
+newtype HelperInc a = HelperInc { unHelperInc :: a} deriving (Eq, Functor)
+
+instance Applicative HelperInc where
+  pure = HelperInc
+  HelperInc f <*> HelperInc a = HelperInc (f a)
 
 data Prices = Prices
   { _advancedHelperPrice :: AdvancedHelperPrice
@@ -49,14 +58,14 @@ newtype TreeSeedPrice = TreeSeedPrice { unTreeSeedPrice :: Paperclips } deriving
 
 data Action
   = SetP Paperclips
-  | SetH Helpers
+  | SetH (Helpers Integer)
   | SetE ErrorLogLine
   | SetR ResearchProgress
   | SetTreeSeeds TreeSeeds
   | SetTrees Trees
   | SetWater Water
   | SetAdvancedHelperResearchProgress ResearchProgress
-  | SetHelperInc HelperInc
+  | SetHelperInc (HelperInc (Helpers Integer))
   | SetProgs [Prog]
   deriving (Eq, Show)
 

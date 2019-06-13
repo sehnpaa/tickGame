@@ -1,10 +1,12 @@
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
 module Resources where
 
 data Resources = Resources
   { _paperclips :: Paperclips
-  , _helpers :: Helpers
+  , _helpers :: Helpers Integer
   , _storage :: Storage
   , _trees :: Trees
   , _treeSeeds :: TreeSeeds
@@ -17,9 +19,13 @@ newtype Paperclips = Paperclips { unPaperclips :: Integer } deriving (Enum, Eq, 
 instance Show Paperclips where
   show (Paperclips a) = show a
 
-newtype Helpers = Helpers { unHelpers :: Integer } deriving (Enum, Eq, Ord)
+newtype Helpers a = Helpers { unHelpers :: a } deriving (Enum, Eq, Functor, Ord)
 
-instance Show Helpers where
+instance Applicative Helpers where
+  pure = Helpers
+  Helpers f <*> Helpers a = Helpers (f a)
+
+instance Show (Helpers Integer) where
   show (Helpers a) = show a
 
 newtype Storage = Storage { unStorage :: Integer } deriving (Eq)
