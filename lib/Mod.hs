@@ -40,15 +40,15 @@ instance Applicative HelperInc where
   HelperInc f <*> HelperInc a = HelperInc (f a)
 
 data Prices = Prices
-  { _advancedHelperPrice :: AdvancedHelperPrice Integer
+  { _advancedHelperPrice :: AdvancedHelperPrice (Paperclips Integer)
   , _helperPrice :: HelperPrice Integer
   , _progPrice :: ProgPrice
   , _treePrice :: TreePrice
   , _treeSeedPrice :: TreeSeedPrice } deriving (Eq, Show)
 
-newtype AdvancedHelperPrice a = AdvancedHelperPrice { unAdvancedHelperPrice :: Paperclips a} deriving (Eq)
+newtype AdvancedHelperPrice a = AdvancedHelperPrice { unAdvancedHelperPrice :: a } deriving (Eq)
 
-instance Show (AdvancedHelperPrice Integer) where
+instance Show (AdvancedHelperPrice (Paperclips Integer)) where
   show (AdvancedHelperPrice a) = show a
 
 newtype HelperPrice a = HelperPrice { unHelperPrice :: Paperclips a } deriving (Eq, Functor)

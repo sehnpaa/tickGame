@@ -23,7 +23,7 @@ helperInc f state = (\inc' -> state { _helperInc = inc'}) <$> f (_helperInc stat
 prices :: Lens' Config Prices
 prices f state = (\prices' -> state { _prices = prices'}) <$> f (_prices state)
 
-advancedHelperPrice :: Lens' Prices (AdvancedHelperPrice Integer)
+advancedHelperPrice :: Lens' Prices (AdvancedHelperPrice (Paperclips Integer))
 advancedHelperPrice f state = (\price' -> state { _advancedHelperPrice = price'}) <$> f (_advancedHelperPrice state)
 
 helperPrices :: Lens' Prices (HelperPrice Integer)

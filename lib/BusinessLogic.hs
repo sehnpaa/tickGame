@@ -100,7 +100,7 @@ pumpWater w tank = Water $ min (unWaterTank tank) (succ $ unWater w)
 mkErrorLogLine :: Seconds -> Text -> ErrorLogLine
 mkErrorLogLine s t = ErrorLogLine $ Data.Text.concat ["Tick ", pack (show s), ": ", t]
 
-researchAdvancedHelper :: Seconds -> Paperclips Integer -> AdvancedHelperPrice Integer -> ResearchProgress -> Duration -> Either ErrorLogLine (Paperclips Integer, ResearchProgress)
+researchAdvancedHelper :: Seconds -> Paperclips Integer -> AdvancedHelperPrice (Paperclips Integer) -> ResearchProgress -> Duration -> Either ErrorLogLine (Paperclips Integer, ResearchProgress)
 researchAdvancedHelper s p price progress duration =
   case (unAdvancedHelperPrice price > p, progress) of
     (True, NotResearched) -> Left $ mkErrorLogLine s "Not enough paperclips."
@@ -111,7 +111,7 @@ researchAdvancedHelper s p price progress duration =
 decPaperclipsWith :: Num a => HelperPrice a -> Paperclips a -> Paperclips a
 decPaperclipsWith = withIso (Iso.paperclips . Iso.helperPrice) (\_ eli price -> under Iso.paperclips (\p -> p - eli price))
 
-decPaperclipsWith' :: Num a => AdvancedHelperPrice a -> Paperclips a -> Paperclips a
+decPaperclipsWith' :: Num a => AdvancedHelperPrice (Paperclips a) -> Paperclips a -> Paperclips a
 decPaperclipsWith' hp p = withIso Iso.advancedHelperPrice (\_ eli price -> Iso.under2 Iso.paperclips (-) p (eli price)) hp
 
 plantASeed :: Seconds -> TreeDuration -> TreePrice -> TreeSeeds -> Either ErrorLogLine TreeSeeds

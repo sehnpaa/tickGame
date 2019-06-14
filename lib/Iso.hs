@@ -8,7 +8,7 @@ import Data.Tuple.Curry (Curry, uncurryN)
 import Mod
 import Resources
 
-advancedHelperPrice :: (Profunctor p, Functor f) => p (AdvancedHelperPrice a) (f (AdvancedHelperPrice a)) -> p (Paperclips a) (f (Paperclips a))
+advancedHelperPrice :: (Profunctor p, Functor f) => p (AdvancedHelperPrice (Paperclips a)) (f (AdvancedHelperPrice (Paperclips a))) -> p (Paperclips a) (f (Paperclips a))
 advancedHelperPrice = iso AdvancedHelperPrice unAdvancedHelperPrice
 
 helperInc :: (Profunctor p, Functor f) => p (HelperInc (b a)) (f (HelperInc (b a))) -> p (b a) (f (b a))
