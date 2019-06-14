@@ -5,18 +5,22 @@
 module Resources where
 
 data Resources = Resources
-  { _paperclips :: Paperclips
+  { _paperclips :: Paperclips Integer
   , _helpers :: Helpers Integer
-  , _storage :: Storage
+  , _storage :: Storage (Paperclips Integer)
   , _trees :: Trees
   , _treeSeeds :: TreeSeeds
   , _water :: Water
   , _waterTank :: WaterTank
   , _wood :: Wood } deriving (Eq, Show)
 
-newtype Paperclips = Paperclips { unPaperclips :: Integer } deriving (Enum, Eq, Ord)
+newtype Paperclips a = Paperclips { unPaperclips :: a} deriving (Enum, Eq, Functor, Ord)
 
-instance Show Paperclips where
+instance Applicative Paperclips where
+  pure = Paperclips
+  Paperclips f <*> Paperclips a = Paperclips (f a)
+
+instance Show (Paperclips Integer) where
   show (Paperclips a) = show a
 
 newtype Helpers a = Helpers { unHelpers :: a } deriving (Enum, Eq, Functor, Ord)
@@ -28,9 +32,9 @@ instance Applicative Helpers where
 instance Show (Helpers Integer) where
   show (Helpers a) = show a
 
-newtype Storage = Storage { unStorage :: Integer } deriving (Eq)
+newtype Storage a = Storage { unStorage :: a } deriving (Eq, Functor)
 
-instance Show Storage where
+instance Show (Storage (Paperclips Integer)) where
   show (Storage a) = show a
 
 newtype Trees = Trees { unTrees :: Integer } deriving (Enum, Eq, Num, Ord)

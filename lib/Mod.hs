@@ -40,24 +40,30 @@ instance Applicative HelperInc where
   HelperInc f <*> HelperInc a = HelperInc (f a)
 
 data Prices = Prices
-  { _advancedHelperPrice :: AdvancedHelperPrice
-  , _helperPrice :: HelperPrice
+  { _advancedHelperPrice :: AdvancedHelperPrice Integer
+  , _helperPrice :: HelperPrice Integer
   , _progPrice :: ProgPrice
   , _treePrice :: TreePrice
   , _treeSeedPrice :: TreeSeedPrice } deriving (Eq, Show)
 
-newtype AdvancedHelperPrice = AdvancedHelperPrice { unAdvancedHelperPrice :: Paperclips } deriving (Eq, Show)
+newtype AdvancedHelperPrice a = AdvancedHelperPrice { unAdvancedHelperPrice :: Paperclips a} deriving (Eq)
 
-newtype HelperPrice = HelperPrice { unHelperPrice :: Paperclips } deriving (Eq, Show)
+instance Show (AdvancedHelperPrice Integer) where
+  show (AdvancedHelperPrice a) = show a
+
+newtype HelperPrice a = HelperPrice { unHelperPrice :: Paperclips a } deriving (Eq, Functor)
+
+instance Show (HelperPrice Integer) where
+  show (HelperPrice a) = show a
 
 newtype ProgPrice = ProgPrice { unProgPrice :: Integer } deriving (Eq, Show)
 
 newtype TreePrice = TreePrice { unTreePrice :: Integer } deriving (Eq, Show)
 
-newtype TreeSeedPrice = TreeSeedPrice { unTreeSeedPrice :: Paperclips } deriving (Eq, Show)
+newtype TreeSeedPrice = TreeSeedPrice { unTreeSeedPrice :: Paperclips Integer } deriving (Eq, Show)
 
 data Action
-  = SetP Paperclips
+  = SetP (Paperclips Integer)
   | SetH (Helpers Integer)
   | SetE ErrorLogLine
   | SetR ResearchProgress

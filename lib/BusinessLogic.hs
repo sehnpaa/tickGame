@@ -1,8 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE TypeOperators #-}
 
 module BusinessLogic where
 
-import Control.Applicative
+import Control.Applicative (liftA2)
 import Control.Lens
 import Data.Text (concat, pack, Text)
 
@@ -10,31 +12,38 @@ import qualified Iso as Iso
 import Mod
 import Resources
 
-helperWork :: Paperclips -> Helpers Integer -> HelperInc (Helpers Integer) -> Storage -> Paperclips
-helperWork p h inc storage = Paperclips $ min (unStorage storage) $ (unPaperclips $ addHelperWork inc h p)
+helperWork :: (Num a, Ord a) => Paperclips a -> Helpers a -> HelperInc (Helpers a) -> Storage (Paperclips a) -> Paperclips a
+helperWork p h inc storage = limitByStorage storage $ addHelperWork inc h p
 
-addHelperWork :: HelperInc (Helpers Integer) -> Helpers Integer -> Paperclips -> Paperclips
-addHelperWork inc h p = Paperclips $ (unPaperclips p) + (unHelpers h) * (unHelpers $ unHelperInc inc)
+limitByStorage :: Ord a => Storage a -> a -> a
+limitByStorage s = min (unStorage s)
 
-researchWork :: ResearchProgress -> HelperInc (Helpers Integer) -> (ResearchProgress, HelperInc (Helpers Integer))
+addHelperWork :: Num a => HelperInc (Helpers a) -> Helpers a -> Paperclips a -> Paperclips a
+addHelperWork inc h p = liftA2 (+) p $ unNat helpersToPaperclips $ calcIncOfHelperWork inc h
+
+newtype m :~> n = Nat { unNat :: forall a. m a -> n a}
+
+helpersToPaperclips :: Helpers :~> Paperclips
+helpersToPaperclips = Nat (\h -> Paperclips $ withIso Iso.helpers (\_ eli -> eli h))
+
+calcIncOfHelperWork :: Num a => HelperInc (Helpers a) -> Helpers a -> Helpers a
+calcIncOfHelperWork inc h = liftA2 (*) h $ Iso.unwrap Iso.helperInc inc
+
+researchWork :: Num a => ResearchProgress -> HelperInc (Helpers a) -> (ResearchProgress, HelperInc (Helpers a))
 researchWork progress c =
   case progress of
     NotResearched -> (progress, c)
-    ResearchInProgress 1 -> (ResearchDone, incHelperIncWith c c)
+    ResearchInProgress 1 -> (ResearchDone, twoLevels (+) c c)
     ResearchInProgress n -> (ResearchInProgress (n-1), c)
     ResearchDone -> (progress, c)
 
-incHelperIncWith :: HelperInc (Helpers Integer) -> HelperInc (Helpers Integer) -> HelperInc (Helpers Integer)
-incHelperIncWith = (liftA2 . liftA2) (+)
+twoLevels :: (Applicative f, Applicative g) => (a -> b -> c) -> f (g a) -> f (g b) -> f (g c)
+twoLevels = liftA2 . liftA2
 
 seedWork :: Seconds -> Water -> ProgPrice -> [Prog] -> Trees -> Either (ErrorLogLine, [Prog]) (Water, [Prog], Trees)
 seedWork s water price progs ts =
   let ts' = additionalTrees progs
-      progs' = filter (not . isGrowingDone) $ map (\x -> case x of
-        NotGrowing -> NotGrowing
-        Growing 1 -> GrowingDone
-        Growing n -> Growing (n-1)
-        GrowingDone -> GrowingDone) progs
+      progs' = filter (not . isGrowingDone) $ progressGrowing progs
     in
       if any isGrowing progs
         then
@@ -42,6 +51,13 @@ seedWork s water price progs ts =
             Nothing -> Left (mkErrorLogLine s "Not enough water for the seeds.", removeGrowingSeeds progs)
             Just water' -> Right $ (water', progs', ts+ts')
         else Right $ (water, progs, ts)
+
+progressGrowing :: [Prog] -> [Prog]
+progressGrowing = map (\x -> case x of
+        NotGrowing -> NotGrowing
+        Growing 1 -> GrowingDone
+        Growing n -> Growing (n-1)
+        GrowingDone -> GrowingDone)
 
 calcRemainingWater :: ProgPrice -> [Prog] -> Water -> Maybe Water
 calcRemainingWater price progs water =
@@ -69,7 +85,7 @@ isGrowingDone _ = False
 additionalTrees :: [Prog] -> Trees
 additionalTrees = Trees . toInteger . length . filter (\x -> case x of Growing 1 -> True; _ -> False)
 
-buyHelper :: Seconds -> HelperPrice -> Paperclips -> Helpers Integer -> Either ErrorLogLine (Helpers Integer, Paperclips)
+buyHelper :: (Enum a, Num a, Ord a) => Seconds -> HelperPrice a -> Paperclips a -> Helpers a -> Either ErrorLogLine (Helpers a, Paperclips a)
 buyHelper s price p h =
   if unHelperPrice price > p
     then Left (lineNeedMorePaperclips s)
@@ -84,7 +100,7 @@ pumpWater w tank = Water $ min (unWaterTank tank) (succ $ unWater w)
 mkErrorLogLine :: Seconds -> Text -> ErrorLogLine
 mkErrorLogLine s t = ErrorLogLine $ Data.Text.concat ["Tick ", pack (show s), ": ", t]
 
-researchAdvancedHelper :: Seconds -> Paperclips -> AdvancedHelperPrice -> ResearchProgress -> Duration -> Either ErrorLogLine (Paperclips, ResearchProgress)
+researchAdvancedHelper :: Seconds -> Paperclips Integer -> AdvancedHelperPrice Integer -> ResearchProgress -> Duration -> Either ErrorLogLine (Paperclips Integer, ResearchProgress)
 researchAdvancedHelper s p price progress duration =
   case (unAdvancedHelperPrice price > p, progress) of
     (True, NotResearched) -> Left $ mkErrorLogLine s "Not enough paperclips."
@@ -92,10 +108,10 @@ researchAdvancedHelper s p price progress duration =
     (_, ResearchInProgress _) -> Left $ mkErrorLogLine s "Already in progress."
     (_, ResearchDone) -> Left $ mkErrorLogLine s "Already done."
 
-decPaperclipsWith :: HelperPrice -> Paperclips -> Paperclips
+decPaperclipsWith :: Num a => HelperPrice a -> Paperclips a -> Paperclips a
 decPaperclipsWith = withIso (Iso.paperclips . Iso.helperPrice) (\_ eli price -> under Iso.paperclips (\p -> p - eli price))
 
-decPaperclipsWith' :: AdvancedHelperPrice -> Paperclips -> Paperclips
+decPaperclipsWith' :: Num a => AdvancedHelperPrice a -> Paperclips a -> Paperclips a
 decPaperclipsWith' hp p = withIso Iso.advancedHelperPrice (\_ eli price -> Iso.under2 Iso.paperclips (-) p (eli price)) hp
 
 plantASeed :: Seconds -> TreeDuration -> TreePrice -> TreeSeeds -> Either ErrorLogLine TreeSeeds
@@ -122,11 +138,11 @@ isNotGrowing a = case a of
 lineNeedMoreSeeds :: Seconds -> ErrorLogLine
 lineNeedMoreSeeds s = ErrorLogLine $ Data.Text.concat ["Tick ", pack (show s), ": You need more seeds."]
 
-buyASeed :: Seconds -> TreeSeedPrice -> Paperclips -> TreeSeeds -> Either ErrorLogLine (TreeSeeds, Paperclips)
+buyASeed :: Seconds -> TreeSeedPrice -> Paperclips Integer -> TreeSeeds -> Either ErrorLogLine (TreeSeeds, Paperclips Integer)
 buyASeed s (TreeSeedPrice price) p (TreeSeeds seeds) =
   if price > p
     then Left $ mkErrorLogLine s "Not enough paperclips."
     else Right $ (TreeSeeds $ seeds ++ [NotGrowing], Iso.underAp Iso.paperclips (-) (p,price))
 
-createPaperclip :: Paperclips -> Paperclips
+createPaperclip :: Paperclips Integer -> Paperclips Integer
 createPaperclip = under Iso.paperclips succ

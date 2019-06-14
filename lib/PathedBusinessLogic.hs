@@ -6,7 +6,7 @@ import LensUtils
 import Mod
 import Resources
 
-helperWork :: MyState -> Paperclips
+helperWork :: MyState -> Paperclips Integer
 helperWork = arg4 BL.helperWork
       (resources.paperclips)
       (resources.helpers)
@@ -26,7 +26,7 @@ seedWork = arg5 BL.seedWork
       (resources.treeSeeds.progs)
       (resources.trees)
 
-buyHelper :: MyState -> Either ErrorLogLine (Helpers Integer, Paperclips)
+buyHelper :: MyState -> Either ErrorLogLine (Helpers Integer, Paperclips Integer)
 buyHelper = arg4 BL.buyHelper
       seconds
       (config.prices.helperPrices)
@@ -38,7 +38,7 @@ pumpWater = arg2 BL.pumpWater
       (resources.water)
       (resources.waterTank)
 
-researchAdvancedHelper :: MyState -> Either ErrorLogLine (Paperclips, ResearchProgress)
+researchAdvancedHelper :: MyState -> Either ErrorLogLine (Paperclips Integer, ResearchProgress)
 researchAdvancedHelper = arg5 BL.researchAdvancedHelper
       seconds
       (resources.paperclips)
@@ -53,13 +53,13 @@ plantASeed = arg4 BL.plantASeed
       (config.prices.treePrice)
       (resources.treeSeeds)
 
-buyASeed :: MyState -> Either ErrorLogLine (TreeSeeds, Paperclips)
+buyASeed :: MyState -> Either ErrorLogLine (TreeSeeds, Paperclips Integer)
 buyASeed = arg4 BL.buyASeed
       seconds
       (config.prices.treeSeedPrice)
       (resources.paperclips)
       (resources.treeSeeds)
 
-createPaperclip :: MyState -> Paperclips
+createPaperclip :: MyState -> Paperclips Integer
 createPaperclip = arg1 BL.createPaperclip
       (resources.paperclips)

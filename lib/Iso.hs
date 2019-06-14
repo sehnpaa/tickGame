@@ -8,19 +8,19 @@ import Data.Tuple.Curry (Curry, uncurryN)
 import Mod
 import Resources
 
-advancedHelperPrice :: (Profunctor p, Functor f) => p AdvancedHelperPrice (f AdvancedHelperPrice) -> p Paperclips (f Paperclips)
+advancedHelperPrice :: (Profunctor p, Functor f) => p (AdvancedHelperPrice a) (f (AdvancedHelperPrice a)) -> p (Paperclips a) (f (Paperclips a))
 advancedHelperPrice = iso AdvancedHelperPrice unAdvancedHelperPrice
 
-helperInc :: (Profunctor p, Functor f) => p (HelperInc (Helpers Integer)) (f (HelperInc (Helpers Integer))) -> p (Helpers Integer) (f (Helpers Integer))
+helperInc :: (Profunctor p, Functor f) => p (HelperInc (b a)) (f (HelperInc (b a))) -> p (b a) (f (b a))
 helperInc = iso HelperInc unHelperInc
 
-helperPrice :: (Profunctor p, Functor f) => p HelperPrice (f HelperPrice) -> p Paperclips (f Paperclips)
+helperPrice :: (Profunctor p, Functor f) => p (HelperPrice a) (f (HelperPrice a)) -> p (Paperclips a) (f (Paperclips a))
 helperPrice = iso HelperPrice unHelperPrice
 
-helpers :: (Profunctor p, Functor f) => p (Helpers Integer) (f (Helpers Integer)) -> p Integer (f Integer)
+helpers :: (Profunctor p, Functor f) => p (Helpers a) (f (Helpers a)) -> p a (f a)
 helpers = iso Helpers unHelpers
 
-paperclips :: (Profunctor p, Functor f) => p Paperclips (f Paperclips) -> p Integer (f Integer)
+paperclips :: (Profunctor p, Functor f) => p (Paperclips a) (f (Paperclips a)) -> p a (f a)
 paperclips = iso Paperclips unPaperclips
 
 treePrice :: (Profunctor p, Functor f) => p TreePrice (f TreePrice) -> p Integer (f Integer)
@@ -79,3 +79,14 @@ replace all underN functions.
 
 underAp :: (Curry (t1 -> s1) b1, Each s2 t1 b b2) => AnIso s1 b2 r b -> b1 -> s2 -> r
 underAp i fx a = withIso i (\con eli -> con $ toEachArg fx eli a)
+
+-------------------------
+
+unwrap :: AnIso s r a b -> b -> r
+unwrap i a = withIso i (\_ eli -> eli a)
+
+-------------------------
+
+-- Walk down 2 independent isos and apply f
+walkDown2 :: AnIso s t a b -> AnIso s1 t1 a1 b1 -> (t -> t1 -> r) -> b -> b1 -> r
+walkDown2 iso1 iso2 f a1 a2 = withIso iso1 (\_ eli1 -> withIso iso2 (\_ eli2 -> f (eli1 a1) (eli2 a2)))

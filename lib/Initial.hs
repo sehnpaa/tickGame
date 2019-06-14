@@ -25,7 +25,7 @@ resources :: Resources
 resources = Resources
     (Paperclips 0)
     (Helpers 0)
-    (Storage 1000)
+    (Storage (Paperclips 1000))
     (Trees 0)
     (TreeSeeds (replicate 10 NotGrowing))
     (Water 100)

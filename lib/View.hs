@@ -12,13 +12,13 @@ viewActions = view actions
 viewErrorLog :: MyState -> [ErrorLogLine]
 viewErrorLog = view errorLog
 
-viewPaperclips :: MyState -> Paperclips
+viewPaperclips :: MyState -> Paperclips Integer
 viewPaperclips = view (resources.paperclips)
 
 viewHelpers :: MyState -> Helpers Integer
 viewHelpers = view (resources.helpers)
 
-viewStorage :: MyState -> Storage
+viewStorage :: MyState -> Storage (Paperclips Integer)
 viewStorage = view (resources.storage)
 
 viewTrees :: MyState -> Trees

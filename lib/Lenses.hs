@@ -23,10 +23,10 @@ helperInc f state = (\inc' -> state { _helperInc = inc'}) <$> f (_helperInc stat
 prices :: Lens' Config Prices
 prices f state = (\prices' -> state { _prices = prices'}) <$> f (_prices state)
 
-advancedHelperPrice :: Lens' Prices AdvancedHelperPrice
+advancedHelperPrice :: Lens' Prices (AdvancedHelperPrice Integer)
 advancedHelperPrice f state = (\price' -> state { _advancedHelperPrice = price'}) <$> f (_advancedHelperPrice state)
 
-helperPrices :: Lens' Prices HelperPrice
+helperPrices :: Lens' Prices (HelperPrice Integer)
 helperPrices f state = (\helperPrice' -> state { _helperPrice = helperPrice'}) <$> f (_helperPrice state)
 
 treePrice :: Lens' Prices TreePrice
@@ -47,13 +47,13 @@ errorLog f state = (\errorLog' -> state { _errorLog = errorLog'}) <$> f (_errorL
 resources :: Lens' MyState Resources
 resources f state = (\resources' -> state { _resources = resources'}) <$> f (_resources state)
 
-paperclips :: Lens' Resources Paperclips
+paperclips :: Lens' Resources (Paperclips Integer)
 paperclips f state = (\paperclips' -> state { _paperclips = paperclips'}) <$> f (_paperclips state)
 
 helpers :: Lens' Resources (Helpers Integer)
 helpers f state = (\helpers' -> state { _helpers = helpers'}) <$> f (_helpers state)
 
-storage :: Lens' Resources Storage
+storage :: Lens' Resources (Storage (Paperclips Integer))
 storage f state = (\storage' -> state { _storage = storage'}) <$> f (_storage state)
 
 water :: Lens' Resources Water
