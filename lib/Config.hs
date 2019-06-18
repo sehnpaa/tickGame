@@ -4,7 +4,7 @@
 module Config where
 
 import Control.Lens (Profunctor, iso)
-import Resources
+import Elements
 
 data Config = Config
   { _constants :: Constants

@@ -3,6 +3,7 @@ module Lenses where
 import Control.Lens
 
 import Config
+import Elements
 import Mod
 import Resources
 
@@ -48,25 +49,28 @@ errorLog f state = (\errorLog' -> state { _errorLog = errorLog'}) <$> f (_errorL
 resources :: Lens' MyState Resources
 resources f state = (\resources' -> state { _resources = resources'}) <$> f (_resources state)
 
-paperclips :: Lens' Resources (Paperclips Integer)
+elements :: Lens' Resources Elements
+elements f state = (\elements' -> state { _elements = elements'}) <$> f (_elements state)
+
+paperclips :: Lens' Elements (Paperclips Integer)
 paperclips f state = (\paperclips' -> state { _paperclips = paperclips'}) <$> f (_paperclips state)
 
-helpers :: Lens' Resources (Helpers Integer)
+helpers :: Lens' Elements (Helpers Integer)
 helpers f state = (\helpers' -> state { _helpers = helpers'}) <$> f (_helpers state)
 
 storage :: Lens' Resources (Storage (Paperclips Integer))
 storage f state = (\storage' -> state { _storage = storage'}) <$> f (_storage state)
 
-water :: Lens' Resources (Water Integer)
+water :: Lens' Elements (Water Integer)
 water f state = (\water' -> state { _water = water'}) <$> f (_water state)
 
 waterTank :: Lens' Resources (WaterTank Integer)
 waterTank f state = (\tank' -> state { _waterTank = tank'}) <$> f (_waterTank state)
 
-trees :: Lens' Resources Trees
+trees :: Lens' Elements Trees
 trees f state = (\trees' -> state { _trees = trees'}) <$> f (_trees state)
 
-treeSeeds :: Lens' Resources TreeSeeds
+treeSeeds :: Lens' Elements TreeSeeds
 treeSeeds f state = (\treeSeeds' -> state { _treeSeeds = treeSeeds'}) <$> f (_treeSeeds state)
 
 progs :: Lens' TreeSeeds [Prog]
@@ -87,7 +91,7 @@ researchCompDuration f state = (\duration -> state { _researchCompDuration = dur
 seconds :: Lens' MyState Seconds
 seconds f state = (\seconds' -> state { _seconds = seconds'}) <$> f (_seconds state)
 
-wood :: Lens' Resources Wood
+wood :: Lens' Elements Wood
 wood f state = (\wood' -> state { _wood = wood'}) <$> f (_wood state)
 
 isStarted :: Lens' MyState IsStarted

@@ -16,6 +16,7 @@ library tickGameLib
     other-modules:
       BusinessLogic
       Config
+      Elements
       Initial
       Iso
       Lenses

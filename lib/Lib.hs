@@ -1,15 +1,17 @@
 module Lib
   ( Initial.getInitialState
   , module Config
+  , module Elements
   , module Lenses
   , module Lib
   , module Mod
   , module Resources ) where
 
 import Data.Bifoldable (Bifoldable, bifoldMap)
-import Control.Lens
+import Control.Lens (over, set, view)
 
 import Config
+import Elements
 import qualified Initial as Initial
 import Lenses
 import Mod
@@ -25,16 +27,16 @@ handleActions state = let as = view actions state
     set actions [] $ foldr applyAction state as
 
 applyAction :: Action -> MyState -> MyState
-applyAction (SetP p) state = set (resources.paperclips) p state
-applyAction (SetH h) state = set (resources.helpers) h state
+applyAction (SetP p) state = set (resources.elements.paperclips) p state
+applyAction (SetH h) state = set (resources.elements.helpers) h state
 applyAction (SetE err) state = over errorLog (\errs -> err : errs) state
 applyAction (SetR r) state = set (researchAreas.advancedHelperResearch.researchCompProgress) r state
-applyAction (SetTreeSeeds s) state = set (resources.treeSeeds) s state
-applyAction (SetTrees t) state = set (resources.trees) t state
+applyAction (SetTreeSeeds s) state = set (resources.elements.treeSeeds) s state
+applyAction (SetTrees t) state = set (resources.elements.trees) t state
 applyAction (SetAdvancedHelperResearchProgress p) state = set (researchAreas.advancedHelperResearch.researchCompProgress) p state
 applyAction (SetHelperInc i) state = set (config.constants.helperInc) i state
-applyAction (SetProgs ps) state = set (resources.treeSeeds.progs) ps state
-applyAction (SetWater w) state = set (resources.water) w state
+applyAction (SetProgs ps) state = set (resources.elements.treeSeeds.progs) ps state
+applyAction (SetWater w) state = set (resources.elements.water) w state
 
 helperWork :: MyState -> MyState
 helperWork state

@@ -1,6 +1,7 @@
 module Initial where
 
 import Config
+import Elements
 import Mod
 import Resources
 
@@ -24,13 +25,17 @@ researchAreas = ResearchAreas
 
 resources :: Resources
 resources = Resources
+    elements
+    (Storage (Paperclips 1000))
+    (WaterTank 100)
+
+elements :: Elements
+elements = Elements
     (Paperclips 0)
     (Helpers 0)
-    (Storage (Paperclips 1000))
     (Trees 0)
     (TreeSeeds (replicate 10 NotGrowing))
     (Water 100)
-    (WaterTank 100)
     (Wood 0)
 
 getInitialState :: MyState

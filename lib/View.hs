@@ -1,7 +1,8 @@
 module View where
 
-import Control.Lens
+import Control.Lens (view)
 
+import Elements
 import Lenses
 import Mod
 import Resources
@@ -13,28 +14,28 @@ viewErrorLog :: MyState -> [ErrorLogLine]
 viewErrorLog = view errorLog
 
 viewPaperclips :: MyState -> Paperclips Integer
-viewPaperclips = view (resources.paperclips)
+viewPaperclips = view (resources.elements.paperclips)
 
 viewHelpers :: MyState -> Helpers Integer
-viewHelpers = view (resources.helpers)
+viewHelpers = view (resources.elements.helpers)
 
 viewStorage :: MyState -> Storage (Paperclips Integer)
 viewStorage = view (resources.storage)
 
 viewTrees :: MyState -> Trees
-viewTrees = view (resources.trees)
+viewTrees = view (resources.elements.trees)
 
 viewTreeSeeds :: MyState -> TreeSeeds
-viewTreeSeeds = view (resources.treeSeeds)
+viewTreeSeeds = view (resources.elements.treeSeeds)
 
 viewWater :: MyState -> Water Integer
-viewWater = view (resources.water)
+viewWater = view (resources.elements.water)
 
 viewWaterTank :: MyState -> WaterTank Integer
 viewWaterTank = view (resources.waterTank)
 
 viewWood :: MyState -> Wood
-viewWood = view (resources.wood)
+viewWood = view (resources.elements.wood)
 
 viewAdvancedHelperResearch :: MyState -> ResearchProgress
 viewAdvancedHelperResearch = view (researchAreas.advancedHelperResearch.researchCompProgress)

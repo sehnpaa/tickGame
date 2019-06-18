@@ -9,6 +9,7 @@ import Control.Lens (Profunctor, iso, under, withIso)
 import Data.Text (Text, concat, pack)
 
 import Config
+import Elements
 import Iso
 import NaturalTransformation
 import Resources

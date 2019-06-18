@@ -2,15 +2,15 @@ module PathedBusinessLogic where
 
 import qualified BusinessLogic as BL
 import Config
+import Elements
 import Lenses
 import LensUtils
 import Mod
-import Resources
 
 helperWork :: MyState -> Paperclips Integer
 helperWork = arg4 BL.helperWork
-      (resources.paperclips)
-      (resources.helpers)
+      (resources.elements.paperclips)
+      (resources.elements.helpers)
       (config.constants.helperInc)
       (resources.storage)
 
@@ -22,27 +22,27 @@ researchWork = arg2 BL.researchWork
 seedWork :: MyState -> Either (ErrorLogLine, [Prog]) (Water Integer, [Prog], Trees)
 seedWork = arg5 BL.seedWork
       seconds
-      (resources.water)
+      (resources.elements.water)
       (config.prices.progPrice)
-      (resources.treeSeeds.progs)
-      (resources.trees)
+      (resources.elements.treeSeeds.progs)
+      (resources.elements.trees)
 
 buyHelper :: MyState -> Either ErrorLogLine (Helpers Integer, Paperclips Integer)
 buyHelper = arg4 BL.buyHelper
       seconds
       (config.prices.helperPrices)
-      (resources.paperclips)
-      (resources.helpers)
+      (resources.elements.paperclips)
+      (resources.elements.helpers)
 
 pumpWater :: MyState -> Water Integer
 pumpWater = arg2 BL.pumpWater
-      (resources.water)
+      (resources.elements.water)
       (resources.waterTank)
 
 researchAdvancedHelper :: MyState -> Either ErrorLogLine (Paperclips Integer, ResearchProgress)
 researchAdvancedHelper = arg5 BL.researchAdvancedHelper
       seconds
-      (resources.paperclips)
+      (resources.elements.paperclips)
       (config.prices.advancedHelperPrice)
       (researchAreas.advancedHelperResearch.researchCompProgress)
       (researchAreas.advancedHelperResearch.researchCompDuration)
@@ -52,16 +52,16 @@ plantASeed = arg4 BL.plantASeed
       seconds
       (config.durations.treeDuration)
       (config.prices.treePrice)
-      (resources.treeSeeds)
+      (resources.elements.treeSeeds)
 
 buyASeed :: MyState -> Either ErrorLogLine (TreeSeeds, Paperclips Integer)
 buyASeed = arg4 BL.buyASeed
       seconds
       (config.prices.treeSeedPrice)
-      (resources.paperclips)
-      (resources.treeSeeds)
+      (resources.elements.paperclips)
+      (resources.elements.treeSeeds)
 
 createPaperclip :: MyState -> Paperclips Integer
 createPaperclip = arg2 BL.createPaperclip
-      (resources.paperclips)
+      (resources.elements.paperclips)
       (resources.storage)
