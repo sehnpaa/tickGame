@@ -23,6 +23,7 @@ library tickGameLib
       NaturalTransformation
       PathedBusinessLogic
       Resources
+      Utils
     build-depends:
         base >=4.11 && <5
       , gi-gtk

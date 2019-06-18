@@ -78,10 +78,39 @@ newtype Wood = Wood { unWood :: Integer } deriving (Enum, Eq, Ord)
 instance Show Wood where
   show (Wood a) = show a
 
---
+---
 
 limitByStorage :: Ord a => Storage a -> a -> a
 limitByStorage s = min (Iso.unwrap isoStorage s)
+
+waterCost :: [Prog] -> Integer -> Water
+waterCost progs waterPerSeed = let numberOfGrowingSeeds = toInteger . length . filter isGrowing $ progs
+      in
+        Water $ waterPerSeed * numberOfGrowingSeeds
+
+removeGrowingSeeds :: [Prog] -> [Prog]
+removeGrowingSeeds = filter (not . isGrowing)
+
+isGrowing :: Prog -> Bool
+isGrowing (Growing _) = True
+isGrowing _ = False
+
+isGrowingDone :: Prog -> Bool
+isGrowingDone GrowingDone = True
+isGrowingDone _ = False
+
+additionalTrees :: [Prog] -> Trees
+additionalTrees = Trees . toInteger . length . filter (\x -> case x of Growing 1 -> True; _ -> False)
+
+countNotGrowingSeeds :: TreeSeeds -> Integer
+countNotGrowingSeeds = toInteger . length . filter isNotGrowing . unTreeSeeds
+
+isNotGrowing :: Prog -> Bool
+isNotGrowing a = case a of
+  NotGrowing -> True
+  _ -> False
+
+---
 
 isoHelpers :: (Profunctor p, Functor f) => p (Helpers a) (f (Helpers a)) -> p a (f a)
 isoHelpers = iso Helpers unHelpers

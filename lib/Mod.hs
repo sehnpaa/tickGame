@@ -1,16 +1,18 @@
 {-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Mod where
 
 import Control.Applicative (liftA2)
-import Control.Lens (Profunctor, iso)
-import Data.Text (Text)
+import Control.Lens (Profunctor, iso, under, withIso)
+import Data.Text (Text, concat, pack)
 
 import Iso
 import NaturalTransformation
 import Resources
+import Utils
 
 data MyState = MyState
   { _config :: Config
@@ -132,14 +134,43 @@ data MyEvent
 
 ---
 
-helperWork2 :: (Num a, Ord a) => Paperclips a -> Helpers a -> HelperInc (Helpers a) -> Storage (Paperclips a) -> Paperclips a
-helperWork2 p h inc storage = limitByStorage storage $ addHelperWork inc h p
-
 addHelperWork :: Num a => HelperInc (Helpers a) -> Helpers a -> Paperclips a -> Paperclips a
 addHelperWork inc h p = liftA2 (+) p $ unNat helpersToPaperclips $ productOfHelperWork inc h
 
 productOfHelperWork :: Num a => HelperInc (Helpers a) -> Helpers a -> Helpers a
 productOfHelperWork inc h = liftA2 (*) h $ Iso.unwrap isoHelperInc inc
+
+progressGrowing :: [Prog] -> [Prog]
+progressGrowing = map (\x -> case x of
+        NotGrowing -> NotGrowing
+        Growing 1 -> GrowingDone
+        Growing n -> Growing (n-1)
+        GrowingDone -> GrowingDone)
+
+calcRemainingWater :: ProgPrice -> [Prog] -> Water -> Maybe Water
+calcRemainingWater price progs water =
+  let cost = waterCost progs (unProgPrice price)
+    in case cost > water of
+      True -> Nothing
+      False -> Just $ Iso.under2 isoWater (-) water cost
+
+lineNeedMorePaperclips :: Seconds -> ErrorLogLine
+lineNeedMorePaperclips s = ErrorLogLine $ Data.Text.concat ["Tick ", pack (show s), ": You need more paperclips."]
+
+mkErrorLogLine :: Seconds -> Text -> ErrorLogLine
+mkErrorLogLine s t = ErrorLogLine $ Data.Text.concat ["Tick ", pack (show s), ": ", t]
+
+lineNeedMoreSeeds :: Seconds -> ErrorLogLine
+lineNeedMoreSeeds s = ErrorLogLine $ Data.Text.concat ["Tick ", pack (show s), ": You need more seeds."]
+
+initializeSeed :: TreeDuration -> TreeSeeds -> TreeSeeds
+initializeSeed duration = TreeSeeds . changeFirst (== NotGrowing) (const $ Growing $ unTreeDuration duration) . unTreeSeeds
+
+decPaperclipsWith :: Num a => HelperPrice a -> Paperclips a -> Paperclips a
+decPaperclipsWith = withIso (isoPaperclips . isoHelperPrice) (\_ eli price -> under isoPaperclips (\p -> p - eli price))
+
+decPaperclipsWith' :: Num a => AdvancedHelperPrice (Paperclips a) -> Paperclips a -> Paperclips a
+decPaperclipsWith' hp p = withIso isoAdvancedHelperPrice (\_ eli price -> Iso.under2 isoPaperclips (-) p (eli price)) hp
 
 ---
 
