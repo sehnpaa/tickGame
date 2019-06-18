@@ -3,6 +3,7 @@
 
 module Config where
 
+import Control.Lens (Profunctor, iso)
 import Resources
 
 data Config = Config
@@ -30,8 +31,8 @@ instance Applicative HelperInc where
 data Prices = Prices
   { _advancedHelperPrice :: AdvancedHelperPrice (Paperclips Integer)
   , _helperPrice :: HelperPrice Integer
-  , _progPrice :: ProgPrice
-  , _treePrice :: TreePrice
+  , _progPrice :: ProgPrice Integer
+  , _treePrice :: TreePrice Integer
   , _treeSeedPrice :: TreeSeedPrice } deriving (Eq, Show)
 
 newtype AdvancedHelperPrice a = AdvancedHelperPrice { unAdvancedHelperPrice :: a } deriving (Eq)
@@ -44,8 +45,12 @@ newtype HelperPrice a = HelperPrice { unHelperPrice :: Paperclips a } deriving (
 instance Show (HelperPrice Integer) where
   show (HelperPrice a) = show a
 
-newtype ProgPrice = ProgPrice { unProgPrice :: Integer } deriving (Eq, Show)
+newtype ProgPrice a = ProgPrice { unProgPrice :: a } deriving (Eq, Show)
 
-newtype TreePrice = TreePrice { unTreePrice :: Integer } deriving (Eq, Show)
+newtype TreePrice a = TreePrice { unTreePrice :: a } deriving (Eq, Show)
 
 newtype TreeSeedPrice = TreeSeedPrice { unTreeSeedPrice :: Paperclips Integer } deriving (Eq, Show)
+
+isoTreePrice :: (Profunctor p, Functor f) => p (TreePrice a) (f (TreePrice a)) -> p a (f a)
+isoTreePrice = iso TreePrice unTreePrice
+

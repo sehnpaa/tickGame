@@ -16,8 +16,8 @@ data Resources = Resources
   , _storage :: Storage (Paperclips Integer)
   , _trees :: Trees
   , _treeSeeds :: TreeSeeds
-  , _water :: Water
-  , _waterTank :: WaterTank
+  , _water :: Water Integer
+  , _waterTank :: WaterTank Integer
   , _wood :: Wood } deriving (Eq, Show)
 
 newtype Paperclips a = Paperclips { unPaperclips :: a} deriving (Enum, Eq, Functor, Ord)
@@ -63,14 +63,14 @@ instance Show Prog where
       noun _ = "ticks"
   show GrowingDone = show "Growing done"
 
-newtype Water = Water { unWater :: Integer } deriving (Eq, Ord)
+newtype Water a = Water { unWater :: a } deriving (Eq, Functor, Ord)
 
-instance Show Water where
+instance Show (Water Integer) where
   show (Water a) = show a
 
-newtype WaterTank = WaterTank { unWaterTank :: Integer } deriving (Eq)
+newtype WaterTank a = WaterTank { unWaterTank :: a } deriving (Eq)
 
-instance Show WaterTank where
+instance Show (WaterTank Integer) where
   show (WaterTank a) = show a
 
 newtype Wood = Wood { unWood :: Integer } deriving (Enum, Eq, Ord)
@@ -83,8 +83,8 @@ instance Show Wood where
 limitByStorage :: Ord a => Storage a -> a -> a
 limitByStorage s = min (Iso.unwrap isoStorage s)
 
-waterCost :: [Prog] -> Integer -> Water
-waterCost progs waterPerSeed = let numberOfGrowingSeeds = toInteger . length . filter isGrowing $ progs
+waterCost :: Num a => [Prog] -> a -> Water a
+waterCost progs waterPerSeed = let numberOfGrowingSeeds = fromIntegral . length . filter isGrowing $ progs
       in
         Water $ waterPerSeed * numberOfGrowingSeeds
 
@@ -102,8 +102,8 @@ isGrowingDone _ = False
 additionalTrees :: [Prog] -> Trees
 additionalTrees = Trees . toInteger . length . filter (\x -> case x of Growing 1 -> True; _ -> False)
 
-countNotGrowingSeeds :: TreeSeeds -> Integer
-countNotGrowingSeeds = toInteger . length . filter isNotGrowing . unTreeSeeds
+countNotGrowingSeeds :: Num a => TreeSeeds -> a
+countNotGrowingSeeds = fromIntegral . length . filter isNotGrowing . unTreeSeeds
 
 isNotGrowing :: Prog -> Bool
 isNotGrowing a = case a of
@@ -131,7 +131,7 @@ isoStorage = iso Storage unStorage
 isoTreeSeeds :: (Profunctor p, Functor f) => p TreeSeeds (f TreeSeeds) -> p [Prog] (f [Prog])
 isoTreeSeeds = iso TreeSeeds unTreeSeeds
 
-isoWater :: (Profunctor p, Functor f) => p Water (f Water) -> p Integer (f Integer)
+isoWater :: (Profunctor p, Functor f) => p (Water a) (f (Water a)) -> p a (f a)
 isoWater = iso Water unWater
 
 helpersToPaperclips :: Helpers :~> Paperclips

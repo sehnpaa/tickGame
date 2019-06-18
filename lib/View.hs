@@ -27,10 +27,10 @@ viewTrees = view (resources.trees)
 viewTreeSeeds :: MyState -> TreeSeeds
 viewTreeSeeds = view (resources.treeSeeds)
 
-viewWater :: MyState -> Water
+viewWater :: MyState -> Water Integer
 viewWater = view (resources.water)
 
-viewWaterTank :: MyState -> WaterTank
+viewWaterTank :: MyState -> WaterTank Integer
 viewWaterTank = view (resources.waterTank)
 
 viewWood :: MyState -> Wood

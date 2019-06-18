@@ -19,7 +19,7 @@ researchWork progress c =
     ResearchInProgress n -> (ResearchInProgress (n-1), c)
     ResearchDone -> (progress, c)
 
-seedWork :: Seconds -> Water -> ProgPrice -> [Prog] -> Trees -> Either (ErrorLogLine, [Prog]) (Water, [Prog], Trees)
+seedWork :: (Num a, Ord a) => Seconds -> Water a -> ProgPrice a -> [Prog] -> Trees -> Either (ErrorLogLine, [Prog]) (Water a, [Prog], Trees)
 seedWork s water price progs ts =
   let ts' = additionalTrees progs
       progs' = filter (not . isGrowingDone) $ progressGrowing progs
@@ -37,7 +37,7 @@ buyHelper s price p h =
     then Left (lineNeedMorePaperclips s)
     else Right (succ h, decPaperclipsWith price p)
 
-pumpWater :: Water -> WaterTank -> Water
+pumpWater :: (Enum a, Num a, Ord a) => Water a -> WaterTank a -> Water a
 pumpWater w tank = Water $ min (unWaterTank tank) (succ $ unWater w)
 
 researchAdvancedHelper :: Seconds -> Paperclips Integer -> AdvancedHelperPrice (Paperclips Integer) -> ResearchProgress -> Duration -> Either ErrorLogLine (Paperclips Integer, ResearchProgress)
@@ -48,7 +48,7 @@ researchAdvancedHelper s p price progress duration =
     (_, ResearchInProgress _) -> Left $ mkErrorLogLine s "Already in progress."
     (_, ResearchDone) -> Left $ mkErrorLogLine s "Already done."
 
-plantASeed :: Seconds -> TreeDuration -> TreePrice -> TreeSeeds -> Either ErrorLogLine TreeSeeds
+plantASeed :: (Num a, Ord a) => Seconds -> TreeDuration -> TreePrice a -> TreeSeeds -> Either ErrorLogLine TreeSeeds
 plantASeed s dur price seeds =
   if unTreePrice price > countNotGrowingSeeds seeds
     then Left $ lineNeedMoreSeeds s

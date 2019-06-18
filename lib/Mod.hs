@@ -30,7 +30,7 @@ data Action
   | SetR ResearchProgress
   | SetTreeSeeds TreeSeeds
   | SetTrees Trees
-  | SetWater Water
+  | SetWater (Water Integer)
   | SetAdvancedHelperResearchProgress ResearchProgress
   | SetHelperInc (HelperInc (Helpers Integer))
   | SetProgs [Prog]
@@ -94,7 +94,7 @@ addHelperWork inc h p = liftA2 (+) p $ unNat helpersToPaperclips $ productOfHelp
 productOfHelperWork :: Num a => HelperInc (Helpers a) -> Helpers a -> Helpers a
 productOfHelperWork inc h = liftA2 (*) h $ Iso.unwrap isoHelperInc inc
 
-calcRemainingWater :: ProgPrice -> [Prog] -> Water -> Maybe Water
+calcRemainingWater :: (Num a, Ord a) => ProgPrice a -> [Prog] -> Water a -> Maybe (Water a)
 calcRemainingWater price progs water =
   let cost = waterCost progs (unProgPrice price)
     in case cost > water of
@@ -129,9 +129,6 @@ isoHelperInc = iso HelperInc unHelperInc
 
 isoHelperPrice :: (Profunctor p, Functor f) => p (HelperPrice a) (f (HelperPrice a)) -> p (Paperclips a) (f (Paperclips a))
 isoHelperPrice = iso HelperPrice unHelperPrice
-
-isoTreePrice :: (Profunctor p, Functor f) => p TreePrice (f TreePrice) -> p Integer (f Integer)
-isoTreePrice = iso TreePrice unTreePrice
 
 startResearch :: Duration -> ResearchProgress
 startResearch (Duration n) = ResearchInProgress n

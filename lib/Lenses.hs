@@ -30,10 +30,10 @@ advancedHelperPrice f state = (\price' -> state { _advancedHelperPrice = price'}
 helperPrices :: Lens' Prices (HelperPrice Integer)
 helperPrices f state = (\helperPrice' -> state { _helperPrice = helperPrice'}) <$> f (_helperPrice state)
 
-treePrice :: Lens' Prices TreePrice
+treePrice :: Lens' Prices (TreePrice Integer)
 treePrice f state = (\treePrice' -> state { _treePrice = treePrice'}) <$> f (_treePrice state)
 
-progPrice :: Lens' Prices ProgPrice
+progPrice :: Lens' Prices (ProgPrice Integer)
 progPrice f state = (\price' -> state { _progPrice = price'}) <$> f (_progPrice state)
 
 treeSeedPrice :: Lens' Prices TreeSeedPrice
@@ -57,10 +57,10 @@ helpers f state = (\helpers' -> state { _helpers = helpers'}) <$> f (_helpers st
 storage :: Lens' Resources (Storage (Paperclips Integer))
 storage f state = (\storage' -> state { _storage = storage'}) <$> f (_storage state)
 
-water :: Lens' Resources Water
+water :: Lens' Resources (Water Integer)
 water f state = (\water' -> state { _water = water'}) <$> f (_water state)
 
-waterTank :: Lens' Resources WaterTank
+waterTank :: Lens' Resources (WaterTank Integer)
 waterTank f state = (\tank' -> state { _waterTank = tank'}) <$> f (_waterTank state)
 
 trees :: Lens' Resources Trees

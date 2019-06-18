@@ -19,7 +19,7 @@ researchWork = arg2 BL.researchWork
       (researchAreas.advancedHelperResearch.researchCompProgress)
       (config.constants.helperInc)
 
-seedWork :: MyState -> Either (ErrorLogLine, [Prog]) (Water, [Prog], Trees)
+seedWork :: MyState -> Either (ErrorLogLine, [Prog]) (Water Integer, [Prog], Trees)
 seedWork = arg5 BL.seedWork
       seconds
       (resources.water)
@@ -34,7 +34,7 @@ buyHelper = arg4 BL.buyHelper
       (resources.paperclips)
       (resources.helpers)
 
-pumpWater :: MyState -> Water
+pumpWater :: MyState -> Water Integer
 pumpWater = arg2 BL.pumpWater
       (resources.water)
       (resources.waterTank)
