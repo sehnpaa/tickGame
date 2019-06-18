@@ -4,8 +4,12 @@
 
 module Mod where
 
+import Control.Applicative (liftA2)
+import Control.Lens (Profunctor, iso)
 import Data.Text (Text)
 
+import Iso
+import NaturalTransformation
 import Resources
 
 data MyState = MyState
@@ -125,6 +129,31 @@ data MyEvent
   | ExitApplication
   | Tick
   deriving (Eq, Show)
+
+---
+
+helperWork2 :: (Num a, Ord a) => Paperclips a -> Helpers a -> HelperInc (Helpers a) -> Storage (Paperclips a) -> Paperclips a
+helperWork2 p h inc storage = limitByStorage storage $ addHelperWork inc h p
+
+addHelperWork :: Num a => HelperInc (Helpers a) -> Helpers a -> Paperclips a -> Paperclips a
+addHelperWork inc h p = liftA2 (+) p $ unNat helpersToPaperclips $ productOfHelperWork inc h
+
+productOfHelperWork :: Num a => HelperInc (Helpers a) -> Helpers a -> Helpers a
+productOfHelperWork inc h = liftA2 (*) h $ Iso.unwrap isoHelperInc inc
+
+---
+
+isoAdvancedHelperPrice :: (Profunctor p, Functor f) => p (AdvancedHelperPrice (Paperclips a)) (f (AdvancedHelperPrice (Paperclips a))) -> p (Paperclips a) (f (Paperclips a))
+isoAdvancedHelperPrice = iso AdvancedHelperPrice unAdvancedHelperPrice
+
+isoHelperInc :: (Profunctor p, Functor f) => p (HelperInc (b a)) (f (HelperInc (b a))) -> p (b a) (f (b a))
+isoHelperInc = iso HelperInc unHelperInc
+
+isoHelperPrice :: (Profunctor p, Functor f) => p (HelperPrice a) (f (HelperPrice a)) -> p (Paperclips a) (f (Paperclips a))
+isoHelperPrice = iso HelperPrice unHelperPrice
+
+isoTreePrice :: (Profunctor p, Functor f) => p TreePrice (f TreePrice) -> p Integer (f Integer)
+isoTreePrice = iso TreePrice unTreePrice
 
 startResearch :: Duration -> ResearchProgress
 startResearch (Duration n) = ResearchInProgress n

@@ -2,40 +2,8 @@
 
 module Iso where
 
-import Control.Lens (AnIso, Each, Profunctor, each, iso, over, withIso)
+import Control.Lens (AnIso, Each, each, over, withIso)
 import Data.Tuple.Curry (Curry, uncurryN)
-
-import Mod
-import Resources
-
-advancedHelperPrice :: (Profunctor p, Functor f) => p (AdvancedHelperPrice (Paperclips a)) (f (AdvancedHelperPrice (Paperclips a))) -> p (Paperclips a) (f (Paperclips a))
-advancedHelperPrice = iso AdvancedHelperPrice unAdvancedHelperPrice
-
-helperInc :: (Profunctor p, Functor f) => p (HelperInc (b a)) (f (HelperInc (b a))) -> p (b a) (f (b a))
-helperInc = iso HelperInc unHelperInc
-
-helperPrice :: (Profunctor p, Functor f) => p (HelperPrice a) (f (HelperPrice a)) -> p (Paperclips a) (f (Paperclips a))
-helperPrice = iso HelperPrice unHelperPrice
-
-helpers :: (Profunctor p, Functor f) => p (Helpers a) (f (Helpers a)) -> p a (f a)
-helpers = iso Helpers unHelpers
-
-paperclips :: (Profunctor p, Functor f) => p (Paperclips a) (f (Paperclips a)) -> p a (f a)
-paperclips = iso Paperclips unPaperclips
-
-storage :: (Profunctor p, Functor f) => p (Storage a) (f (Storage a)) -> p a (f a)
-storage = iso Storage unStorage
-
-treePrice :: (Profunctor p, Functor f) => p TreePrice (f TreePrice) -> p Integer (f Integer)
-treePrice = iso TreePrice unTreePrice
-
-treeSeeds :: (Profunctor p, Functor f) => p TreeSeeds (f TreeSeeds) -> p [Prog] (f [Prog])
-treeSeeds = iso TreeSeeds unTreeSeeds
-
-water :: (Profunctor p, Functor f) => p Water (f Water) -> p Integer (f Integer)
-water = iso Water unWater
-
--------------------------
 
 under1 :: AnIso s t r b -> (t -> s) -> b -> r
 under1 i g a = withIso i (\con eli -> con $ g (eli a))

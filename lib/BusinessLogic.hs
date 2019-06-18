@@ -7,21 +7,8 @@ import Control.Lens
 import Data.Text (concat, pack, Text)
 
 import qualified Iso as Iso
-import NaturalTransformation
 import Mod
 import Resources
-
-helperWork :: (Num a, Ord a) => Paperclips a -> Helpers a -> HelperInc (Helpers a) -> Storage (Paperclips a) -> Paperclips a
-helperWork p h inc storage = limitByStorage storage $ addHelperWork inc h p
-
-limitByStorage :: Ord a => Storage a -> a -> a
-limitByStorage s = min (Iso.unwrap Iso.storage s)
-
-addHelperWork :: Num a => HelperInc (Helpers a) -> Helpers a -> Paperclips a -> Paperclips a
-addHelperWork inc h p = liftA2 (+) p $ unNat helpersToPaperclips $ productOfHelperWork inc h
-
-productOfHelperWork :: Num a => HelperInc (Helpers a) -> Helpers a -> Helpers a
-productOfHelperWork inc h = liftA2 (*) h $ Iso.unwrap Iso.helperInc inc
 
 researchWork :: Num a => ResearchProgress -> HelperInc (Helpers a) -> (ResearchProgress, HelperInc (Helpers a))
 researchWork progress c =
@@ -58,7 +45,7 @@ calcRemainingWater price progs water =
   let cost = waterCost progs (unProgPrice price)
     in case cost > water of
       True -> Nothing
-      False -> Just $ Iso.under2 Iso.water (-) water cost
+      False -> Just $ Iso.under2 isoWater (-) water cost
 
 waterCost :: [Prog] -> Integer -> Water
 waterCost progs waterPerSeed = let numberOfGrowingSeeds = toInteger . length . filter isGrowing $ progs
@@ -103,10 +90,10 @@ researchAdvancedHelper s p price progress duration =
     (_, ResearchDone) -> Left $ mkErrorLogLine s "Already done."
 
 decPaperclipsWith :: Num a => HelperPrice a -> Paperclips a -> Paperclips a
-decPaperclipsWith = withIso (Iso.paperclips . Iso.helperPrice) (\_ eli price -> under Iso.paperclips (\p -> p - eli price))
+decPaperclipsWith = withIso (isoPaperclips . isoHelperPrice) (\_ eli price -> under isoPaperclips (\p -> p - eli price))
 
 decPaperclipsWith' :: Num a => AdvancedHelperPrice (Paperclips a) -> Paperclips a -> Paperclips a
-decPaperclipsWith' hp p = withIso Iso.advancedHelperPrice (\_ eli price -> Iso.under2 Iso.paperclips (-) p (eli price)) hp
+decPaperclipsWith' hp p = withIso isoAdvancedHelperPrice (\_ eli price -> Iso.under2 isoPaperclips (-) p (eli price)) hp
 
 plantASeed :: Seconds -> TreeDuration -> TreePrice -> TreeSeeds -> Either ErrorLogLine TreeSeeds
 plantASeed s dur price seeds =
@@ -136,7 +123,7 @@ buyASeed :: Seconds -> TreeSeedPrice -> Paperclips Integer -> TreeSeeds -> Eithe
 buyASeed s (TreeSeedPrice price) p (TreeSeeds seeds) =
   if price > p
     then Left $ mkErrorLogLine s "Not enough paperclips."
-    else Right $ (TreeSeeds $ seeds ++ [NotGrowing], Iso.underAp Iso.paperclips (-) (p,price))
+    else Right $ (TreeSeeds $ seeds ++ [NotGrowing], Iso.underAp isoPaperclips (-) (p,price))
 
 createPaperclip :: Paperclips Integer -> Paperclips Integer
-createPaperclip = under Iso.paperclips succ
+createPaperclip = under isoPaperclips succ

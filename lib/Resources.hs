@@ -1,8 +1,14 @@
 {-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE TypeOperators #-}
 
 module Resources where
+
+import Control.Lens (Profunctor, iso, withIso)
+
+import NaturalTransformation
+import qualified Iso
 
 data Resources = Resources
   { _paperclips :: Paperclips Integer
@@ -72,3 +78,25 @@ newtype Wood = Wood { unWood :: Integer } deriving (Enum, Eq, Ord)
 instance Show Wood where
   show (Wood a) = show a
 
+--
+
+limitByStorage :: Ord a => Storage a -> a -> a
+limitByStorage s = min (Iso.unwrap isoStorage s)
+
+isoHelpers :: (Profunctor p, Functor f) => p (Helpers a) (f (Helpers a)) -> p a (f a)
+isoHelpers = iso Helpers unHelpers
+
+isoPaperclips :: (Profunctor p, Functor f) => p (Paperclips a) (f (Paperclips a)) -> p a (f a)
+isoPaperclips = iso Paperclips unPaperclips
+
+isoStorage :: (Profunctor p, Functor f) => p (Storage a) (f (Storage a)) -> p a (f a)
+isoStorage = iso Storage unStorage
+
+isoTreeSeeds :: (Profunctor p, Functor f) => p TreeSeeds (f TreeSeeds) -> p [Prog] (f [Prog])
+isoTreeSeeds = iso TreeSeeds unTreeSeeds
+
+isoWater :: (Profunctor p, Functor f) => p Water (f Water) -> p Integer (f Integer)
+isoWater = iso Water unWater
+
+helpersToPaperclips :: Helpers :~> Paperclips
+helpersToPaperclips = Nat (\h -> Paperclips $ withIso isoHelpers (\_ eli -> eli h))

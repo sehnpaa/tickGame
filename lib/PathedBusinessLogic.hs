@@ -7,7 +7,7 @@ import Mod
 import Resources
 
 helperWork :: MyState -> Paperclips Integer
-helperWork = arg4 BL.helperWork
+helperWork = arg4 helperWork2
       (resources.paperclips)
       (resources.helpers)
       (config.constants.helperInc)
