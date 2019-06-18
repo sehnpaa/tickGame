@@ -20,6 +20,7 @@ library tickGameLib
       Lenses
       LensUtils
       Mod
+      NaturalTransformation
       PathedBusinessLogic
       Resources
     build-depends:

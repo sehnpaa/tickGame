@@ -1,6 +1,4 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE TypeOperators #-}
 
 module BusinessLogic where
 
@@ -9,6 +7,7 @@ import Control.Lens
 import Data.Text (concat, pack, Text)
 
 import qualified Iso as Iso
+import NaturalTransformation
 import Mod
 import Resources
 
@@ -16,18 +15,13 @@ helperWork :: (Num a, Ord a) => Paperclips a -> Helpers a -> HelperInc (Helpers 
 helperWork p h inc storage = limitByStorage storage $ addHelperWork inc h p
 
 limitByStorage :: Ord a => Storage a -> a -> a
-limitByStorage s = min (unStorage s)
+limitByStorage s = min (Iso.unwrap Iso.storage s)
 
 addHelperWork :: Num a => HelperInc (Helpers a) -> Helpers a -> Paperclips a -> Paperclips a
-addHelperWork inc h p = liftA2 (+) p $ unNat helpersToPaperclips $ calcIncOfHelperWork inc h
+addHelperWork inc h p = liftA2 (+) p $ unNat helpersToPaperclips $ productOfHelperWork inc h
 
-newtype m :~> n = Nat { unNat :: forall a. m a -> n a}
-
-helpersToPaperclips :: Helpers :~> Paperclips
-helpersToPaperclips = Nat (\h -> Paperclips $ withIso Iso.helpers (\_ eli -> eli h))
-
-calcIncOfHelperWork :: Num a => HelperInc (Helpers a) -> Helpers a -> Helpers a
-calcIncOfHelperWork inc h = liftA2 (*) h $ Iso.unwrap Iso.helperInc inc
+productOfHelperWork :: Num a => HelperInc (Helpers a) -> Helpers a -> Helpers a
+productOfHelperWork inc h = liftA2 (*) h $ Iso.unwrap Iso.helperInc inc
 
 researchWork :: Num a => ResearchProgress -> HelperInc (Helpers a) -> (ResearchProgress, HelperInc (Helpers a))
 researchWork progress c =
