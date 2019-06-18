@@ -61,5 +61,6 @@ buyASeed = arg4 BL.buyASeed
       (resources.treeSeeds)
 
 createPaperclip :: MyState -> Paperclips Integer
-createPaperclip = arg1 BL.createPaperclip
+createPaperclip = arg2 BL.createPaperclip
       (resources.paperclips)
+      (resources.storage)

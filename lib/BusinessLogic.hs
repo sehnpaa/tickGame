@@ -61,5 +61,5 @@ buyASeed s (TreeSeedPrice price) p (TreeSeeds seeds) =
     then Left $ mkErrorLogLine s "Not enough paperclips."
     else Right $ (TreeSeeds $ seeds ++ [NotGrowing], Iso.underAp isoPaperclips (-) (p,price))
 
-createPaperclip :: Paperclips Integer -> Paperclips Integer
-createPaperclip = under isoPaperclips succ
+createPaperclip :: (Enum a, Ord a) => Paperclips a -> Storage (Paperclips a) -> Paperclips a
+createPaperclip p storage = min (unStorage storage) $ fmap succ p
