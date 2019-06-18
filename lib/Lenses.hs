@@ -2,6 +2,7 @@ module Lenses where
 
 import Control.Lens
 
+import Config
 import Mod
 import Resources
 

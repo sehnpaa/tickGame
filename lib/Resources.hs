@@ -110,6 +110,13 @@ isNotGrowing a = case a of
   NotGrowing -> True
   _ -> False
 
+progressGrowing :: [Prog] -> [Prog]
+progressGrowing = map (\x -> case x of
+        NotGrowing -> NotGrowing
+        Growing 1 -> GrowingDone
+        Growing n -> Growing (n-1)
+        GrowingDone -> GrowingDone)
+
 ---
 
 isoHelpers :: (Profunctor p, Functor f) => p (Helpers a) (f (Helpers a)) -> p a (f a)

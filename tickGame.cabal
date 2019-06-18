@@ -15,6 +15,7 @@ library tickGameLib
     exposed-modules: Lib, View
     other-modules:
       BusinessLogic
+      Config
       Initial
       Iso
       Lenses

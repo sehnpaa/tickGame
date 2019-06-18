@@ -1,5 +1,6 @@
 module Initial where
 
+import Config
 import Mod
 import Resources
 

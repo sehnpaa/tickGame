@@ -2,9 +2,8 @@
 
 module BusinessLogic where
 
-import Control.Lens
-
 import qualified Iso as Iso
+import Config
 import Mod
 import Resources
 import Utils

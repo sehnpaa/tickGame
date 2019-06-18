@@ -1,5 +1,6 @@
 module Lib
   ( Initial.getInitialState
+  , module Config
   , module Lenses
   , module Lib
   , module Mod
@@ -8,11 +9,12 @@ module Lib
 import Data.Bifoldable (Bifoldable, bifoldMap)
 import Control.Lens
 
+import Config
 import qualified Initial as Initial
 import Lenses
 import Mod
-import qualified PathedBusinessLogic as PBL
 import Resources
+import qualified PathedBusinessLogic as PBL
 
 nextTick :: MyState -> MyState
 nextTick = handleActions . addSecond . helperWork . seedWork . researchWork

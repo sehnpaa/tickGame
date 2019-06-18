@@ -1,4 +1,3 @@
-{-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings #-}
@@ -9,6 +8,7 @@ import Control.Applicative (liftA2)
 import Control.Lens (Profunctor, iso, under, withIso)
 import Data.Text (Text, concat, pack)
 
+import Config
 import Iso
 import NaturalTransformation
 import Resources
@@ -22,51 +22,6 @@ data MyState = MyState
   , _resources :: Resources
   , _seconds :: Seconds
   , _isStarted :: IsStarted } deriving (Eq, Show)
-
-data Config = Config
-  { _constants :: Constants
-  , _durations :: Durations
-  , _prices :: Prices } deriving (Eq, Show)
-
-data Durations = Durations
-  { _treeDuration :: TreeDuration } deriving (Eq, Show)
-
-newtype TreeDuration = TreeDuration { unTreeDuration :: Integer } deriving (Eq, Show)
-
-data Constants = Constants
-  { _helperInc :: HelperInc (Helpers Integer) } deriving (Eq, Show)
-
-instance Show (HelperInc (Helpers Integer)) where
-  show (HelperInc a) = show a
-
-newtype HelperInc a = HelperInc { unHelperInc :: a} deriving (Eq, Functor)
-
-instance Applicative HelperInc where
-  pure = HelperInc
-  HelperInc f <*> HelperInc a = HelperInc (f a)
-
-data Prices = Prices
-  { _advancedHelperPrice :: AdvancedHelperPrice (Paperclips Integer)
-  , _helperPrice :: HelperPrice Integer
-  , _progPrice :: ProgPrice
-  , _treePrice :: TreePrice
-  , _treeSeedPrice :: TreeSeedPrice } deriving (Eq, Show)
-
-newtype AdvancedHelperPrice a = AdvancedHelperPrice { unAdvancedHelperPrice :: a } deriving (Eq)
-
-instance Show (AdvancedHelperPrice (Paperclips Integer)) where
-  show (AdvancedHelperPrice a) = show a
-
-newtype HelperPrice a = HelperPrice { unHelperPrice :: Paperclips a } deriving (Eq, Functor)
-
-instance Show (HelperPrice Integer) where
-  show (HelperPrice a) = show a
-
-newtype ProgPrice = ProgPrice { unProgPrice :: Integer } deriving (Eq, Show)
-
-newtype TreePrice = TreePrice { unTreePrice :: Integer } deriving (Eq, Show)
-
-newtype TreeSeedPrice = TreeSeedPrice { unTreeSeedPrice :: Paperclips Integer } deriving (Eq, Show)
 
 data Action
   = SetP (Paperclips Integer)
@@ -119,7 +74,6 @@ newtype IsStarted = IsStarted { unIsStarted :: Bool } deriving (Eq)
 instance Show IsStarted where
   show (IsStarted a) = show a
 
-
 data MyEvent
   = Start
   | CreatePaperclip
@@ -139,13 +93,6 @@ addHelperWork inc h p = liftA2 (+) p $ unNat helpersToPaperclips $ productOfHelp
 
 productOfHelperWork :: Num a => HelperInc (Helpers a) -> Helpers a -> Helpers a
 productOfHelperWork inc h = liftA2 (*) h $ Iso.unwrap isoHelperInc inc
-
-progressGrowing :: [Prog] -> [Prog]
-progressGrowing = map (\x -> case x of
-        NotGrowing -> NotGrowing
-        Growing 1 -> GrowingDone
-        Growing n -> Growing (n-1)
-        GrowingDone -> GrowingDone)
 
 calcRemainingWater :: ProgPrice -> [Prog] -> Water -> Maybe Water
 calcRemainingWater price progs water =

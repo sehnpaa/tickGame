@@ -1,6 +1,7 @@
 module PathedBusinessLogic where
 
 import qualified BusinessLogic as BL
+import Config
 import Lenses
 import LensUtils
 import Mod
