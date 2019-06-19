@@ -20,7 +20,7 @@ researchWork progress c =
     ResearchInProgress n -> (ResearchInProgress (n-1), c)
     ResearchDone -> (progress, c)
 
-seedWork :: (Num a, Ord a) => Seconds -> Water a -> ProgPrice a -> [Prog] -> Trees -> Either (ErrorLogLine, [Prog]) (Water a, [Prog], Trees)
+seedWork :: (Num a, Ord a) => Seconds -> Water a -> ProgPrice a -> [Prog a] -> Trees a -> Either (ErrorLogLine, [Prog a]) (Water a, [Prog a], Trees a)
 seedWork s water price progs ts =
   let ts' = additionalTrees progs
       progs' = filter (not . isGrowingDone) $ progressGrowing progs
@@ -49,13 +49,13 @@ researchAdvancedHelper s p price progress duration =
     (_, ResearchInProgress _) -> Left $ mkErrorLogLine s "Already in progress."
     (_, ResearchDone) -> Left $ mkErrorLogLine s "Already done."
 
-plantASeed :: (Num a, Ord a) => Seconds -> TreeDuration -> TreePrice a -> TreeSeeds -> Either ErrorLogLine TreeSeeds
+plantASeed :: (Num a, Ord a) => Seconds -> TreeDuration -> TreePrice a -> TreeSeeds a -> Either ErrorLogLine (TreeSeeds a)
 plantASeed s dur price seeds =
   if unTreePrice price > countNotGrowingSeeds seeds
     then Left $ lineNeedMoreSeeds s
     else Right $ initializeSeed dur seeds
 
-buyASeed :: Seconds -> TreeSeedPrice -> Paperclips Integer -> TreeSeeds -> Either ErrorLogLine (TreeSeeds, Paperclips Integer)
+buyASeed :: Seconds -> TreeSeedPrice -> Paperclips Integer -> TreeSeeds a -> Either ErrorLogLine (TreeSeeds a, Paperclips Integer)
 buyASeed s (TreeSeedPrice price) p (TreeSeeds seeds) =
   if price > p
     then Left $ mkErrorLogLine s "Not enough paperclips."

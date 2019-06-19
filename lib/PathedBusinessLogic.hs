@@ -19,7 +19,7 @@ researchWork = arg2 BL.researchWork
       (researchAreas.advancedHelperResearch.researchCompProgress)
       (config.constants.helperInc)
 
-seedWork :: MyState -> Either (ErrorLogLine, [Prog]) (Water Integer, [Prog], Trees)
+seedWork :: MyState -> Either (ErrorLogLine, [Prog Integer]) (Water Integer, [Prog Integer], Trees Integer)
 seedWork = arg5 BL.seedWork
       seconds
       (resources.elements.water)
@@ -47,14 +47,14 @@ researchAdvancedHelper = arg5 BL.researchAdvancedHelper
       (researchAreas.advancedHelperResearch.researchCompProgress)
       (researchAreas.advancedHelperResearch.researchCompDuration)
 
-plantASeed :: MyState -> Either ErrorLogLine TreeSeeds
+plantASeed :: MyState -> Either ErrorLogLine (TreeSeeds Integer)
 plantASeed = arg4 BL.plantASeed
       seconds
       (config.durations.treeDuration)
       (config.prices.treePrice)
       (resources.elements.treeSeeds)
 
-buyASeed :: MyState -> Either ErrorLogLine (TreeSeeds, Paperclips Integer)
+buyASeed :: MyState -> Either ErrorLogLine (TreeSeeds Integer, Paperclips Integer)
 buyASeed = arg4 BL.buyASeed
       seconds
       (config.prices.treeSeedPrice)

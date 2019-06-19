@@ -67,13 +67,13 @@ water f state = (\water' -> state { _water = water'}) <$> f (_water state)
 waterTank :: Lens' Resources (WaterTank Integer)
 waterTank f state = (\tank' -> state { _waterTank = tank'}) <$> f (_waterTank state)
 
-trees :: Lens' Elements Trees
+trees :: Lens' Elements (Trees Integer)
 trees f state = (\trees' -> state { _trees = trees'}) <$> f (_trees state)
 
-treeSeeds :: Lens' Elements TreeSeeds
+treeSeeds :: Lens' Elements (TreeSeeds Integer)
 treeSeeds f state = (\treeSeeds' -> state { _treeSeeds = treeSeeds'}) <$> f (_treeSeeds state)
 
-progs :: Lens' TreeSeeds [Prog]
+progs :: Lens' (TreeSeeds Integer) [Prog Integer]
 progs f state = (\treeSeeds' -> TreeSeeds treeSeeds') <$> f (unTreeSeeds state )
 
 researchAreas :: Lens' MyState ResearchAreas
@@ -91,7 +91,7 @@ researchCompDuration f state = (\duration -> state { _researchCompDuration = dur
 seconds :: Lens' MyState Seconds
 seconds f state = (\seconds' -> state { _seconds = seconds'}) <$> f (_seconds state)
 
-wood :: Lens' Elements Wood
+wood :: Lens' Elements (Wood Integer)
 wood f state = (\wood' -> state { _wood = wood'}) <$> f (_wood state)
 
 isStarted :: Lens' MyState IsStarted

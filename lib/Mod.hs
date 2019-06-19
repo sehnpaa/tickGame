@@ -29,12 +29,12 @@ data Action
   | SetH (Helpers Integer)
   | SetE ErrorLogLine
   | SetR ResearchProgress
-  | SetTreeSeeds TreeSeeds
-  | SetTrees Trees
+  | SetTreeSeeds (TreeSeeds Integer)
+  | SetTrees (Trees Integer)
   | SetWater (Water Integer)
   | SetAdvancedHelperResearchProgress ResearchProgress
   | SetHelperInc (HelperInc (Helpers Integer))
-  | SetProgs [Prog]
+  | SetProgs [Prog Integer]
   deriving (Eq, Show)
 
 newtype ErrorLogLine = ErrorLogLine { unErrorLogLine :: Text } deriving (Eq)
@@ -95,7 +95,7 @@ addHelperWork inc h p = liftA2 (+) p $ unNat helpersToPaperclips $ productOfHelp
 productOfHelperWork :: Num a => HelperInc (Helpers a) -> Helpers a -> Helpers a
 productOfHelperWork inc h = liftA2 (*) h $ Iso.unwrap isoHelperInc inc
 
-calcRemainingWater :: (Num a, Ord a) => ProgPrice a -> [Prog] -> Water a -> Maybe (Water a)
+calcRemainingWater :: (Num a, Ord a) => ProgPrice a -> [Prog a] -> Water a -> Maybe (Water a)
 calcRemainingWater price progs water =
   let cost = waterCost progs (unProgPrice price)
     in case cost > water of
@@ -111,8 +111,8 @@ mkErrorLogLine s t = ErrorLogLine $ Data.Text.concat ["Tick ", pack (show s), ":
 lineNeedMoreSeeds :: Seconds -> ErrorLogLine
 lineNeedMoreSeeds s = ErrorLogLine $ Data.Text.concat ["Tick ", pack (show s), ": You need more seeds."]
 
-initializeSeed :: TreeDuration -> TreeSeeds -> TreeSeeds
-initializeSeed duration = TreeSeeds . changeFirst (== NotGrowing) (const $ Growing $ unTreeDuration duration) . unTreeSeeds
+initializeSeed :: (Eq a, Num a) => TreeDuration -> TreeSeeds a -> TreeSeeds a
+initializeSeed duration = TreeSeeds . changeFirst (== NotGrowing) (const $ Growing $ fromIntegral $ unTreeDuration duration) . unTreeSeeds
 
 decPaperclipsWith :: Num a => HelperPrice a -> Paperclips a -> Paperclips a
 decPaperclipsWith = withIso (isoPaperclips . isoHelperPrice) (\_ eli price -> under isoPaperclips (\p -> p - eli price))

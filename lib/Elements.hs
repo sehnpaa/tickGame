@@ -7,10 +7,22 @@ module Elements where
 data Elements = Elements
   { _paperclips :: Paperclips Integer
   , _helpers :: Helpers Integer
-  , _trees :: Trees
-  , _treeSeeds :: TreeSeeds
+  , _trees :: Trees Integer
+  , _treeSeeds :: TreeSeeds Integer
   , _water :: Water Integer
-  , _wood :: Wood } deriving (Eq, Show)
+  , _wood :: Wood Integer } deriving (Eq, Show)
+
+data Element f a = Element
+  { _cost :: Cost
+  , _count :: f Integer }
+
+data Cost = Cost
+  { _paperclipsCost :: Paperclips Integer
+  , _helpersCost :: Helpers Integer
+  , _treesCost :: Trees Integer
+  , _treeSeedsCost :: TreeSeeds Integer
+  , _waterCost :: Water Integer
+  , _woodCost :: Wood Integer} deriving (Eq, Show)
 
 newtype Paperclips a = Paperclips { unPaperclips :: a } deriving (Enum, Eq, Functor, Ord)
 
@@ -30,19 +42,19 @@ instance Applicative Helpers where
 instance Show (Helpers Integer) where
   show (Helpers a) = show a
 
-newtype Trees = Trees { unTrees :: Integer } deriving (Enum, Eq, Num, Ord)
+newtype Trees a = Trees { unTrees :: a } deriving (Enum, Eq, Num, Ord)
 
-instance Show Trees where
+instance Show (Trees Integer) where
   show (Trees a) = show a
 
-newtype TreeSeeds = TreeSeeds { unTreeSeeds :: [Prog]} deriving (Eq)
+newtype TreeSeeds a = TreeSeeds { unTreeSeeds :: [Prog a]} deriving (Eq)
 
-instance Show TreeSeeds where
+instance Show (TreeSeeds Integer) where
   show (TreeSeeds a) = show a
 
-data Prog = NotGrowing | Growing Integer | GrowingDone deriving (Eq)
+data Prog a = NotGrowing | Growing a | GrowingDone deriving (Eq)
 
-instance Show Prog where
+instance Show (Prog Integer) where
   show NotGrowing = show "Not growing"
   show (Growing n) = show "Growing in progress - " ++ show n ++ " " ++ noun n ++ " left."
     where
@@ -55,8 +67,8 @@ newtype Water a = Water { unWater :: a } deriving (Eq, Functor, Ord)
 instance Show (Water Integer) where
   show (Water a) = show a
 
-newtype Wood = Wood { unWood :: Integer } deriving (Enum, Eq, Ord)
+newtype Wood a = Wood { unWood :: a } deriving (Enum, Eq, Ord)
 
-instance Show Wood where
+instance Show (Wood Integer) where
   show (Wood a) = show a
 

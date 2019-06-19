@@ -22,10 +22,10 @@ viewHelpers = view (resources.elements.helpers)
 viewStorage :: MyState -> Storage (Paperclips Integer)
 viewStorage = view (resources.storage)
 
-viewTrees :: MyState -> Trees
+viewTrees :: MyState -> Trees Integer
 viewTrees = view (resources.elements.trees)
 
-viewTreeSeeds :: MyState -> TreeSeeds
+viewTreeSeeds :: MyState -> TreeSeeds Integer
 viewTreeSeeds = view (resources.elements.treeSeeds)
 
 viewWater :: MyState -> Water Integer
@@ -34,7 +34,7 @@ viewWater = view (resources.elements.water)
 viewWaterTank :: MyState -> WaterTank Integer
 viewWaterTank = view (resources.waterTank)
 
-viewWood :: MyState -> Wood
+viewWood :: MyState -> Wood Integer
 viewWood = view (resources.elements.wood)
 
 viewAdvancedHelperResearch :: MyState -> ResearchProgress

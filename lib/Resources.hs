@@ -31,34 +31,34 @@ instance Show (WaterTank Integer) where
 limitByStorage :: Ord a => Storage a -> a -> a
 limitByStorage s = min (Iso.unwrap isoStorage s)
 
-waterCost :: Num a => [Prog] -> a -> Water a
+waterCost :: Num a => [Prog a] -> a -> Water a
 waterCost progs waterPerSeed = let numberOfGrowingSeeds = fromIntegral . length . filter isGrowing $ progs
       in
         Water $ waterPerSeed * numberOfGrowingSeeds
 
-removeGrowingSeeds :: [Prog] -> [Prog]
+removeGrowingSeeds :: [Prog a] -> [Prog a]
 removeGrowingSeeds = filter (not . isGrowing)
 
-isGrowing :: Prog -> Bool
+isGrowing :: Prog a -> Bool
 isGrowing (Growing _) = True
 isGrowing _ = False
 
-isGrowingDone :: Prog -> Bool
+isGrowingDone :: Prog a -> Bool
 isGrowingDone GrowingDone = True
 isGrowingDone _ = False
 
-additionalTrees :: [Prog] -> Trees
-additionalTrees = Trees . toInteger . length . filter (\x -> case x of Growing 1 -> True; _ -> False)
+additionalTrees :: (Eq a, Num a) => [Prog a] -> Trees a
+additionalTrees = Trees . fromIntegral . length . filter (\x -> case x of Growing 1 -> True; _ -> False)
 
-countNotGrowingSeeds :: Num a => TreeSeeds -> a
+countNotGrowingSeeds :: Num a => TreeSeeds a -> a
 countNotGrowingSeeds = fromIntegral . length . filter isNotGrowing . unTreeSeeds
 
-isNotGrowing :: Prog -> Bool
+isNotGrowing :: Prog a -> Bool
 isNotGrowing a = case a of
   NotGrowing -> True
   _ -> False
 
-progressGrowing :: [Prog] -> [Prog]
+progressGrowing :: (Eq a, Num a) => [Prog a] -> [Prog a]
 progressGrowing = map (\x -> case x of
         NotGrowing -> NotGrowing
         Growing 1 -> GrowingDone
@@ -76,7 +76,7 @@ isoPaperclips = iso Paperclips unPaperclips
 isoStorage :: (Profunctor p, Functor f) => p (Storage a) (f (Storage a)) -> p a (f a)
 isoStorage = iso Storage unStorage
 
-isoTreeSeeds :: (Profunctor p, Functor f) => p TreeSeeds (f TreeSeeds) -> p [Prog] (f [Prog])
+isoTreeSeeds :: (Profunctor p, Functor f) => p (TreeSeeds a) (f (TreeSeeds a)) -> p [Prog a] (f [Prog a])
 isoTreeSeeds = iso TreeSeeds unTreeSeeds
 
 isoWater :: (Profunctor p, Functor f) => p (Water a) (f (Water a)) -> p a (f a)
