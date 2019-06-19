@@ -30,7 +30,6 @@ instance Applicative HelperInc where
 
 data Prices = Prices
   { _advancedHelperPrice :: AdvancedHelperPrice (Paperclips Integer)
-  , _helperPrice :: HelperPrice Integer
   , _progPrice :: ProgPrice Integer
   , _treePrice :: TreePrice Integer
   , _treeSeedPrice :: TreeSeedPrice } deriving (Eq, Show)

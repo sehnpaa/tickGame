@@ -32,11 +32,11 @@ seedWork s water price progs ts =
             Just water' -> Right $ (water', progs', ts+ts')
         else Right $ (water, progs, ts)
 
-buyHelper :: (Enum a, Num a, Ord a) => Seconds -> HelperPrice a -> Paperclips a -> Helpers a -> Either ErrorLogLine (Helpers a, Paperclips a)
-buyHelper s price p h =
-  if unHelperPrice price > p
+buyHelper :: (Enum a, Num a, Ord a) => Seconds -> Cost a -> Paperclips a -> Helpers a -> Either ErrorLogLine (Helpers a, Paperclips a)
+buyHelper s cost p h =
+  if needMorePaperclips cost p
     then Left (lineNeedMorePaperclips s)
-    else Right (succ h, decPaperclipsWith price p)
+    else Right (succ h, decPaperclipsWith cost p)
 
 pumpWater :: (Enum a, Num a, Ord a) => Water a -> WaterTank a -> Water a
 pumpWater w tank = Water $ min (unWaterTank tank) (succ $ unWater w)

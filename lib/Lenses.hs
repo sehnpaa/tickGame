@@ -28,8 +28,8 @@ prices f state = (\prices' -> state { _prices = prices'}) <$> f (_prices state)
 advancedHelperPrice :: Lens' Prices (AdvancedHelperPrice (Paperclips Integer))
 advancedHelperPrice f state = (\price' -> state { _advancedHelperPrice = price'}) <$> f (_advancedHelperPrice state)
 
-helperPrices :: Lens' Prices (HelperPrice Integer)
-helperPrices f state = (\helperPrice' -> state { _helperPrice = helperPrice'}) <$> f (_helperPrice state)
+-- helperPrices :: Lens' Prices (HelperPrice Integer)
+-- helperPrices f state = (\helperPrice' -> state { _helperPrice = helperPrice'}) <$> f (_helperPrice state)
 
 treePrice :: Lens' Prices (TreePrice Integer)
 treePrice f state = (\treePrice' -> state { _treePrice = treePrice'}) <$> f (_treePrice state)
@@ -52,26 +52,50 @@ resources f state = (\resources' -> state { _resources = resources'}) <$> f (_re
 elements :: Lens' Resources Elements
 elements f state = (\elements' -> state { _elements = elements'}) <$> f (_elements state)
 
-paperclips :: Lens' Elements (Paperclips Integer)
-paperclips f state = (\paperclips' -> state { _paperclips = paperclips'}) <$> f (_paperclips state)
+cost :: Lens' (Element f a) (Acquirement (Cost Integer))
+cost f state = (\a -> state { _cost = a }) <$> f (_cost state)
+
+cost2 :: Lens' (Acquirement (Cost Integer)) (Cost Integer)
+cost2 f state = (\a -> AcquirePaperclips a ) <$> f (case state of AcquirePaperclips p -> p)
+
+count :: Lens' (Element f a) (f Integer)
+count f state = (\a -> state { _count = a }) <$> f (_count state)
+
+elementPaperclips :: Lens' Elements (Element Paperclips Integer)
+elementPaperclips f state = (\paperclips' -> state { _paperclips = paperclips'}) <$> f (_paperclips state)
+
+paperclips  :: Lens' Elements (Paperclips Integer)
+paperclips = elementPaperclips . count
+
+elementHelpers :: Lens' Elements (Element Helpers Integer)
+elementHelpers f state = (\helpers' -> state { _helpers = helpers'}) <$> f (_helpers state)
 
 helpers :: Lens' Elements (Helpers Integer)
-helpers f state = (\helpers' -> state { _helpers = helpers'}) <$> f (_helpers state)
+helpers = elementHelpers . count
 
 storage :: Lens' Resources (Storage (Paperclips Integer))
 storage f state = (\storage' -> state { _storage = storage'}) <$> f (_storage state)
 
+elementWater :: Lens' Elements (Element Water Integer)
+elementWater f state = (\water' -> state { _water = water'}) <$> f (_water state)
+
 water :: Lens' Elements (Water Integer)
-water f state = (\water' -> state { _water = water'}) <$> f (_water state)
+water = elementWater . count
 
 waterTank :: Lens' Resources (WaterTank Integer)
 waterTank f state = (\tank' -> state { _waterTank = tank'}) <$> f (_waterTank state)
 
+elementTrees :: Lens' Elements (Element Trees Integer)
+elementTrees f state = (\trees' -> state { _trees = trees'}) <$> f (_trees state)
+
 trees :: Lens' Elements (Trees Integer)
-trees f state = (\trees' -> state { _trees = trees'}) <$> f (_trees state)
+trees = elementTrees . count
+
+elementTreeSeeds :: Lens' Elements (Element TreeSeeds Integer)
+elementTreeSeeds f state = (\treeSeeds' -> state { _treeSeeds = treeSeeds'}) <$> f (_treeSeeds state)
 
 treeSeeds :: Lens' Elements (TreeSeeds Integer)
-treeSeeds f state = (\treeSeeds' -> state { _treeSeeds = treeSeeds'}) <$> f (_treeSeeds state)
+treeSeeds = elementTreeSeeds . count
 
 progs :: Lens' (TreeSeeds Integer) [Prog Integer]
 progs f state = (\treeSeeds' -> TreeSeeds treeSeeds') <$> f (unTreeSeeds state )
@@ -91,8 +115,11 @@ researchCompDuration f state = (\duration -> state { _researchCompDuration = dur
 seconds :: Lens' MyState Seconds
 seconds f state = (\seconds' -> state { _seconds = seconds'}) <$> f (_seconds state)
 
+elementWood :: Lens' Elements (Element Wood Integer)
+elementWood f state = (\wood' -> state { _wood = wood'}) <$> f (_wood state)
+
 wood :: Lens' Elements (Wood Integer)
-wood f state = (\wood' -> state { _wood = wood'}) <$> f (_wood state)
+wood = elementWood . count
 
 isStarted :: Lens' MyState IsStarted
 isStarted f state = (\isStarted' -> state { _isStarted = isStarted'}) <$> f (_isStarted state)

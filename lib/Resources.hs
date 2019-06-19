@@ -5,7 +5,7 @@
 
 module Resources where
 
-import Control.Lens (Profunctor, iso, withIso)
+import Control.Lens (Profunctor, iso, view, withIso)
 
 import Elements
 import NaturalTransformation
@@ -65,6 +65,8 @@ progressGrowing = map (\x -> case x of
         Growing n -> Growing (n-1)
         GrowingDone -> GrowingDone)
 
+needMorePaperclips :: Ord a => Cost a -> Paperclips a -> Bool
+needMorePaperclips c p = (view paperclipCost c) > p
 ---
 
 isoHelpers :: (Profunctor p, Functor f) => p (Helpers a) (f (Helpers a)) -> p a (f a)

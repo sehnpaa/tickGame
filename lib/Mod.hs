@@ -5,7 +5,7 @@
 module Mod where
 
 import Control.Applicative (liftA2)
-import Control.Lens (Profunctor, iso, under, withIso)
+import Control.Lens (Profunctor, iso, view, withIso)
 import Data.Text (Text, concat, pack)
 
 import Config
@@ -114,8 +114,8 @@ lineNeedMoreSeeds s = ErrorLogLine $ Data.Text.concat ["Tick ", pack (show s), "
 initializeSeed :: (Eq a, Num a) => TreeDuration -> TreeSeeds a -> TreeSeeds a
 initializeSeed duration = TreeSeeds . changeFirst (== NotGrowing) (const $ Growing $ fromIntegral $ unTreeDuration duration) . unTreeSeeds
 
-decPaperclipsWith :: Num a => HelperPrice a -> Paperclips a -> Paperclips a
-decPaperclipsWith = withIso (isoPaperclips . isoHelperPrice) (\_ eli price -> under isoPaperclips (\p -> p - eli price))
+decPaperclipsWith :: Num a => Cost a -> Paperclips a -> Paperclips a
+decPaperclipsWith c p = under2 isoPaperclips (-) p $ view paperclipCost c
 
 decPaperclipsWith' :: Num a => AdvancedHelperPrice (Paperclips a) -> Paperclips a -> Paperclips a
 decPaperclipsWith' hp p = withIso isoAdvancedHelperPrice (\_ eli price -> Iso.under2 isoPaperclips (-) p (eli price)) hp

@@ -30,7 +30,7 @@ seedWork = arg5 BL.seedWork
 buyHelper :: MyState -> Either ErrorLogLine (Helpers Integer, Paperclips Integer)
 buyHelper = arg4 BL.buyHelper
       seconds
-      (config.prices.helperPrices)
+      (resources.elements.elementPaperclips.cost.cost2)
       (resources.elements.paperclips)
       (resources.elements.helpers)
 
