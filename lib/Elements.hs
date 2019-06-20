@@ -132,3 +132,6 @@ instance Show (Wood Integer) where
 
 paperclipCost :: Lens' (Cost a) (Paperclips a)
 paperclipCost f state = (\c -> state { _paperclipsCost = c}) <$> f (_paperclipsCost state)
+
+treeSeedCost :: Lens' (Cost a) (TreeSeeds a)
+treeSeedCost f state = (\c -> state { _treeSeedsCost = c}) <$> f (_treeSeedsCost state)

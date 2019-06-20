@@ -37,9 +37,6 @@ treePrice f state = (\treePrice' -> state { _treePrice = treePrice'}) <$> f (_tr
 progPrice :: Lens' Prices (ProgPrice Integer)
 progPrice f state = (\price' -> state { _progPrice = price'}) <$> f (_progPrice state)
 
-treeSeedPrice :: Lens' Prices TreeSeedPrice
-treeSeedPrice f state = (\price' -> state { _treeSeedPrice = price'}) <$> f (_treeSeedPrice state)
-
 actions :: Lens' MyState [Action]
 actions f state = (\actions' -> state { _actions = actions'}) <$> f (_actions state)
 
@@ -57,6 +54,9 @@ cost f state = (\a -> state { _cost = a }) <$> f (_cost state)
 
 helpersManually :: Lens' (AcquireHelpers (Cost Integer)) (HelpersManually (Cost Integer))
 helpersManually f state = (\a -> state { _helpersManually = a }) <$> f (_helpersManually state)
+
+buyTreeSeeds :: Lens' (AcquireTreeSeeds (Cost Integer)) (BuyTreeSeeds (Cost Integer))
+buyTreeSeeds f state = AcquireTreeSeeds <$> f (unAcquireTreeSeeds state)
 
 count :: Lens' (Element ac f a) (f Integer)
 count f state = (\a -> state { _count = a }) <$> f (_count state)

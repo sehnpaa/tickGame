@@ -10,7 +10,6 @@ prices = Prices
     (AdvancedHelperPrice $ Paperclips 5)
     (ProgPrice 2)
     (TreePrice 1)
-    (TreeSeedPrice $ Paperclips 100)
 
 config :: Config
 config = Config
@@ -33,7 +32,7 @@ elements = Elements
     (Element (AcquirePaperclips (PaperclipsManually Initial.paperclipCost) (PaperclipsFromHelper noCost)) $ Paperclips 0)
     (Element (AcquireHelpers (HelpersManually helperCost)) $ Helpers 0)
     (Element (AcquireTrees (TreesFromTreeSeeds treeCost)) $ Trees 0)
-    (Element (AcquireTreeSeeds (BuyTreeSeeds treeSeedCost)) $ TreeSeeds (replicate 10 NotGrowing))
+    (Element (AcquireTreeSeeds (BuyTreeSeeds Initial.treeSeedCost)) $ TreeSeeds (replicate 10 NotGrowing))
     (Element (AcquireWater (WaterManually Initial.waterCost)) $ Water 100)
     (Element (AcquireWood (WoodManually woodCost)) $ Wood 0)
 

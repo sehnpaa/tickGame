@@ -67,6 +67,10 @@ progressGrowing = map (\x -> case x of
 
 needMorePaperclips :: Ord a => Cost a -> Paperclips a -> Bool
 needMorePaperclips c p = (view paperclipCost c) > p
+
+needMorePaperclips' :: Ord a => BuyTreeSeeds (Cost a) -> Paperclips a -> Bool
+needMorePaperclips' c p = unPaperclips (_paperclipsCost $ unBuyTreeSeeds c) > unPaperclips p
+
 ---
 
 isoHelpers :: (Profunctor p, Functor f) => p (Helpers a) (f (Helpers a)) -> p a (f a)

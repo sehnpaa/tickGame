@@ -2,7 +2,6 @@
 
 module BusinessLogic where
 
-import qualified Iso as Iso
 import Config
 import Elements
 import Mod
@@ -55,11 +54,11 @@ plantASeed s dur price seeds =
     then Left $ lineNeedMoreSeeds s
     else Right $ initializeSeed dur seeds
 
-buyASeed :: Seconds -> TreeSeedPrice -> Paperclips Integer -> TreeSeeds a -> Either ErrorLogLine (TreeSeeds a, Paperclips Integer)
-buyASeed s (TreeSeedPrice price) p (TreeSeeds seeds) =
-  if price > p
+buyASeed :: (Num a, Ord a) => Seconds -> BuyTreeSeeds (Cost a) -> Paperclips a -> TreeSeeds a -> Either ErrorLogLine (TreeSeeds a, Paperclips a)
+buyASeed s cost p (TreeSeeds seeds) =
+  if needMorePaperclips' cost p
     then Left $ mkErrorLogLine s "Not enough paperclips."
-    else Right $ (TreeSeeds $ seeds ++ [NotGrowing], Iso.underAp isoPaperclips (-) (p,price))
+    else Right $ (TreeSeeds $ seeds ++ [NotGrowing], Paperclips $ (unPaperclips p) - (unPaperclips $ _paperclipsCost $ unBuyTreeSeeds cost))
 
 createPaperclip :: (Enum a, Ord a) => Paperclips a -> Storage (Paperclips a) -> Paperclips a
 createPaperclip p storage = min (unStorage storage) $ fmap succ p
