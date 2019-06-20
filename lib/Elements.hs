@@ -7,62 +7,71 @@ module Elements where
 import Control.Lens
 
 data Elements = Elements
-  { _paperclips :: Element Paperclips Integer
-  , _helpers :: Element Helpers Integer
-  , _trees :: Element Trees Integer
-  , _treeSeeds :: Element TreeSeeds Integer
-  , _water :: Element Water Integer
-  , _wood :: Element Wood Integer} deriving (Eq, Show)
+  { _paperclips :: Element AcquirePaperclips Paperclips Integer
+  , _helpers :: Element AcquireHelpers Helpers Integer
+  , _trees :: Element AcquireTrees Trees Integer
+  , _treeSeeds :: Element AcquireTreeSeeds TreeSeeds Integer
+  , _water :: Element AcquireWater Water Integer
+  , _wood :: Element AcquireWood Wood Integer} deriving (Eq, Show)
 
-data Element f a = Element
-  { _cost :: Acquirement (Cost Integer)
+data Element acquire f a = Element
+  { _cost :: acquire (Cost Integer)
   , _count :: f Integer }
 
--- Not a sum type, either is AcquirePaperclips
-data Acquirement cost
-  = AcquirePaperclips cost
-  | AcquireHelpers cost
-  | AcquireTrees cost
-  | AcquireTreeSeeds cost
-  | AcquireWater
-  | AcquireWood
+data AcquirePaperclips cost = AcquirePaperclips
+  { _paperclipsManually :: PaperclipsManually cost
+  , _paperclipsFromHelpers :: PaperclipsFromHelper cost }
 
-data AcquirePaperclips cost = PaperclipsManually | PaperclipsFromHelpers
-data AcquireHelpers cost = HelpersManually cost
-data AcquireTrees cost = TreesFromTreeSeeds cost
-data AcquireTreeSeeds cost = BuyTreeSeeds cost
-data AcquireWater = WaterManually
-data AcquireWood = WoodTODO
+newtype PaperclipsManually cost = PaperclipsManually { unPaperclipsManually :: cost }
+newtype PaperclipsFromHelper cost = PaperclipsFromHelper { unPaperclipsFromHelper :: cost }
 
-instance Eq (Element Paperclips a) where
+data AcquireHelpers cost = AcquireHelpers
+  { _helpersManually :: HelpersManually cost }
+
+newtype HelpersManually cost = HelpersManually { unHelpersManually :: cost }
+
+newtype AcquireTrees cost = AcquireTrees { unAcquireTrees :: TreesFromTreeSeeds cost }
+newtype TreesFromTreeSeeds cost = TreesFromTreeSeeds { unTreesFromTreeSeeds :: cost }
+
+newtype AcquireTreeSeeds cost = AcquireTreeSeeds { unAcquireTreeSeeds :: BuyTreeSeeds cost }
+newtype BuyTreeSeeds cost = BuyTreeSeeds { unBuyTreeSeeds :: cost }
+
+newtype AcquireWater cost = AcquireWater { unAquireWater :: WaterManually cost }
+newtype WaterManually cost = WaterManually { unWaterManually :: cost }
+
+newtype AcquireWood cost = AcquireWood { unAcquireWood :: WoodManually cost }
+newtype WoodManually cost = WoodManually { unWoodManually :: cost }
+
+
+instance Eq (Element ac Paperclips a) where
   a == b = _count a == _count b
-instance Eq (Element Helpers a) where
+instance Eq (Element ac Helpers a) where
   a == b = _count a == _count b
-instance Eq (Element Trees a) where
+instance Eq (Element ac Trees a) where
   a == b = _count a == _count b
-instance Eq (Element TreeSeeds a) where
+instance Eq (Element ac TreeSeeds a) where
   a == b = _count a == _count b
-instance Eq (Element Water a) where
+instance Eq (Element ac Water a) where
   a == b = _count a == _count b
-instance Eq (Element Wood a) where
+instance Eq (Element ac Wood a) where
   a == b = _count a == _count b
 
-instance Show (Element Paperclips a) where
+instance Show (Element ac Paperclips a) where
   show = show . _count
 
-instance Show (Element Helpers a) where
+instance Show (Element ac Helpers a) where
   show = show . _count
 
-instance Show (Element Trees a) where
+instance Show (Element ac Trees a) where
   show = show . _count
 
-instance Show (Element TreeSeeds a) where
+instance Show (Element ac TreeSeeds a) where
   show = show . _count
 
-instance Show (Element Water a) where
+instance Show (Element ac Water a) where
   show = show . _count
 
-instance Show (Element Wood a) where
+instance Show (Element ac Wood a) where
   show = show . _count
 
 data Cost a = Cost

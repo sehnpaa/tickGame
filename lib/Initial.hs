@@ -30,24 +30,30 @@ resources = Resources
 
 elements :: Elements
 elements = Elements
-    (Element (AcquirePaperclips Initial.paperclipCost) $ Paperclips 0)
-    (Element (AcquireHelpers helperCost) $ Helpers 0)
-    (Element (AcquireTrees treeCost) $ Trees 0)
-    (Element (AcquireTreeSeeds treeSeedCost) $ TreeSeeds (replicate 10 NotGrowing))
-    (Element AcquireWater $ Water 100)
-    (Element AcquireWood $ Wood 0)
+    (Element (AcquirePaperclips (PaperclipsManually Initial.paperclipCost) (PaperclipsFromHelper noCost)) $ Paperclips 0)
+    (Element (AcquireHelpers (HelpersManually helperCost)) $ Helpers 0)
+    (Element (AcquireTrees (TreesFromTreeSeeds treeCost)) $ Trees 0)
+    (Element (AcquireTreeSeeds (BuyTreeSeeds treeSeedCost)) $ TreeSeeds (replicate 10 NotGrowing))
+    (Element (AcquireWater (WaterManually Initial.waterCost)) $ Water 100)
+    (Element (AcquireWood (WoodManually woodCost)) $ Wood 0)
 
 paperclipCost :: Cost Integer
-paperclipCost = Cost (Paperclips 10) (Helpers 0) (Trees 0) (TreeSeeds []) (Water 0) (Wood 0)
+paperclipCost = noCost
 
 helperCost :: Cost Integer
-helperCost = noCost
+helperCost = Cost (Paperclips 10) (Helpers 0) (Trees 0) (TreeSeeds []) (Water 0) (Wood 0)
 
 treeCost :: Cost Integer
-treeCost = noCost
+treeCost = Cost (Paperclips 0) (Helpers 0) (Trees 0) (TreeSeeds [GrowingDone]) (Water 0) (Wood 0)
 
 treeSeedCost :: Cost Integer
-treeSeedCost = noCost
+treeSeedCost = Cost (Paperclips 100) (Helpers 0) (Trees 0) (TreeSeeds []) (Water 0) (Wood 0)
+
+waterCost :: Cost Integer
+waterCost = noCost
+
+woodCost :: Cost Integer
+woodCost = noCost
 
 noCost :: Cost Integer
 noCost = Cost (Paperclips 0) (Helpers 0) (Trees 0) (TreeSeeds []) (Water 0) (Wood 0)
