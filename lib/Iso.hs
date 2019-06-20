@@ -2,8 +2,15 @@
 
 module Iso where
 
-import Control.Lens (AnIso, Each, each, over, withIso)
-import Data.Tuple.Curry (Curry, uncurryN)
+import           Control.Lens                   ( AnIso
+                                                , Each
+                                                , each
+                                                , over
+                                                , withIso
+                                                )
+import           Data.Tuple.Curry               ( Curry
+                                                , uncurryN
+                                                )
 
 under1 :: AnIso s t r b -> (t -> s) -> b -> r
 under1 i g a = withIso i (\con eli -> con $ g (eli a))
@@ -48,7 +55,12 @@ replace all underN functions.
 6 :: Paperclips
 -}
 
-underAp :: (Curry (t1 -> s1) b1, Each s2 t1 b b2) => AnIso s1 b2 r b -> b1 -> s2 -> r
+underAp
+    :: (Curry (t1 -> s1) b1, Each s2 t1 b b2)
+    => AnIso s1 b2 r b
+    -> b1
+    -> s2
+    -> r
 underAp i fx a = withIso i (\con eli -> con $ toEachArg fx eli a)
 
 -------------------------
@@ -59,5 +71,7 @@ unwrap i a = withIso i (\_ eli -> eli a)
 -------------------------
 
 -- Walk down 2 independent isos and apply f
-walkDown2 :: AnIso s t a b -> AnIso s1 t1 a1 b1 -> (t -> t1 -> r) -> b -> b1 -> r
-walkDown2 iso1 iso2 f a1 a2 = withIso iso1 (\_ eli1 -> withIso iso2 (\_ eli2 -> f (eli1 a1) (eli2 a2)))
+walkDown2
+    :: AnIso s t a b -> AnIso s1 t1 a1 b1 -> (t -> t1 -> r) -> b -> b1 -> r
+walkDown2 iso1 iso2 f a1 a2 =
+    withIso iso1 (\_ eli1 -> withIso iso2 (\_ eli2 -> f (eli1 a1) (eli2 a2)))

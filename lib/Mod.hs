@@ -4,16 +4,23 @@
 
 module Mod where
 
-import Control.Applicative (liftA2)
-import Control.Lens (Profunctor, iso, view, withIso)
-import Data.Text (Text, concat, pack)
+import           Control.Applicative            ( liftA2 )
+import           Control.Lens                   ( Profunctor
+                                                , iso
+                                                , view
+                                                , withIso
+                                                )
+import           Data.Text                      ( Text
+                                                , concat
+                                                , pack
+                                                )
 
-import Config
-import Elements
-import Iso
-import NaturalTransformation
-import Resources
-import Utils
+import           Config
+import           Elements
+import           Iso
+import           NaturalTransformation
+import           Resources
+import           Utils
 
 data MyState = MyState
   { _config :: Config
@@ -47,10 +54,11 @@ data ResearchProgress = NotResearched | ResearchInProgress Integer | ResearchDon
 
 instance Show ResearchProgress where
   show NotResearched = "Not researched"
-  show (ResearchInProgress n) = "Research in progress - " ++ show n ++ " " ++ noun n ++ " left."
-    where
-      noun 1 = "tick"
-      noun _ = "ticks"
+  show (ResearchInProgress n) =
+    "Research in progress - " ++ show n ++ " " ++ noun n ++ " left."
+   where
+    noun 1 = "tick"
+    noun _ = "ticks"
   show ResearchDone = "Research done"
 
 data ResearchAreas = ResearchAreas
@@ -89,46 +97,71 @@ data MyEvent
 
 ---
 
-addHelperWork :: Num a => HelperInc (Helpers a) -> Helpers a -> Paperclips a -> Paperclips a
-addHelperWork inc h p = liftA2 (+) p $ unNat helpersToPaperclips $ productOfHelperWork inc h
+addHelperWork
+  :: Num a => HelperInc (Helpers a) -> Helpers a -> Paperclips a -> Paperclips a
+addHelperWork inc h p =
+  liftA2 (+) p $ unNat helpersToPaperclips $ productOfHelperWork inc h
 
 productOfHelperWork :: Num a => HelperInc (Helpers a) -> Helpers a -> Helpers a
 productOfHelperWork inc h = liftA2 (*) h $ Iso.unwrap isoHelperInc inc
 
-calcRemainingWater :: (Num a, Ord a) => ProgPrice a -> [Prog a] -> Water a -> Maybe (Water a)
+calcRemainingWater
+  :: (Num a, Ord a) => ProgPrice a -> [Prog a] -> Water a -> Maybe (Water a)
 calcRemainingWater price progs water =
   let cost = waterCost progs (unProgPrice price)
-    in case cost > water of
-      True -> Nothing
-      False -> Just $ Iso.under2 isoWater (-) water cost
+  in  case cost > water of
+        True  -> Nothing
+        False -> Just $ Iso.under2 isoWater (-) water cost
 
 lineNeedMorePaperclips :: Seconds -> ErrorLogLine
-lineNeedMorePaperclips s = ErrorLogLine $ Data.Text.concat ["Tick ", pack (show s), ": You need more paperclips."]
+lineNeedMorePaperclips s = ErrorLogLine
+  $ Data.Text.concat ["Tick ", pack (show s), ": You need more paperclips."]
 
 mkErrorLogLine :: Seconds -> Text -> ErrorLogLine
-mkErrorLogLine s t = ErrorLogLine $ Data.Text.concat ["Tick ", pack (show s), ": ", t]
+mkErrorLogLine s t =
+  ErrorLogLine $ Data.Text.concat ["Tick ", pack (show s), ": ", t]
 
 lineNeedMoreSeeds :: Seconds -> ErrorLogLine
-lineNeedMoreSeeds s = ErrorLogLine $ Data.Text.concat ["Tick ", pack (show s), ": You need more seeds."]
+lineNeedMoreSeeds s = ErrorLogLine
+  $ Data.Text.concat ["Tick ", pack (show s), ": You need more seeds."]
 
 initializeSeed :: (Eq a, Num a) => TreeDuration -> TreeSeeds a -> TreeSeeds a
-initializeSeed duration = TreeSeeds . changeFirst (== NotGrowing) (const $ Growing $ fromIntegral $ unTreeDuration duration) . unTreeSeeds
+initializeSeed duration =
+  TreeSeeds
+    . changeFirst (== NotGrowing)
+                  (const $ Growing $ fromIntegral $ unTreeDuration duration)
+    . unTreeSeeds
 
 decPaperclipsWith :: Num a => Cost a -> Paperclips a -> Paperclips a
 decPaperclipsWith c p = under2 isoPaperclips (-) p $ view paperclipCost c
 
-decPaperclipsWith' :: Num a => AdvancedHelperPrice (Paperclips a) -> Paperclips a -> Paperclips a
-decPaperclipsWith' hp p = withIso isoAdvancedHelperPrice (\_ eli price -> Iso.under2 isoPaperclips (-) p (eli price)) hp
+decPaperclipsWith'
+  :: Num a => AdvancedHelperPrice (Paperclips a) -> Paperclips a -> Paperclips a
+decPaperclipsWith' hp p = withIso
+  isoAdvancedHelperPrice
+  (\_ eli price -> Iso.under2 isoPaperclips (-) p (eli price))
+  hp
 
 ---
 
-isoAdvancedHelperPrice :: (Profunctor p, Functor f) => p (AdvancedHelperPrice (Paperclips a)) (f (AdvancedHelperPrice (Paperclips a))) -> p (Paperclips a) (f (Paperclips a))
+isoAdvancedHelperPrice
+  :: (Profunctor p, Functor f)
+  => p
+       (AdvancedHelperPrice (Paperclips a))
+       (f (AdvancedHelperPrice (Paperclips a)))
+  -> p (Paperclips a) (f (Paperclips a))
 isoAdvancedHelperPrice = iso AdvancedHelperPrice unAdvancedHelperPrice
 
-isoHelperInc :: (Profunctor p, Functor f) => p (HelperInc (b a)) (f (HelperInc (b a))) -> p (b a) (f (b a))
+isoHelperInc
+  :: (Profunctor p, Functor f)
+  => p (HelperInc (b a)) (f (HelperInc (b a)))
+  -> p (b a) (f (b a))
 isoHelperInc = iso HelperInc unHelperInc
 
-isoHelperPrice :: (Profunctor p, Functor f) => p (HelperPrice a) (f (HelperPrice a)) -> p (Paperclips a) (f (Paperclips a))
+isoHelperPrice
+  :: (Profunctor p, Functor f)
+  => p (HelperPrice a) (f (HelperPrice a))
+  -> p (Paperclips a) (f (Paperclips a))
 isoHelperPrice = iso HelperPrice unHelperPrice
 
 startResearch :: Duration -> ResearchProgress

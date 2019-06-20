@@ -3,8 +3,10 @@
 
 module Config where
 
-import Control.Lens (Profunctor, iso)
-import Elements
+import           Control.Lens                   ( Profunctor
+                                                , iso
+                                                )
+import           Elements
 
 data Config = Config
   { _constants :: Constants
@@ -49,6 +51,7 @@ newtype TreePrice a = TreePrice { unTreePrice :: a } deriving (Eq, Show)
 
 newtype TreeSeedPrice = TreeSeedPrice { unTreeSeedPrice :: Paperclips Integer } deriving (Eq, Show)
 
-isoTreePrice :: (Profunctor p, Functor f) => p (TreePrice a) (f (TreePrice a)) -> p a (f a)
+isoTreePrice
+  :: (Profunctor p, Functor f) => p (TreePrice a) (f (TreePrice a)) -> p a (f a)
 isoTreePrice = iso TreePrice unTreePrice
 

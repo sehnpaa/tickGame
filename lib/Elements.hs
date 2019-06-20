@@ -4,7 +4,7 @@
 
 module Elements where
 
-import Control.Lens
+import           Control.Lens
 
 data Elements = Elements
   { _paperclips :: Element AcquirePaperclips Paperclips Integer
@@ -114,10 +114,11 @@ data Prog a = NotGrowing | Growing a | GrowingDone deriving (Eq)
 
 instance Show (Prog Integer) where
   show NotGrowing = show "Not growing"
-  show (Growing n) = show "Growing in progress - " ++ show n ++ " " ++ noun n ++ " left."
-    where
-      noun 1 = "tick"
-      noun _ = "ticks"
+  show (Growing n) =
+    show "Growing in progress - " ++ show n ++ " " ++ noun n ++ " left."
+   where
+    noun 1 = "tick"
+    noun _ = "ticks"
   show GrowingDone = show "Growing done"
 
 newtype Water a = Water { unWater :: a } deriving (Eq, Functor, Ord)
@@ -131,7 +132,9 @@ instance Show (Wood Integer) where
   show (Wood a) = show a
 
 paperclipCost :: Lens' (Cost a) (Paperclips a)
-paperclipCost f state = (\c -> state { _paperclipsCost = c}) <$> f (_paperclipsCost state)
+paperclipCost f state =
+  (\c -> state { _paperclipsCost = c }) <$> f (_paperclipsCost state)
 
 treeSeedCost :: Lens' (Cost a) (TreeSeeds a)
-treeSeedCost f state = (\c -> state { _treeSeedsCost = c}) <$> f (_treeSeedsCost state)
+treeSeedCost f state =
+  (\c -> state { _treeSeedsCost = c }) <$> f (_treeSeedsCost state)

@@ -5,10 +5,14 @@
 
 module Resources where
 
-import Control.Lens (Profunctor, iso, view, withIso)
+import           Control.Lens                   ( Profunctor
+                                                , iso
+                                                , view
+                                                , withIso
+                                                )
 
-import Elements
-import NaturalTransformation
+import           Elements
+import           NaturalTransformation
 import qualified Iso
 
 data Resources = Resources
@@ -32,61 +36,78 @@ limitByStorage :: Ord a => Storage a -> a -> a
 limitByStorage s = min (Iso.unwrap isoStorage s)
 
 waterCost :: Num a => [Prog a] -> a -> Water a
-waterCost progs waterPerSeed = let numberOfGrowingSeeds = fromIntegral . length . filter isGrowing $ progs
-      in
-        Water $ waterPerSeed * numberOfGrowingSeeds
+waterCost progs waterPerSeed =
+  let numberOfGrowingSeeds = fromIntegral . length . filter isGrowing $ progs
+  in  Water $ waterPerSeed * numberOfGrowingSeeds
 
 removeGrowingSeeds :: [Prog a] -> [Prog a]
 removeGrowingSeeds = filter (not . isGrowing)
 
 isGrowing :: Prog a -> Bool
 isGrowing (Growing _) = True
-isGrowing _ = False
+isGrowing _           = False
 
 isGrowingDone :: Prog a -> Bool
 isGrowingDone GrowingDone = True
-isGrowingDone _ = False
+isGrowingDone _           = False
 
 additionalTrees :: (Eq a, Num a) => [Prog a] -> Trees a
-additionalTrees = Trees . fromIntegral . length . filter (\x -> case x of Growing 1 -> True; _ -> False)
+additionalTrees = Trees . fromIntegral . length . filter
+  (\x -> case x of
+    Growing 1 -> True
+    _         -> False
+  )
 
 countNotGrowingSeeds :: Num a => TreeSeeds a -> a
-countNotGrowingSeeds = fromIntegral . length . filter isNotGrowing . unTreeSeeds
+countNotGrowingSeeds =
+  fromIntegral . length . filter isNotGrowing . unTreeSeeds
 
 isNotGrowing :: Prog a -> Bool
 isNotGrowing a = case a of
   NotGrowing -> True
-  _ -> False
+  _          -> False
 
 progressGrowing :: (Eq a, Num a) => [Prog a] -> [Prog a]
-progressGrowing = map (\x -> case x of
-        NotGrowing -> NotGrowing
-        Growing 1 -> GrowingDone
-        Growing n -> Growing (n-1)
-        GrowingDone -> GrowingDone)
+progressGrowing = map
+  (\x -> case x of
+    NotGrowing  -> NotGrowing
+    Growing 1   -> GrowingDone
+    Growing n   -> Growing (n - 1)
+    GrowingDone -> GrowingDone
+  )
 
 needMorePaperclips :: Ord a => Cost a -> Paperclips a -> Bool
 needMorePaperclips c p = (view paperclipCost c) > p
 
 needMorePaperclips' :: Ord a => BuyTreeSeeds (Cost a) -> Paperclips a -> Bool
-needMorePaperclips' c p = unPaperclips (_paperclipsCost $ unBuyTreeSeeds c) > unPaperclips p
+needMorePaperclips' c p =
+  unPaperclips (_paperclipsCost $ unBuyTreeSeeds c) > unPaperclips p
 
 ---
 
-isoHelpers :: (Profunctor p, Functor f) => p (Helpers a) (f (Helpers a)) -> p a (f a)
+isoHelpers
+  :: (Profunctor p, Functor f) => p (Helpers a) (f (Helpers a)) -> p a (f a)
 isoHelpers = iso Helpers unHelpers
 
-isoPaperclips :: (Profunctor p, Functor f) => p (Paperclips a) (f (Paperclips a)) -> p a (f a)
+isoPaperclips
+  :: (Profunctor p, Functor f)
+  => p (Paperclips a) (f (Paperclips a))
+  -> p a (f a)
 isoPaperclips = iso Paperclips unPaperclips
 
-isoStorage :: (Profunctor p, Functor f) => p (Storage a) (f (Storage a)) -> p a (f a)
+isoStorage
+  :: (Profunctor p, Functor f) => p (Storage a) (f (Storage a)) -> p a (f a)
 isoStorage = iso Storage unStorage
 
-isoTreeSeeds :: (Profunctor p, Functor f) => p (TreeSeeds a) (f (TreeSeeds a)) -> p [Prog a] (f [Prog a])
+isoTreeSeeds
+  :: (Profunctor p, Functor f)
+  => p (TreeSeeds a) (f (TreeSeeds a))
+  -> p [Prog a] (f [Prog a])
 isoTreeSeeds = iso TreeSeeds unTreeSeeds
 
 isoWater :: (Profunctor p, Functor f) => p (Water a) (f (Water a)) -> p a (f a)
 isoWater = iso Water unWater
 
 helpersToPaperclips :: Helpers :~> Paperclips
-helpersToPaperclips = Nat (\h -> Paperclips $ withIso isoHelpers (\_ eli -> eli h))
+helpersToPaperclips =
+  Nat (\h -> Paperclips $ withIso isoHelpers (\_ eli -> eli h))
