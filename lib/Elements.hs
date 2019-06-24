@@ -12,7 +12,7 @@ data Elements = Elements
   , _trees :: Element AcquireTrees Trees Integer
   , _treeSeeds :: Element AcquireTreeSeeds TreeSeeds Integer
   , _water :: Element AcquireWater Water Integer
-  , _wood :: Element AcquireWood Wood Integer} deriving (Eq, Show)
+  , _wood :: Element AcquireWood Wood Integer}
 
 data Element acquire f a = Element
   { _cost :: acquire (Cost Integer)
@@ -42,45 +42,13 @@ newtype WaterManually cost = WaterManually { unWaterManually :: cost }
 newtype AcquireWood cost = AcquireWood { unAcquireWood :: WoodManually cost }
 newtype WoodManually cost = WoodManually { unWoodManually :: cost }
 
-
-instance Eq (Element ac Paperclips a) where
-  a == b = _count a == _count b
-instance Eq (Element ac Helpers a) where
-  a == b = _count a == _count b
-instance Eq (Element ac Trees a) where
-  a == b = _count a == _count b
-instance Eq (Element ac TreeSeeds a) where
-  a == b = _count a == _count b
-instance Eq (Element ac Water a) where
-  a == b = _count a == _count b
-instance Eq (Element ac Wood a) where
-  a == b = _count a == _count b
-
-instance Show (Element ac Paperclips a) where
-  show = show . _count
-
-instance Show (Element ac Helpers a) where
-  show = show . _count
-
-instance Show (Element ac Trees a) where
-  show = show . _count
-
-instance Show (Element ac TreeSeeds a) where
-  show = show . _count
-
-instance Show (Element ac Water a) where
-  show = show . _count
-
-instance Show (Element ac Wood a) where
-  show = show . _count
-
 data Cost a = Cost
   { _paperclipsCost :: Paperclips a
   , _helpersCost :: Helpers a
   , _treesCost :: Trees a
   , _treeSeedsCost :: TreeSeeds a
   , _waterCost :: Water a
-  , _woodCost :: Wood a } deriving (Eq)
+  , _woodCost :: Wood a }
 
 newtype Paperclips a = Paperclips { unPaperclips :: a } deriving (Enum, Eq, Functor, Ord)
 

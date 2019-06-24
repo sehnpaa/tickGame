@@ -18,14 +18,14 @@ import qualified Iso
 data Resources = Resources
   { _elements :: Elements
   , _storage :: Storage (Paperclips Integer)
-  , _waterTank :: WaterTank Integer } deriving (Eq, Show)
+  , _waterTank :: WaterTank Integer }
 
-newtype Storage a = Storage { unStorage :: a } deriving (Eq, Functor)
+newtype Storage a = Storage { unStorage :: a } deriving (Functor)
 
 instance Show (Storage (Paperclips Integer)) where
   show (Storage a) = show a
 
-newtype WaterTank a = WaterTank { unWaterTank :: a } deriving (Eq)
+newtype WaterTank a = WaterTank { unWaterTank :: a }
 
 instance Show (WaterTank Integer) where
   show (WaterTank a) = show a

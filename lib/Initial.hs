@@ -5,7 +5,7 @@ import           Elements
 import           Mod
 import           Resources
 
-prices :: Prices
+prices :: Prices Integer
 prices =
     Prices (AdvancedHelperPrice $ Paperclips 5) (ProgPrice 2) (TreePrice 1)
 

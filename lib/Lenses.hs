@@ -27,23 +27,20 @@ helperInc :: Lens' Constants (HelperInc (Helpers Integer))
 helperInc f state =
     (\inc' -> state { _helperInc = inc' }) <$> f (_helperInc state)
 
-prices :: Lens' Config Prices
+prices :: Lens' Config (Prices Integer)
 prices f state =
     (\prices' -> state { _prices = prices' }) <$> f (_prices state)
 
-advancedHelperPrice :: Lens' Prices (AdvancedHelperPrice (Paperclips Integer))
+advancedHelperPrice :: Lens' (Prices Integer) (AdvancedHelperPrice (Paperclips Integer))
 advancedHelperPrice f state =
     (\price' -> state { _advancedHelperPrice = price' })
         <$> f (_advancedHelperPrice state)
 
--- helperPrices :: Lens' Prices (HelperPrice Integer)
--- helperPrices f state = (\helperPrice' -> state { _helperPrice = helperPrice'}) <$> f (_helperPrice state)
-
-treePrice :: Lens' Prices (TreePrice Integer)
+treePrice :: Lens' (Prices a) (TreePrice a)
 treePrice f state =
     (\treePrice' -> state { _treePrice = treePrice' }) <$> f (_treePrice state)
 
-progPrice :: Lens' Prices (ProgPrice Integer)
+progPrice :: Lens' (Prices a) (ProgPrice a)
 progPrice f state =
     (\price' -> state { _progPrice = price' }) <$> f (_progPrice state)
 

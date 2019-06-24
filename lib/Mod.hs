@@ -29,7 +29,7 @@ data MyState = MyState
   , _researchAreas :: ResearchAreas
   , _resources :: Resources
   , _seconds :: Seconds
-  , _isStarted :: IsStarted } deriving (Eq, Show)
+  , _isStarted :: IsStarted }
 
 data Action
   = SetP (Paperclips Integer)
@@ -42,9 +42,8 @@ data Action
   | SetAdvancedHelperResearchProgress ResearchProgress
   | SetHelperInc (HelperInc (Helpers Integer))
   | SetProgs [Prog Integer]
-  deriving (Eq, Show)
 
-newtype ErrorLogLine = ErrorLogLine { unErrorLogLine :: Text } deriving (Eq)
+newtype ErrorLogLine = ErrorLogLine { unErrorLogLine :: Text }
 
 instance Show ErrorLogLine where
   show (ErrorLogLine a) = show a
@@ -62,23 +61,20 @@ instance Show ResearchProgress where
   show ResearchDone = "Research done"
 
 data ResearchAreas = ResearchAreas
-  { _advancedHelperResearch :: ResearchComp } deriving Eq
-
-instance Show ResearchAreas where
-  show (ResearchAreas a) = show a
+  { _advancedHelperResearch :: ResearchComp }
 
 data ResearchComp = ResearchComp
   { _researchCompDuration :: Duration
-  , _researchCompProgress :: ResearchProgress } deriving (Eq, Show)
+  , _researchCompProgress :: ResearchProgress }
 
-newtype Duration = Duration { unDuration :: Integer } deriving (Eq, Show)
+newtype Duration = Duration { unDuration :: Integer }
 
 newtype Seconds = Seconds { unSeconds :: Integer } deriving (Enum, Eq, Num)
 
 instance Show Seconds where
   show (Seconds a) = show a
 
-newtype IsStarted = IsStarted { unIsStarted :: Bool } deriving (Eq)
+newtype IsStarted = IsStarted { unIsStarted :: Bool }
 
 instance Show IsStarted where
   show (IsStarted a) = show a
