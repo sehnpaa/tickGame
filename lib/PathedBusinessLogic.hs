@@ -7,24 +7,26 @@ import           LensUtils
 import           Mod
 import           Resources
 
-helperWork :: MyState -> Paperclips Integer
+helperWork :: (Num a, Ord a) => MyState a -> Paperclips a
 helperWork = arg4 BL.helperWork
                   (resources . elements . elementPaperclips . count)
                   (resources . elements . elementHelpers . count)
                   (config . constants . helperInc)
                   (resources . storage)
 
-researchWork :: MyState -> (ResearchProgress, HelperInc (Helpers Integer))
+researchWork
+      :: (Eq a, Num a)
+      => MyState a
+      -> (ResearchProgress a, HelperInc (Helpers a))
 researchWork = arg2
       BL.researchWork
       (researchAreas . advancedHelperResearch . researchCompProgress)
       (config . constants . helperInc)
 
 seedWork
-      :: MyState
-      -> Either
-               (ErrorLogLine, [Prog Integer])
-               (Water Integer, [Prog Integer], Trees Integer)
+      :: (Num a, Ord a, Show a)
+      => MyState a
+      -> Either (ErrorLogLine, [Prog a]) (Water a, [Prog a], Trees a)
 seedWork = arg5 BL.seedWork
                 seconds
                 (resources . elements . elementWater . count)
@@ -33,7 +35,9 @@ seedWork = arg5 BL.seedWork
                 (resources . elements . elementTrees . count)
 
 buyHelper
-      :: MyState -> Either ErrorLogLine (Helpers Integer, Paperclips Integer)
+      :: (Enum a, Num a, Ord a, Show a)
+      => MyState a
+      -> Either ErrorLogLine (Helpers a, Paperclips a)
 buyHelper = arg4
       BL.buyHelper
       seconds
@@ -41,13 +45,15 @@ buyHelper = arg4
       (resources . elements . elementPaperclips . count)
       (resources . elements . elementHelpers . count)
 
-pumpWater :: MyState -> Water Integer
+pumpWater :: (Enum a, Num a, Ord a) => MyState a -> Water a
 pumpWater = arg2 BL.pumpWater
                  (resources . elements . elementWater . count)
                  (resources . waterTank)
 
 researchAdvancedHelper
-      :: MyState -> Either ErrorLogLine (Paperclips Integer, ResearchProgress)
+      :: (Num a, Ord a, Show a)
+      => MyState a
+      -> Either ErrorLogLine (Paperclips a, ResearchProgress a)
 researchAdvancedHelper = arg5
       BL.researchAdvancedHelper
       seconds
@@ -56,7 +62,10 @@ researchAdvancedHelper = arg5
       (researchAreas . advancedHelperResearch . researchCompProgress)
       (researchAreas . advancedHelperResearch . researchCompDuration)
 
-plantASeed :: MyState -> Either ErrorLogLine (TreeSeeds Integer)
+plantASeed
+      :: (Num a, Ord a, Show a)
+      => MyState a
+      -> Either ErrorLogLine (TreeSeeds a)
 plantASeed = arg4 BL.plantASeed
                   seconds
                   (resources . elements . elementTreeSeeds . duration)
@@ -64,7 +73,9 @@ plantASeed = arg4 BL.plantASeed
                   (resources . elements . elementTreeSeeds . count)
 
 buyASeed
-      :: MyState -> Either ErrorLogLine (TreeSeeds Integer, Paperclips Integer)
+      :: (Num a, Ord a, Show a)
+      => MyState a
+      -> Either ErrorLogLine (TreeSeeds a, Paperclips a)
 buyASeed = arg4
       BL.buyASeed
       seconds
@@ -72,7 +83,7 @@ buyASeed = arg4
       (resources . elements . elementPaperclips . count)
       (resources . elements . elementTreeSeeds . count)
 
-createPaperclip :: MyState -> Paperclips Integer
+createPaperclip :: (Enum a, Ord a) => MyState a -> Paperclips a
 createPaperclip = arg2 BL.createPaperclip
                        (resources . elements . elementPaperclips . count)
                        (resources . storage)

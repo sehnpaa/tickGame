@@ -16,10 +16,10 @@ import           Elements
 import           NaturalTransformation
 import qualified Iso
 
-data Resources = Resources
-  { _elements :: Elements Integer
-  , _storage :: Storage (Paperclips Integer)
-  , _waterTank :: WaterTank Integer }
+data Resources a = Resources
+  { _elements :: Elements a
+  , _storage :: Storage (Paperclips a)
+  , _waterTank :: WaterTank a }
 
 newtype Storage a = Storage { unStorage :: a } deriving (Functor)
 
@@ -86,17 +86,17 @@ needMorePaperclips' c p =
 
 ---
 
-elements :: Lens' Resources (Elements Integer)
+elements :: Lens' (Resources a) (Elements a)
 elements f state =
   (\elements' -> state { _elements = elements' }) <$> f (_elements state)
 
-storage :: Lens' Resources (Storage (Paperclips Integer))
+storage :: Lens' (Resources a) (Storage (Paperclips a))
 storage f state =
-    (\storage' -> state { _storage = storage' }) <$> f (_storage state)
+  (\storage' -> state { _storage = storage' }) <$> f (_storage state)
 
-waterTank :: Lens' Resources (WaterTank Integer)
+waterTank :: Lens' (Resources a) (WaterTank a)
 waterTank f state =
-    (\tank' -> state { _waterTank = tank' }) <$> f (_waterTank state)
+  (\tank' -> state { _waterTank = tank' }) <$> f (_waterTank state)
 
 isoHelpers
   :: (Profunctor p, Functor f) => p (Helpers a) (f (Helpers a)) -> p a (f a)

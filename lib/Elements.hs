@@ -3,7 +3,6 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE TemplateHaskell #-}
 
-
 module Elements where
 
 import           Control.Lens
@@ -149,7 +148,7 @@ elementTreeSeeds
 elementTreeSeeds f state =
   (\treeSeeds' -> state { _treeSeeds = treeSeeds' }) <$> f (_treeSeeds state)
 
-progs :: Lens' (TreeSeeds Integer) [Prog Integer]
+progs :: Lens' (TreeSeeds a) [Prog a]
 progs f state = TreeSeeds <$> f (unTreeSeeds state)
 
 elementWood :: Lens' (Elements a) (Element AcquireWood DurationWood Wood a)

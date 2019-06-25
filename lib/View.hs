@@ -6,42 +6,42 @@ import           Elements
 import           Mod
 import           Resources
 
-viewActions :: MyState -> [Action]
+viewActions :: MyState a -> [Action a]
 viewActions = view actions
 
-viewErrorLog :: MyState -> [ErrorLogLine]
+viewErrorLog :: MyState a -> [ErrorLogLine]
 viewErrorLog = view errorLog
 
-viewPaperclips :: MyState -> Paperclips Integer
+viewPaperclips :: MyState a -> Paperclips a
 viewPaperclips = view (resources . elements . elementPaperclips . count)
 
-viewHelpers :: MyState -> Helpers Integer
+viewHelpers :: MyState a -> Helpers a
 viewHelpers = view (resources . elements . elementHelpers . count)
 
-viewStorage :: MyState -> Storage (Paperclips Integer)
+viewStorage :: MyState a -> Storage (Paperclips a)
 viewStorage = view (resources . storage)
 
-viewTrees :: MyState -> Trees Integer
+viewTrees :: MyState a -> Trees a
 viewTrees = view (resources . elements . elementTrees . count)
 
-viewTreeSeeds :: MyState -> TreeSeeds Integer
+viewTreeSeeds :: MyState a -> TreeSeeds a
 viewTreeSeeds = view (resources . elements . elementTreeSeeds . count)
 
-viewWater :: MyState -> Water Integer
+viewWater :: MyState a -> Water a
 viewWater = view (resources . elements . elementWater . count)
 
-viewWaterTank :: MyState -> WaterTank Integer
+viewWaterTank :: MyState a -> WaterTank a
 viewWaterTank = view (resources . waterTank)
 
-viewWood :: MyState -> Wood Integer
+viewWood :: MyState a -> Wood a
 viewWood = view (resources . elements . elementWood . count)
 
-viewAdvancedHelperResearch :: MyState -> ResearchProgress
+viewAdvancedHelperResearch :: MyState a -> ResearchProgress a
 viewAdvancedHelperResearch =
     view (researchAreas . advancedHelperResearch . researchCompProgress)
 
-viewSeconds :: MyState -> Seconds
+viewSeconds :: MyState a -> Seconds a
 viewSeconds = view seconds
 
-viewIsStarted :: MyState -> IsStarted
+viewIsStarted :: MyState a -> IsStarted
 viewIsStarted = view isStarted

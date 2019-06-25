@@ -20,10 +20,10 @@ helperWork
 helperWork p h inc storage = limitByStorage storage $ addHelperWork inc h p
 
 researchWork
-  :: Num a
-  => ResearchProgress
+  :: (Eq a, Num a)
+  => ResearchProgress a
   -> HelperInc (Helpers a)
-  -> (ResearchProgress, HelperInc (Helpers a))
+  -> (ResearchProgress a, HelperInc (Helpers a))
 researchWork progress c = case progress of
   NotResearched        -> (progress, c)
   ResearchInProgress 1 -> (ResearchDone, twoLevels (+) c c)
@@ -31,8 +31,8 @@ researchWork progress c = case progress of
   ResearchDone         -> (progress, c)
 
 seedWork
-  :: (Num a, Ord a)
-  => Seconds
+  :: (Num a, Ord a, Show a)
+  => Seconds a
   -> Water a
   -> ProgPrice a
   -> [Prog a]
@@ -53,8 +53,8 @@ seedWork s water price progs ts =
         else Right $ (water, progs, ts)
 
 buyHelper
-  :: (Enum a, Num a, Ord a)
-  => Seconds
+  :: (Enum a, Num a, Ord a, Show a)
+  => Seconds a
   -> HelpersManually (Cost a)
   -> Paperclips a
   -> Helpers a
@@ -67,12 +67,12 @@ pumpWater :: (Enum a, Num a, Ord a) => Water a -> WaterTank a -> Water a
 pumpWater w tank = Water $ min (unWaterTank tank) (succ $ unWater w)
 
 researchAdvancedHelper
-  :: Seconds
-  -> Paperclips Integer
-  -> AdvancedHelperPrice (Paperclips Integer)
-  -> ResearchProgress
-  -> DurationAdvancedHelper Integer
-  -> Either ErrorLogLine (Paperclips Integer, ResearchProgress)
+  :: (Num a, Ord a, Show a) => Seconds a
+  -> Paperclips a
+  -> AdvancedHelperPrice (Paperclips a)
+  -> ResearchProgress a
+  -> DurationAdvancedHelper a
+  -> Either ErrorLogLine (Paperclips a, ResearchProgress a)
 researchAdvancedHelper s p price progress duration =
   case (unAdvancedHelperPrice price > p, progress) of
     (True, NotResearched) -> Left $ mkErrorLogLine s "Not enough paperclips."
@@ -82,8 +82,8 @@ researchAdvancedHelper s p price progress duration =
     (_, ResearchDone        ) -> Left $ mkErrorLogLine s "Already done."
 
 plantASeed
-  :: (Num a, Ord a)
-  => Seconds
+  :: (Num a, Ord a, Show a)
+  => Seconds a
   -> DurationTreeSeeds a
   -> TreePrice a
   -> TreeSeeds a
@@ -94,8 +94,8 @@ plantASeed s dur price seeds =
     else Right $ initializeSeed dur seeds
 
 buyASeed
-  :: (Num a, Ord a)
-  => Seconds
+  :: (Num a, Ord a, Show a)
+  => Seconds a
   -> BuyTreeSeeds (Cost a)
   -> Paperclips a
   -> TreeSeeds a

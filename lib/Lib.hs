@@ -23,14 +23,14 @@ import           Mod
 import           Resources
 import qualified PathedBusinessLogic           as PBL
 
-nextTick :: MyState -> MyState
+nextTick :: (Enum a, Num a, Ord a, Show a) => MyState a -> MyState a
 nextTick = handleActions . addSecond . helperWork . seedWork . researchWork
 
-handleActions :: MyState -> MyState
+handleActions :: MyState a -> MyState a
 handleActions state =
   let as = view actions state in set actions [] $ foldr applyAction state as
 
-applyAction :: Action -> MyState -> MyState
+applyAction :: Action a -> MyState a -> MyState a
 applyAction (SetP p) state =
   set (resources . elements . elementPaperclips . count) p state
 applyAction (SetH h) state =
@@ -51,20 +51,20 @@ applyAction (SetProgs ps) state =
 applyAction (SetWater w) state =
   set (resources . elements . elementWater . count) w state
 
-helperWork :: MyState -> MyState
+helperWork :: (Num a, Ord a) => MyState a -> MyState a
 helperWork state = addActions state $ (singleton . SetP) $ PBL.helperWork state
 
 singleton :: a -> [a]
 singleton = (: [])
 
-researchWork :: MyState -> MyState
+researchWork :: (Eq a, Num a) => MyState a -> MyState a
 researchWork state =
   handleActions
     $ addActions state
     $ (\(p, h) -> SetAdvancedHelperResearchProgress p : SetHelperInc h : [])
     $ PBL.researchWork state
 
-seedWork :: MyState -> MyState
+seedWork :: (Num a, Ord a, Show a) => MyState a -> MyState a
 seedWork state =
   addActions state
     $ withExtendedError
@@ -72,60 +72,60 @@ seedWork state =
         (\(w, p, t) -> SetWater w : SetProgs p : SetTrees t : [])
     $ PBL.seedWork state
 
-addSecond :: MyState -> MyState
+addSecond :: (Enum a) => MyState a -> MyState a
 addSecond = over seconds succ
 
-createPaperclip :: MyState -> MyState
+createPaperclip :: (Enum a, Ord a) => MyState a -> MyState a
 createPaperclip state =
   handleActions $ addActions state $ (\p -> SetP p : []) $ PBL.createPaperclip
     state
 
-buyHelper :: MyState -> MyState
+buyHelper :: (Enum a, Num a, Ord a, Show a) => MyState a -> MyState a
 buyHelper state =
   handleActions
     $ addActions state
     $ withError (\(h, p) -> SetH h : SetP p : [])
     $ PBL.buyHelper state
 
-withError :: Bifoldable p => (b -> [Action]) -> p ErrorLogLine b -> [Action]
+withError :: Bifoldable p => (b -> [Action a]) -> p ErrorLogLine b -> [Action a]
 withError = bifoldMap (singleton . SetE)
 
 withExtendedError
   :: Bifoldable p
-  => (a -> [Action])
-  -> (b -> [Action])
+  => (a -> [Action x])
+  -> (b -> [Action x])
   -> p (ErrorLogLine, a) b
-  -> [Action]
+  -> [Action x]
 withExtendedError f = bifoldMap (\(err, a) -> SetE err : f a)
 
-pumpWater :: MyState -> MyState
+pumpWater :: (Enum a, Num a, Ord a) => MyState a -> MyState a
 pumpWater state =
   handleActions $ addActions state $ (\w -> SetWater w : []) $ PBL.pumpWater
     state
 
-addActions :: MyState -> [Action] -> MyState
+addActions :: MyState a -> [Action a] -> MyState a
 addActions state newActions = over actions (\as -> newActions ++ as) state
 
-researchAdvancedHelper :: MyState -> MyState
+researchAdvancedHelper :: (Num a, Ord a, Show a) => MyState a -> MyState a
 researchAdvancedHelper state =
   handleActions
     $ addActions state
     $ withError (\(p, r) -> SetP p : SetR r : [])
     $ PBL.researchAdvancedHelper state
 
-plantASeed :: MyState -> MyState
+plantASeed :: (Num a, Ord a, Show a) => MyState a -> MyState a
 plantASeed state =
   handleActions
     $ addActions state
     $ withError (\s -> SetTreeSeeds s : [])
     $ PBL.plantASeed state
 
-buyASeed :: MyState -> MyState
+buyASeed :: (Num a, Ord a, Show a) => MyState a -> MyState a
 buyASeed state =
   handleActions
     $ addActions state
     $ withError (\(s, p) -> SetTreeSeeds s : SetP p : [])
     $ PBL.buyASeed state
 
-setStarted :: MyState -> MyState
+setStarted :: MyState a -> MyState a
 setStarted = over isStarted (const $ IsStarted True)

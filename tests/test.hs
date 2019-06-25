@@ -12,12 +12,12 @@ import           View
 main :: IO ()
 main = defaultMain tests
 
-defaultConfig :: Config
+defaultConfig :: Config Integer
 defaultConfig = Config
   (Constants (HelperInc (Helpers 1)))
   (Prices (AdvancedHelperPrice $ Paperclips 5) (ProgPrice 2) (TreePrice 1))
 
-state1 :: MyState
+state1 :: MyState Integer
 state1 = MyState
   defaultConfig
   []
@@ -27,7 +27,7 @@ state1 = MyState
   (Seconds 0)
   (IsStarted True)
 
-resources :: Resources
+resources :: Resources Integer
 resources = Resources Main.elements (Storage (Paperclips 1000)) (WaterTank 100)
 
 elements :: Elements Integer
@@ -81,7 +81,9 @@ tests = testGroup "Tests" [unitTests]
 unitTests :: TestTree
 unitTests = testGroup
   "Unit tests"
-  [testCase "first second" $ assertEqual "" 1 (viewSeconds $ nextTick state1)]
+  [ testCase "first second"
+      $ assertEqual "" (Seconds 1) (viewSeconds $ nextTick state1)
+  ]
 
 isCommutative :: Eq a => a -> [a -> a] -> Bool
 isCommutative empty =

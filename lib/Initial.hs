@@ -9,14 +9,14 @@ prices :: Prices Integer
 prices =
     Prices (AdvancedHelperPrice $ Paperclips 5) (ProgPrice 2) (TreePrice 1)
 
-config :: Config
+config :: Config Integer
 config = Config (Constants (HelperInc (Helpers 1))) Initial.prices
 
-researchAreas :: ResearchAreas
+researchAreas :: ResearchAreas Integer
 researchAreas =
     ResearchAreas (ResearchComp (DurationAdvanced $ Ticks 20) NotResearched)
 
-resources :: Resources
+resources :: Resources Integer
 resources =
     Resources Initial.elements (Storage (Paperclips 1000)) (WaterTank 100)
 
@@ -84,7 +84,7 @@ noCost :: Cost Integer
 noCost =
     Cost (Paperclips 0) (Helpers 0) (Trees 0) (TreeSeeds []) (Water 0) (Wood 0)
 
-getInitialState :: MyState
+getInitialState :: MyState Integer
 getInitialState = MyState Initial.config
                           []
                           []

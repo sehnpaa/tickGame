@@ -23,36 +23,36 @@ import           NaturalTransformation
 import           Resources
 import           Utils
 
-data MyState = MyState
-  { _config :: Config
-  , _actions :: [Action]
+data MyState a = MyState
+  { _config :: Config a
+  , _actions :: [Action a]
   , _errorLog :: [ErrorLogLine]
-  , _researchAreas :: ResearchAreas
-  , _resources :: Resources
-  , _seconds :: Seconds
+  , _researchAreas :: ResearchAreas a
+  , _resources :: Resources a
+  , _seconds :: Seconds a
   , _isStarted :: IsStarted }
 
-data Action
-  = SetP (Paperclips Integer)
-  | SetH (Helpers Integer)
+data Action a
+  = SetP (Paperclips a)
+  | SetH (Helpers a)
   | SetE ErrorLogLine
-  | SetR ResearchProgress
-  | SetTreeSeeds (TreeSeeds Integer)
-  | SetTrees (Trees Integer)
-  | SetWater (Water Integer)
-  | SetAdvancedHelperResearchProgress ResearchProgress
-  | SetHelperInc (HelperInc (Helpers Integer))
-  | SetProgs [Prog Integer]
+  | SetR (ResearchProgress a)
+  | SetTreeSeeds (TreeSeeds a)
+  | SetTrees (Trees a)
+  | SetWater (Water a)
+  | SetAdvancedHelperResearchProgress (ResearchProgress a)
+  | SetHelperInc (HelperInc (Helpers a))
+  | SetProgs [Prog a]
 
 newtype ErrorLogLine = ErrorLogLine { unErrorLogLine :: Text }
 
 instance Show ErrorLogLine where
   show (ErrorLogLine a) = show a
 
-data ResearchProgress = NotResearched | ResearchInProgress Integer | ResearchDone
+data ResearchProgress a = NotResearched | ResearchInProgress a | ResearchDone
   deriving (Eq)
 
-instance Show ResearchProgress where
+instance Show (ResearchProgress Integer) where
   show NotResearched = "Not researched"
   show (ResearchInProgress n) =
     "Research in progress - " ++ show n ++ " " ++ noun n ++ " left."
@@ -61,18 +61,18 @@ instance Show ResearchProgress where
     noun _ = "ticks"
   show ResearchDone = "Research done"
 
-data ResearchAreas = ResearchAreas
-  { _advancedHelperResearch :: ResearchComp Integer}
+data ResearchAreas a = ResearchAreas
+  { _advancedHelperResearch :: ResearchComp a}
 
 data ResearchComp a = ResearchComp
   { _researchCompDuration :: DurationAdvancedHelper a
-  , _researchCompProgress :: ResearchProgress }
+  , _researchCompProgress :: ResearchProgress a }
 
 newtype DurationAdvancedHelper a = DurationAdvanced { unDurationAdvanced :: Duration a }
 
-newtype Seconds = Seconds { unSeconds :: Integer } deriving (Enum, Eq, Num)
+newtype Seconds a = Seconds { unSeconds :: a } deriving (Enum, Eq)
 
-instance Show Seconds where
+instance Show (Seconds Integer) where
   show (Seconds a) = show a
 
 newtype IsStarted = IsStarted { unIsStarted :: Bool }
@@ -110,16 +110,16 @@ calcRemainingWater price progs water =
         True  -> Nothing
         False -> Just $ Iso.under2 isoWater (-) water cost
 
-lineNeedMorePaperclips :: Seconds -> ErrorLogLine
-lineNeedMorePaperclips s = ErrorLogLine
+lineNeedMorePaperclips :: (Show a) => Seconds a -> ErrorLogLine
+lineNeedMorePaperclips (Seconds s) = ErrorLogLine
   $ Data.Text.concat ["Tick ", pack (show s), ": You need more paperclips."]
 
-mkErrorLogLine :: Seconds -> Text -> ErrorLogLine
-mkErrorLogLine s t =
+mkErrorLogLine :: (Show a) => Seconds a -> Text -> ErrorLogLine
+mkErrorLogLine (Seconds s) t =
   ErrorLogLine $ Data.Text.concat ["Tick ", pack (show s), ": ", t]
 
-lineNeedMoreSeeds :: Seconds -> ErrorLogLine
-lineNeedMoreSeeds s = ErrorLogLine
+lineNeedMoreSeeds :: (Show a) => Seconds a -> ErrorLogLine
+lineNeedMoreSeeds (Seconds s) = ErrorLogLine
   $ Data.Text.concat ["Tick ", pack (show s), ": You need more seeds."]
 
 initializeSeed
@@ -144,7 +144,7 @@ decPaperclipsWith' hp p = withIso
 
 ---
 
-config :: Lens' MyState Config
+config :: Lens' (MyState a) (Config a)
 config f state =
   (\config' -> state { _config = config' }) <$> f (_config state)
 
@@ -152,36 +152,36 @@ helperInc :: Lens' (Constants a) (HelperInc (Helpers a))
 helperInc f state =
     (\inc' -> state { _helperInc = inc' }) <$> f (_helperInc state)
 
-actions :: Lens' MyState [Action]
+actions :: Lens' (MyState a) [Action a]
 actions f state =
     (\actions' -> state { _actions = actions' }) <$> f (_actions state)
 
-errorLog :: Lens' MyState [ErrorLogLine]
+errorLog :: Lens' (MyState a) [ErrorLogLine]
 errorLog f state =
     (\errorLog' -> state { _errorLog = errorLog' }) <$> f (_errorLog state)
 
-resources :: Lens' MyState Resources
+resources :: Lens' (MyState a) (Resources a)
 resources f state =
     (\resources' -> state { _resources = resources' }) <$> f (_resources state)
 
-researchAreas :: Lens' MyState ResearchAreas
+researchAreas :: Lens' (MyState a) (ResearchAreas a)
 researchAreas f state =
     (\areas' -> state { _researchAreas = areas' }) <$> f (_researchAreas state)
 
-seconds :: Lens' MyState Seconds
+seconds :: Lens' (MyState a) (Seconds a)
 seconds f state =
     (\seconds' -> state { _seconds = seconds' }) <$> f (_seconds state)
 
-isStarted :: Lens' MyState IsStarted
+isStarted :: Lens' (MyState a) IsStarted
 isStarted f state =
     (\isStarted' -> state { _isStarted = isStarted' }) <$> f (_isStarted state)
 
-researchCompProgress :: Lens' (ResearchComp Integer) ResearchProgress
+researchCompProgress :: Lens' (ResearchComp a) (ResearchProgress a)
 researchCompProgress f state =
     (\progress' -> state { _researchCompProgress = progress' })
         <$> f (_researchCompProgress state)
 
-advancedHelperResearch :: Lens' ResearchAreas (ResearchComp Integer)
+advancedHelperResearch :: Lens' (ResearchAreas a) (ResearchComp a)
 advancedHelperResearch f state = (\a -> state { _advancedHelperResearch = a })
     <$> f (_advancedHelperResearch state)
 
@@ -213,7 +213,7 @@ isoHelperPrice
   -> p (Paperclips a) (f (Paperclips a))
 isoHelperPrice = iso HelperPrice unHelperPrice
 
-startResearch :: DurationAdvancedHelper Integer -> ResearchProgress
+startResearch :: DurationAdvancedHelper a -> (ResearchProgress a)
 startResearch = f . unDurationAdvanced
  where
   f Instant   = ResearchDone
