@@ -105,7 +105,7 @@ productOfHelperWork inc h = liftA2 (*) h $ Iso.unwrap isoHelperInc inc
 calcRemainingWater
   :: (Num a, Ord a) => ProgPrice a -> [Prog a] -> Water a -> Maybe (Water a)
 calcRemainingWater price progs water =
-  let cost = waterCost progs (unProgPrice price)
+  let cost = calcWaterCost progs (unProgPrice price)
   in  case cost > water of
         True  -> Nothing
         False -> Just $ Iso.under2 isoWater (-) water cost
@@ -126,7 +126,7 @@ initializeSeed
   :: (Eq a, Num a) => DurationTreeSeeds a -> TreeSeeds a -> TreeSeeds a
 initializeSeed duration =
   TreeSeeds
-    . changeFirst (== NotGrowing) (const $ f $ unDurationTreeSeeds duration)
+    . changeFirst (== NotGrowing) (const $ f $ view durationTreeSeeds duration)
     . unTreeSeeds
  where
   f Instant   = GrowingDone

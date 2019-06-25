@@ -31,21 +31,25 @@ handleActions state =
   let as = view actions state in set actions [] $ foldr applyAction state as
 
 applyAction :: Action -> MyState -> MyState
-applyAction (SetP p  ) state = set (resources . elements . paperclips) p state
-applyAction (SetH h  ) state = set (resources . elements . helpers) h state
+applyAction (SetP p) state =
+  set (resources . elements . elementPaperclips . count) p state
+applyAction (SetH h) state =
+  set (resources . elements . elementHelpers . count) h state
 applyAction (SetE err) state = over errorLog (\errs -> err : errs) state
 applyAction (SetR r) state =
   set (researchAreas . advancedHelperResearch . researchCompProgress) r state
 applyAction (SetTreeSeeds s) state =
-  set (resources . elements . treeSeeds) s state
-applyAction (SetTrees t) state = set (resources . elements . trees) t state
+  set (resources . elements . elementTreeSeeds . count) s state
+applyAction (SetTrees t) state =
+  set (resources . elements . elementTrees . count) t state
 applyAction (SetAdvancedHelperResearchProgress p) state =
   set (researchAreas . advancedHelperResearch . researchCompProgress) p state
 applyAction (SetHelperInc i) state =
   set (config . constants . helperInc) i state
 applyAction (SetProgs ps) state =
-  set (resources . elements . treeSeeds . progs) ps state
-applyAction (SetWater w) state = set (resources . elements . water) w state
+  set (resources . elements . elementTreeSeeds . count . progs) ps state
+applyAction (SetWater w) state =
+  set (resources . elements . elementWater . count) w state
 
 helperWork :: MyState -> MyState
 helperWork state = addActions state $ (singleton . SetP) $ PBL.helperWork state

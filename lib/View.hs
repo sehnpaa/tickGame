@@ -13,28 +13,28 @@ viewErrorLog :: MyState -> [ErrorLogLine]
 viewErrorLog = view errorLog
 
 viewPaperclips :: MyState -> Paperclips Integer
-viewPaperclips = view (resources . elements . paperclips)
+viewPaperclips = view (resources . elements . elementPaperclips . count)
 
 viewHelpers :: MyState -> Helpers Integer
-viewHelpers = view (resources . elements . helpers)
+viewHelpers = view (resources . elements . elementHelpers . count)
 
 viewStorage :: MyState -> Storage (Paperclips Integer)
 viewStorage = view (resources . storage)
 
 viewTrees :: MyState -> Trees Integer
-viewTrees = view (resources . elements . trees)
+viewTrees = view (resources . elements . elementTrees . count)
 
 viewTreeSeeds :: MyState -> TreeSeeds Integer
-viewTreeSeeds = view (resources . elements . treeSeeds)
+viewTreeSeeds = view (resources . elements . elementTreeSeeds . count)
 
 viewWater :: MyState -> Water Integer
-viewWater = view (resources . elements . water)
+viewWater = view (resources . elements . elementWater . count)
 
 viewWaterTank :: MyState -> WaterTank Integer
 viewWaterTank = view (resources . waterTank)
 
 viewWood :: MyState -> Wood Integer
-viewWood = view (resources . elements . wood)
+viewWood = view (resources . elements . elementWood . count)
 
 viewAdvancedHelperResearch :: MyState -> ResearchProgress
 viewAdvancedHelperResearch =

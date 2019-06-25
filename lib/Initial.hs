@@ -46,7 +46,7 @@ elements = Elements
              (Water 100)
              (DurationWater Instant)
     )
-    (Element (AcquireWood (WoodManually woodCost))
+    (Element (AcquireWood (WoodManually Initial.woodCost))
              (Wood 0)
              (DurationWood Instant)
     )

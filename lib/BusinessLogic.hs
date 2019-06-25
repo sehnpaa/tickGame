@@ -2,6 +2,8 @@
 
 module BusinessLogic where
 
+import           Control.Lens
+
 import           Config
 import           Elements
 import           Mod
@@ -105,7 +107,7 @@ buyASeed s cost p (TreeSeeds seeds) = if needMorePaperclips' cost p
       $ ( TreeSeeds $ seeds ++ [NotGrowing]
         , Paperclips
         $ (unPaperclips p)
-        - (unPaperclips $ _paperclipsCost $ unBuyTreeSeeds cost)
+        - (unPaperclips $ view paperclipCost $ unBuyTreeSeeds cost)
         )
 
 createPaperclip

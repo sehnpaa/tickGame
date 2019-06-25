@@ -36,8 +36,8 @@ instance Show (WaterTank Integer) where
 limitByStorage :: Ord a => Storage a -> a -> a
 limitByStorage s = min (Iso.unwrap isoStorage s)
 
-waterCost :: Num a => [Prog a] -> a -> Water a
-waterCost progs waterPerSeed =
+calcWaterCost :: Num a => [Prog a] -> a -> Water a
+calcWaterCost progs waterPerSeed =
   let numberOfGrowingSeeds = fromIntegral . length . filter isGrowing $ progs
   in  Water $ waterPerSeed * numberOfGrowingSeeds
 
@@ -82,7 +82,7 @@ needMorePaperclips c p = (view paperclipCost c) > p
 
 needMorePaperclips' :: Ord a => BuyTreeSeeds (Cost a) -> Paperclips a -> Bool
 needMorePaperclips' c p =
-  unPaperclips (_paperclipsCost $ unBuyTreeSeeds c) > unPaperclips p
+  unPaperclips (view paperclipCost $ unBuyTreeSeeds c) > unPaperclips p
 
 ---
 
