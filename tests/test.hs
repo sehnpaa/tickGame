@@ -30,7 +30,7 @@ state1 = MyState
 resources :: Resources
 resources = Resources Main.elements (Storage (Paperclips 1000)) (WaterTank 100)
 
-elements :: Elements
+elements :: Elements Integer
 elements = Elements
   (Element
     (AcquirePaperclips (PaperclipsManually Main.paperclipManuallyCost)

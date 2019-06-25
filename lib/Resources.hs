@@ -16,7 +16,7 @@ import           NaturalTransformation
 import qualified Iso
 
 data Resources = Resources
-  { _elements :: Elements
+  { _elements :: Elements Integer
   , _storage :: Storage (Paperclips Integer)
   , _waterTank :: WaterTank Integer }
 

@@ -11,7 +11,7 @@ config :: Lens' MyState Config
 config f state =
     (\config' -> state { _config = config' }) <$> f (_config state)
 
-constants :: Lens' Config Constants
+constants :: Lens' Config (Constants Integer)
 constants f state =
     (\constants' -> state { _constants = constants' }) <$> f (_constants state)
 
@@ -19,7 +19,7 @@ treeSeedDuration :: Lens' (Element acquirement d f a) (d a)
 treeSeedDuration f state =
     (\a' -> state { _duration = a' }) <$> f (_duration state)
 
-helperInc :: Lens' Constants (HelperInc (Helpers Integer))
+helperInc :: Lens' (Constants a) (HelperInc (Helpers a))
 helperInc f state =
     (\inc' -> state { _helperInc = inc' }) <$> f (_helperInc state)
 
@@ -28,7 +28,7 @@ prices f state =
     (\prices' -> state { _prices = prices' }) <$> f (_prices state)
 
 advancedHelperPrice
-    :: Lens' (Prices Integer) (AdvancedHelperPrice (Paperclips Integer))
+    :: Lens' (Prices a) (AdvancedHelperPrice (Paperclips a))
 advancedHelperPrice f state =
     (\price' -> state { _advancedHelperPrice = price' })
         <$> f (_advancedHelperPrice state)
@@ -53,7 +53,7 @@ resources :: Lens' MyState Resources
 resources f state =
     (\resources' -> state { _resources = resources' }) <$> f (_resources state)
 
-elements :: Lens' Resources Elements
+elements :: Lens' Resources (Elements Integer)
 elements f state =
     (\elements' -> state { _elements = elements' }) <$> f (_elements state)
 
@@ -61,12 +61,12 @@ cost :: Lens' (Element acquirement d f a) (acquirement (Cost a))
 cost f state = (\a -> state { _cost = a }) <$> f (_cost state)
 
 helpersManually
-    :: Lens' (AcquireHelpers (Cost Integer)) (HelpersManually (Cost Integer))
+    :: Lens' (AcquireHelpers (Cost a)) (HelpersManually (Cost a))
 helpersManually f state =
     (\a -> state { _helpersManually = a }) <$> f (_helpersManually state)
 
 buyTreeSeeds
-    :: Lens' (AcquireTreeSeeds (Cost Integer)) (BuyTreeSeeds (Cost Integer))
+    :: Lens' (AcquireTreeSeeds (Cost a)) (BuyTreeSeeds (Cost a))
 buyTreeSeeds f state = AcquireTreeSeeds <$> f (unAcquireTreeSeeds state)
 
 count :: Lens' (Element ac d f a) (f a)
@@ -74,21 +74,21 @@ count f state = (\a -> state { _count = a }) <$> f (_count state)
 
 elementPaperclips
     :: Lens'
-           Elements
-           (Element AcquirePaperclips DurationPaperclips Paperclips Integer)
+           (Elements a)
+           (Element AcquirePaperclips DurationPaperclips Paperclips a)
 elementPaperclips f state =
     (\paperclips' -> state { _paperclips = paperclips' })
         <$> f (_paperclips state)
 
-paperclips :: Lens' Elements (Paperclips Integer)
+paperclips :: Lens' (Elements a) (Paperclips a)
 paperclips = elementPaperclips . count
 
 elementHelpers
-    :: Lens' Elements (Element AcquireHelpers DurationHelpers Helpers Integer)
+    :: Lens' (Elements a) (Element AcquireHelpers DurationHelpers Helpers a)
 elementHelpers f state =
     (\helpers' -> state { _helpers = helpers' }) <$> f (_helpers state)
 
-helpers :: Lens' Elements (Helpers Integer)
+helpers :: Lens' (Elements a) (Helpers a)
 helpers = elementHelpers . count
 
 storage :: Lens' Resources (Storage (Paperclips Integer))
@@ -96,11 +96,11 @@ storage f state =
     (\storage' -> state { _storage = storage' }) <$> f (_storage state)
 
 elementWater
-    :: Lens' Elements (Element AcquireWater DurationWater Water Integer)
+    :: Lens' (Elements a) (Element AcquireWater DurationWater Water a)
 elementWater f state =
     (\water' -> state { _water = water' }) <$> f (_water state)
 
-water :: Lens' Elements (Water Integer)
+water :: Lens' (Elements a) (Water a)
 water = elementWater . count
 
 waterTank :: Lens' Resources (WaterTank Integer)
@@ -108,21 +108,21 @@ waterTank f state =
     (\tank' -> state { _waterTank = tank' }) <$> f (_waterTank state)
 
 elementTrees
-    :: Lens' Elements (Element AcquireTrees DurationTrees Trees Integer)
+    :: Lens' (Elements a) (Element AcquireTrees DurationTrees Trees a)
 elementTrees f state =
     (\trees' -> state { _trees = trees' }) <$> f (_trees state)
 
-trees :: Lens' Elements (Trees Integer)
+trees :: Lens' (Elements a) (Trees a)
 trees = elementTrees . count
 
 elementTreeSeeds
     :: Lens'
-           Elements
-           (Element AcquireTreeSeeds DurationTreeSeeds TreeSeeds Integer)
+           (Elements a)
+           (Element AcquireTreeSeeds DurationTreeSeeds TreeSeeds a)
 elementTreeSeeds f state =
     (\treeSeeds' -> state { _treeSeeds = treeSeeds' }) <$> f (_treeSeeds state)
 
-treeSeeds :: Lens' Elements (TreeSeeds Integer)
+treeSeeds :: Lens' (Elements a) (TreeSeeds a)
 treeSeeds = elementTreeSeeds . count
 
 progs :: Lens' (TreeSeeds Integer) [Prog Integer]
@@ -151,10 +151,10 @@ seconds :: Lens' MyState Seconds
 seconds f state =
     (\seconds' -> state { _seconds = seconds' }) <$> f (_seconds state)
 
-elementWood :: Lens' Elements (Element AcquireWood DurationWood Wood Integer)
+elementWood :: Lens' (Elements a) (Element AcquireWood DurationWood Wood a)
 elementWood f state = (\wood' -> state { _wood = wood' }) <$> f (_wood state)
 
-wood :: Lens' Elements (Wood Integer)
+wood :: Lens' (Elements a) (Wood a)
 wood = elementWood . count
 
 isStarted :: Lens' MyState IsStarted

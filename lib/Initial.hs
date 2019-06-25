@@ -19,7 +19,7 @@ researchAreas = ResearchAreas (ResearchComp (DurationAdvanced $ Ticks 20) NotRes
 resources :: Resources
 resources = Resources elements (Storage (Paperclips 1000)) (WaterTank 100)
 
-elements :: Elements
+elements :: Elements Integer
 elements = Elements
     (Element
         (AcquirePaperclips (PaperclipsManually Initial.paperclipManuallyCost)

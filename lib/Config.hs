@@ -6,11 +6,11 @@ module Config where
 import           Elements
 
 data Config = Config
-  { _constants :: Constants
+  { _constants :: Constants Integer
   , _prices :: Prices Integer }
 
-data Constants = Constants
-  { _helperInc :: HelperInc (Helpers Integer) }
+data Constants a = Constants
+  { _helperInc :: HelperInc (Helpers a) }
 
 newtype HelperInc a = HelperInc { unHelperInc :: a} deriving (Functor)
 

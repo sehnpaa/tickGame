@@ -6,13 +6,13 @@ module Elements where
 
 import           Control.Lens
 
-data Elements = Elements
-  { _paperclips :: Element AcquirePaperclips DurationPaperclips Paperclips Integer
-  , _helpers :: Element AcquireHelpers DurationHelpers Helpers Integer
-  , _trees :: Element AcquireTrees DurationTrees Trees Integer
-  , _treeSeeds :: Element AcquireTreeSeeds DurationTreeSeeds TreeSeeds Integer
-  , _water :: Element AcquireWater DurationWater Water Integer
-  , _wood :: Element AcquireWood DurationWood Wood Integer}
+data Elements a = Elements
+  { _paperclips :: Element AcquirePaperclips DurationPaperclips Paperclips a
+  , _helpers :: Element AcquireHelpers DurationHelpers Helpers a
+  , _trees :: Element AcquireTrees DurationTrees Trees a
+  , _treeSeeds :: Element AcquireTreeSeeds DurationTreeSeeds TreeSeeds a
+  , _water :: Element AcquireWater DurationWater Water a
+  , _wood :: Element AcquireWood DurationWood Wood a }
 
 data Element acquire duration f a = Element
   { _cost :: acquire (Cost a)
