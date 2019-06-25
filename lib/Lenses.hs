@@ -60,7 +60,7 @@ elements :: Lens' Resources Elements
 elements f state =
     (\elements' -> state { _elements = elements' }) <$> f (_elements state)
 
-cost :: Lens' (Element acquirement f a) (acquirement (Cost Integer))
+cost :: Lens' (Element acquirement f a) (acquirement (Cost a))
 cost f state = (\a -> state { _cost = a }) <$> f (_cost state)
 
 helpersManually
@@ -72,7 +72,7 @@ buyTreeSeeds
     :: Lens' (AcquireTreeSeeds (Cost Integer)) (BuyTreeSeeds (Cost Integer))
 buyTreeSeeds f state = AcquireTreeSeeds <$> f (unAcquireTreeSeeds state)
 
-count :: Lens' (Element ac f a) (f Integer)
+count :: Lens' (Element ac f a) (f a)
 count f state = (\a -> state { _count = a }) <$> f (_count state)
 
 elementPaperclips

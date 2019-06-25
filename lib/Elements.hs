@@ -15,8 +15,8 @@ data Elements = Elements
   , _wood :: Element AcquireWood Wood Integer}
 
 data Element acquire f a = Element
-  { _cost :: acquire (Cost Integer)
-  , _count :: f Integer }
+  { _cost :: acquire (Cost a)
+  , _count :: f a }
 
 data AcquirePaperclips cost = AcquirePaperclips
   { _paperclipsManually :: PaperclipsManually cost
