@@ -64,10 +64,10 @@ data ResearchAreas = ResearchAreas
   { _advancedHelperResearch :: ResearchComp Integer}
 
 data ResearchComp a = ResearchComp
-  { _researchCompDuration :: DurationAdvancedHelper (Duration a)
+  { _researchCompDuration :: DurationAdvancedHelper a
   , _researchCompProgress :: ResearchProgress }
 
-newtype DurationAdvancedHelper a = DurationAdvanced { unDurationAdvanced :: a }
+newtype DurationAdvancedHelper a = DurationAdvanced { unDurationAdvanced :: Duration a }
 
 newtype Seconds = Seconds { unSeconds :: Integer } deriving (Enum, Eq, Num)
 
@@ -163,7 +163,7 @@ isoHelperPrice
   -> p (Paperclips a) (f (Paperclips a))
 isoHelperPrice = iso HelperPrice unHelperPrice
 
-startResearch :: DurationAdvancedHelper (Duration Integer) -> ResearchProgress
+startResearch :: DurationAdvancedHelper Integer -> ResearchProgress
 startResearch = f . unDurationAdvanced
       where
         f Instant = ResearchDone

@@ -33,7 +33,7 @@ resources = Resources Main.elements (Storage (Paperclips 1000)) (WaterTank 100)
 elements :: Elements
 elements = Elements
   (Element
-    (AcquirePaperclips (PaperclipsManually Main.paperclipCost)
+    (AcquirePaperclips (PaperclipsManually Main.paperclipManuallyCost)
                        (PaperclipsFromHelper noCost)
     )
     (Paperclips 0)
@@ -58,12 +58,12 @@ elements = Elements
   )
   (Element (AcquireWood (WoodManually noCost)) (Wood 0) (DurationWood Instant))
 
-paperclipCost :: Cost Integer
-paperclipCost =
-  Cost (Paperclips 10) (Helpers 0) (Trees 0) (TreeSeeds []) (Water 0) (Wood 0)
+paperclipManuallyCost :: Cost Integer
+paperclipManuallyCost = noCost
 
 helperCost :: Cost Integer
-helperCost = noCost
+helperCost =
+  Cost (Paperclips 10) (Helpers 0) (Trees 0) (TreeSeeds []) (Water 0) (Wood 0)
 
 treeCost :: Cost Integer
 treeCost = noCost

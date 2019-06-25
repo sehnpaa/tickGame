@@ -22,7 +22,7 @@ resources = Resources elements (Storage (Paperclips 1000)) (WaterTank 100)
 elements :: Elements
 elements = Elements
     (Element
-        (AcquirePaperclips (PaperclipsManually Initial.paperclipCost)
+        (AcquirePaperclips (PaperclipsManually Initial.paperclipManuallyCost)
                            (PaperclipsFromHelper noCost)
         )
         (Paperclips 0)
@@ -49,8 +49,8 @@ elements = Elements
              (DurationWood Instant)
     )
 
-paperclipCost :: Cost Integer
-paperclipCost = noCost
+paperclipManuallyCost :: Cost Integer
+paperclipManuallyCost = noCost
 
 helperCost :: Cost Integer
 helperCost =

@@ -69,7 +69,7 @@ researchAdvancedHelper
   -> Paperclips Integer
   -> AdvancedHelperPrice (Paperclips Integer)
   -> ResearchProgress
-  -> DurationAdvancedHelper (Duration Integer)
+  -> DurationAdvancedHelper Integer
   -> Either ErrorLogLine (Paperclips Integer, ResearchProgress)
 researchAdvancedHelper s p price progress duration =
   case (unAdvancedHelperPrice price > p, progress) of

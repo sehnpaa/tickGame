@@ -142,7 +142,7 @@ advancedHelperResearch f state = (\a -> state { _advancedHelperResearch = a })
     <$> f (_advancedHelperResearch state)
 
 researchCompDuration
-    :: Lens' (ResearchComp Integer) (DurationAdvancedHelper (Duration Integer))
+    :: Lens' (ResearchComp a) (DurationAdvancedHelper a)
 researchCompDuration f state =
     undefined (\duration -> state { _researchCompDuration = duration })
         <$> f (_researchCompDuration state)
