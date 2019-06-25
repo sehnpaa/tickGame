@@ -58,7 +58,7 @@ researchAdvancedHelper = arg5
 plantASeed :: MyState -> Either ErrorLogLine (TreeSeeds Integer)
 plantASeed = arg4 BL.plantASeed
                   seconds
-                  (config . durations . treeDuration)
+                  (resources . elements . elementTreeSeeds . treeSeedDuration)
                   (config . prices . treePrice)
                   (resources . elements . treeSeeds)
 

@@ -121,12 +121,15 @@ lineNeedMoreSeeds :: Seconds -> ErrorLogLine
 lineNeedMoreSeeds s = ErrorLogLine
   $ Data.Text.concat ["Tick ", pack (show s), ": You need more seeds."]
 
-initializeSeed :: (Eq a, Num a) => TreeDuration -> TreeSeeds a -> TreeSeeds a
+initializeSeed :: (Eq a, Num a) => DurationTreeSeeds (Duration2 a) -> TreeSeeds a -> TreeSeeds a
 initializeSeed duration =
   TreeSeeds
     . changeFirst (== NotGrowing)
-                  (const $ Growing $ fromIntegral $ unTreeDuration duration)
+                  (const $ f $ unDurationTreeSeeds duration)
     . unTreeSeeds
+    where
+      f Instant = GrowingDone
+      f (Ticks n) = Growing n
 
 decPaperclipsWith :: Num a => Cost a -> Paperclips a -> Paperclips a
 decPaperclipsWith c p = under2 isoPaperclips (-) p $ view paperclipCost c

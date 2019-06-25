@@ -15,7 +15,6 @@ main = defaultMain tests
 defaultConfig :: Config
 defaultConfig = Config
   (Constants (HelperInc (Helpers 1)))
-  (Durations $ TreeDuration 10)
   (Prices (AdvancedHelperPrice $ Paperclips 5) (ProgPrice 2) (TreePrice 1))
 
 state1 :: MyState
@@ -32,19 +31,31 @@ resources = Resources Main.elements (Storage (Paperclips 1000)) (WaterTank 100)
 
 elements :: Elements
 elements = Elements
-  ( Element
-      (AcquirePaperclips (PaperclipsManually Main.paperclipCost)
-                         (PaperclipsFromHelper noCost)
-      )
-  $ Paperclips 0
+  (Element
+    (AcquirePaperclips (PaperclipsManually Main.paperclipCost)
+                       (PaperclipsFromHelper noCost)
+    )
+    (Paperclips 0)
+    (DurationPaperclips Instant)
   )
-  (Element (AcquireHelpers (HelpersManually helperCost)) $ Helpers 0)
-  (Element (AcquireTrees (TreesFromTreeSeeds treeCost)) $ Trees 0)
-  ( Element (AcquireTreeSeeds (BuyTreeSeeds Main.treeSeedCost))
-  $ TreeSeeds (replicate 10 NotGrowing)
+  (Element (AcquireHelpers (HelpersManually helperCost))
+           (Helpers 0)
+           (DurationHelpers Instant)
   )
-  (Element (AcquireWater (WaterManually noCost)) $ Water 100)
-  (Element (AcquireWood (WoodManually noCost)) $ Wood 0)
+  (Element (AcquireTrees (TreesFromTreeSeeds treeCost))
+           (Trees 0)
+           (DurationTrees Instant)
+  )
+  (Element (AcquireTreeSeeds (BuyTreeSeeds Main.treeSeedCost))
+           (TreeSeeds (replicate 10 NotGrowing))
+           (DurationTreeSeeds $ Ticks 20)
+  )
+
+  (Element (AcquireWater (WaterManually noCost))
+           (Water 100)
+           (DurationWater Instant)
+  )
+  (Element (AcquireWood (WoodManually noCost)) (Wood 0) (DurationWood Instant))
 
 paperclipCost :: Cost Integer
 paperclipCost =

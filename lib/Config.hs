@@ -7,13 +7,7 @@ import           Elements
 
 data Config = Config
   { _constants :: Constants
-  , _durations :: Durations
   , _prices :: Prices Integer }
-
-data Durations = Durations
-  { _treeDuration :: TreeDuration }
-
-newtype TreeDuration = TreeDuration { unTreeDuration :: Integer }
 
 data Constants = Constants
   { _helperInc :: HelperInc (Helpers Integer) }

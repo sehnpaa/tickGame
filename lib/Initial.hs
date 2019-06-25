@@ -10,9 +10,7 @@ prices =
     Prices (AdvancedHelperPrice $ Paperclips 5) (ProgPrice 2) (TreePrice 1)
 
 config :: Config
-config = Config (Constants (HelperInc (Helpers 1)))
-                (Durations (TreeDuration 20))
-                prices
+config = Config (Constants (HelperInc (Helpers 1))) prices
 
 researchAreas :: ResearchAreas
 researchAreas = ResearchAreas (ResearchComp (Duration 10) NotResearched)
@@ -22,19 +20,33 @@ resources = Resources elements (Storage (Paperclips 1000)) (WaterTank 100)
 
 elements :: Elements
 elements = Elements
-    ( Element
-            (AcquirePaperclips (PaperclipsManually Initial.paperclipCost)
-                               (PaperclipsFromHelper noCost)
-            )
-    $ Paperclips 0
+    (Element
+        (AcquirePaperclips (PaperclipsManually Initial.paperclipCost)
+                           (PaperclipsFromHelper noCost)
+        )
+        (Paperclips 0)
+        (DurationPaperclips Instant)
     )
-    (Element (AcquireHelpers (HelpersManually helperCost)) $ Helpers 0)
-    (Element (AcquireTrees (TreesFromTreeSeeds treeCost)) $ Trees 0)
-    ( Element (AcquireTreeSeeds (BuyTreeSeeds Initial.treeSeedCost))
-    $ TreeSeeds (replicate 10 NotGrowing)
+    (Element (AcquireHelpers (HelpersManually helperCost))
+             (Helpers 0)
+             (DurationHelpers Instant)
     )
-    (Element (AcquireWater (WaterManually Initial.waterCost)) $ Water 100)
-    (Element (AcquireWood (WoodManually woodCost)) $ Wood 0)
+    (Element (AcquireTrees (TreesFromTreeSeeds treeCost))
+             (Trees 0)
+             (DurationTrees Instant)
+    )
+    (Element (AcquireTreeSeeds (BuyTreeSeeds Initial.treeSeedCost))
+             (TreeSeeds (replicate 10 NotGrowing))
+             (DurationTreeSeeds $ Ticks 20)
+    )
+    (Element (AcquireWater (WaterManually Initial.waterCost))
+             (Water 100)
+             (DurationWater Instant)
+    )
+    (Element (AcquireWood (WoodManually woodCost))
+             (Wood 0)
+             (DurationWood Instant)
+    )
 
 paperclipCost :: Cost Integer
 paperclipCost = noCost

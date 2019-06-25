@@ -7,16 +7,26 @@ module Elements where
 import           Control.Lens
 
 data Elements = Elements
-  { _paperclips :: Element AcquirePaperclips Paperclips Integer
-  , _helpers :: Element AcquireHelpers Helpers Integer
-  , _trees :: Element AcquireTrees Trees Integer
-  , _treeSeeds :: Element AcquireTreeSeeds TreeSeeds Integer
-  , _water :: Element AcquireWater Water Integer
-  , _wood :: Element AcquireWood Wood Integer}
+  { _paperclips :: Element AcquirePaperclips DurationPaperclips Paperclips Integer
+  , _helpers :: Element AcquireHelpers DurationHelpers Helpers Integer
+  , _trees :: Element AcquireTrees DurationTrees Trees Integer
+  , _treeSeeds :: Element AcquireTreeSeeds DurationTreeSeeds TreeSeeds Integer
+  , _water :: Element AcquireWater DurationWater Water Integer
+  , _wood :: Element AcquireWood DurationWood Wood Integer}
 
-data Element acquire f a = Element
+data Element acquire duration f a = Element
   { _cost :: acquire (Cost a)
-  , _count :: f a }
+  , _count :: f a
+  , _duration2 :: duration (Duration2 a) }
+
+newtype DurationPaperclips a = DurationPaperclips { unDurationPaperclips :: a }
+newtype DurationHelpers a = DurationHelpers { unDurationHelpers :: a }
+newtype DurationTrees a = DurationTrees { unDurationTrees :: a }
+newtype DurationTreeSeeds a = DurationTreeSeeds { unDurationTreeSeeds :: a }
+newtype DurationWater a = DurationWater { unDurationWater :: a }
+newtype DurationWood a = DurationWood { unDurationWood :: a }
+
+data Duration2 a = Instant | Ticks a
 
 data AcquirePaperclips cost = AcquirePaperclips
   { _paperclipsManually :: PaperclipsManually cost
