@@ -2,7 +2,6 @@ module Lib
   ( Initial.getInitialState
   , module Config
   , module Elements
-  , module Lenses
   , module Lib
   , module Mod
   , module Resources
@@ -20,7 +19,6 @@ import           Control.Lens                   ( over
 import           Config
 import           Elements
 import qualified Initial                       as Initial
-import           Lenses
 import           Mod
 import           Resources
 import qualified PathedBusinessLogic           as PBL

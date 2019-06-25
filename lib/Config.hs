@@ -3,6 +3,8 @@
 
 module Config where
 
+import Control.Lens
+
 import           Elements
 
 data Config = Config
@@ -32,3 +34,25 @@ newtype ProgPrice a = ProgPrice { unProgPrice :: a }
 newtype TreePrice a = TreePrice { unTreePrice :: a }
 
 newtype TreeSeedPrice = TreeSeedPrice { unTreeSeedPrice :: Paperclips Integer }
+
+constants :: Lens' Config (Constants Integer)
+constants f state =
+    (\constants' -> state { _constants = constants' }) <$> f (_constants state)
+
+prices :: Lens' Config (Prices Integer)
+prices f state =
+    (\prices' -> state { _prices = prices' }) <$> f (_prices state)
+
+advancedHelperPrice
+    :: Lens' (Prices a) (AdvancedHelperPrice (Paperclips a))
+advancedHelperPrice f state =
+    (\price' -> state { _advancedHelperPrice = price' })
+        <$> f (_advancedHelperPrice state)
+
+treePrice :: Lens' (Prices a) (TreePrice a)
+treePrice f state =
+    (\treePrice' -> state { _treePrice = treePrice' }) <$> f (_treePrice state)
+
+progPrice :: Lens' (Prices a) (ProgPrice a)
+progPrice f state =
+    (\price' -> state { _progPrice = price' }) <$> f (_progPrice state)

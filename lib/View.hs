@@ -3,7 +3,6 @@ module View where
 import           Control.Lens                   ( view )
 
 import           Elements
-import           Lenses
 import           Mod
 import           Resources
 

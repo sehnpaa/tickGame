@@ -3,9 +3,9 @@ module PathedBusinessLogic where
 import qualified BusinessLogic                 as BL
 import           Config
 import           Elements
-import           Lenses
 import           LensUtils
 import           Mod
+import           Resources
 
 helperWork :: MyState -> Paperclips Integer
 helperWork = arg4 BL.helperWork

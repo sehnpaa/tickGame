@@ -116,3 +116,70 @@ paperclipCost f state =
 treeSeedCost :: Lens' (Cost a) (TreeSeeds a)
 treeSeedCost f state =
   (\c -> state { _treeSeedsCost = c }) <$> f (_treeSeedsCost state)
+
+treeSeedDuration :: Lens' (Element acquirement d f a) (d a)
+treeSeedDuration f state =
+  (\a' -> state { _duration = a' }) <$> f (_duration state)
+
+cost :: Lens' (Element acquirement d f a) (acquirement (Cost a))
+cost f state = (\a -> state { _cost = a }) <$> f (_cost state)
+
+helpersManually :: Lens' (AcquireHelpers (Cost a)) (HelpersManually (Cost a))
+helpersManually f state =
+  (\a -> state { _helpersManually = a }) <$> f (_helpersManually state)
+
+buyTreeSeeds :: Lens' (AcquireTreeSeeds (Cost a)) (BuyTreeSeeds (Cost a))
+buyTreeSeeds f state = AcquireTreeSeeds <$> f (unAcquireTreeSeeds state)
+
+count :: Lens' (Element ac d f a) (f a)
+count f state = (\a -> state { _count = a }) <$> f (_count state)
+
+elementPaperclips
+  :: Lens'
+       (Elements a)
+       (Element AcquirePaperclips DurationPaperclips Paperclips a)
+elementPaperclips f state =
+  (\paperclips' -> state { _paperclips = paperclips' })
+    <$> f (_paperclips state)
+
+paperclips :: Lens' (Elements a) (Paperclips a)
+paperclips = elementPaperclips . count
+
+elementHelpers
+  :: Lens' (Elements a) (Element AcquireHelpers DurationHelpers Helpers a)
+elementHelpers f state =
+  (\helpers' -> state { _helpers = helpers' }) <$> f (_helpers state)
+
+helpers :: Lens' (Elements a) (Helpers a)
+helpers = elementHelpers . count
+
+elementWater :: Lens' (Elements a) (Element AcquireWater DurationWater Water a)
+elementWater f state =
+  (\water' -> state { _water = water' }) <$> f (_water state)
+
+water :: Lens' (Elements a) (Water a)
+water = elementWater . count
+
+elementTrees :: Lens' (Elements a) (Element AcquireTrees DurationTrees Trees a)
+elementTrees f state =
+  (\trees' -> state { _trees = trees' }) <$> f (_trees state)
+
+trees :: Lens' (Elements a) (Trees a)
+trees = elementTrees . count
+
+elementTreeSeeds
+  :: Lens' (Elements a) (Element AcquireTreeSeeds DurationTreeSeeds TreeSeeds a)
+elementTreeSeeds f state =
+  (\treeSeeds' -> state { _treeSeeds = treeSeeds' }) <$> f (_treeSeeds state)
+
+treeSeeds :: Lens' (Elements a) (TreeSeeds a)
+treeSeeds = elementTreeSeeds . count
+
+progs :: Lens' (TreeSeeds Integer) [Prog Integer]
+progs f state = TreeSeeds <$> f (unTreeSeeds state)
+
+elementWood :: Lens' (Elements a) (Element AcquireWood DurationWood Wood a)
+elementWood f state = (\wood' -> state { _wood = wood' }) <$> f (_wood state)
+
+wood :: Lens' (Elements a) (Wood a)
+wood = elementWood . count

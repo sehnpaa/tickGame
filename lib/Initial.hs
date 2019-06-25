@@ -10,20 +10,22 @@ prices =
     Prices (AdvancedHelperPrice $ Paperclips 5) (ProgPrice 2) (TreePrice 1)
 
 config :: Config
-config = Config (Constants (HelperInc (Helpers 1))) prices
+config = Config (Constants (HelperInc (Helpers 1))) Initial.prices
 
 researchAreas :: ResearchAreas
--- researchAreas = ResearchAreas (ResearchComp (Duration 10) NotResearched)
-researchAreas = ResearchAreas (ResearchComp (DurationAdvanced $ Ticks 20) NotResearched)
+researchAreas =
+    ResearchAreas (ResearchComp (DurationAdvanced $ Ticks 20) NotResearched)
 
 resources :: Resources
-resources = Resources elements (Storage (Paperclips 1000)) (WaterTank 100)
+resources =
+    Resources Initial.elements (Storage (Paperclips 1000)) (WaterTank 100)
 
 elements :: Elements Integer
 elements = Elements
     (Element
-        (AcquirePaperclips (PaperclipsManually Initial.paperclipManuallyCost)
-                           (PaperclipsFromHelper noCost)
+        (AcquirePaperclips
+            (PaperclipsManually Initial.paperclipManuallyCost)
+            (PaperclipsFromHelper noCost)
         )
         (Paperclips 0)
         (DurationPaperclips Instant)
@@ -83,5 +85,10 @@ noCost =
     Cost (Paperclips 0) (Helpers 0) (Trees 0) (TreeSeeds []) (Water 0) (Wood 0)
 
 getInitialState :: MyState
-getInitialState =
-    MyState config [] [] researchAreas resources (Seconds 0) (IsStarted False)
+getInitialState = MyState Initial.config
+                          []
+                          []
+                          Initial.researchAreas
+                          Initial.resources
+                          (Seconds 0)
+                          (IsStarted False)

@@ -19,7 +19,6 @@ library tickGameLib
       Elements
       Initial
       Iso
-      Lenses
       LensUtils
       Mod
       NaturalTransformation

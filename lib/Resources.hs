@@ -5,7 +5,8 @@
 
 module Resources where
 
-import           Control.Lens                   ( Profunctor
+import           Control.Lens                   ( Lens'
+                                                , Profunctor
                                                 , iso
                                                 , view
                                                 , withIso
@@ -84,6 +85,18 @@ needMorePaperclips' c p =
   unPaperclips (_paperclipsCost $ unBuyTreeSeeds c) > unPaperclips p
 
 ---
+
+elements :: Lens' Resources (Elements Integer)
+elements f state =
+  (\elements' -> state { _elements = elements' }) <$> f (_elements state)
+
+storage :: Lens' Resources (Storage (Paperclips Integer))
+storage f state =
+    (\storage' -> state { _storage = storage' }) <$> f (_storage state)
+
+waterTank :: Lens' Resources (WaterTank Integer)
+waterTank f state =
+    (\tank' -> state { _waterTank = tank' }) <$> f (_waterTank state)
 
 isoHelpers
   :: (Profunctor p, Functor f) => p (Helpers a) (f (Helpers a)) -> p a (f a)
