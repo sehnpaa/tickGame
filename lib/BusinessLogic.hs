@@ -69,7 +69,7 @@ researchAdvancedHelper
   -> Paperclips Integer
   -> AdvancedHelperPrice (Paperclips Integer)
   -> ResearchProgress
-  -> Duration
+  -> DurationAdvancedHelper (Duration Integer)
   -> Either ErrorLogLine (Paperclips Integer, ResearchProgress)
 researchAdvancedHelper s p price progress duration =
   case (unAdvancedHelperPrice price > p, progress) of
@@ -82,7 +82,7 @@ researchAdvancedHelper s p price progress duration =
 plantASeed
   :: (Num a, Ord a)
   => Seconds
-  -> DurationTreeSeeds (Duration2 a)
+  -> DurationTreeSeeds (Duration a)
   -> TreePrice a
   -> TreeSeeds a
   -> Either ErrorLogLine (TreeSeeds a)

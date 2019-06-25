@@ -61,13 +61,13 @@ instance Show ResearchProgress where
   show ResearchDone = "Research done"
 
 data ResearchAreas = ResearchAreas
-  { _advancedHelperResearch :: ResearchComp }
+  { _advancedHelperResearch :: ResearchComp Integer}
 
-data ResearchComp = ResearchComp
-  { _researchCompDuration :: Duration
+data ResearchComp a = ResearchComp
+  { _researchCompDuration :: DurationAdvancedHelper (Duration a)
   , _researchCompProgress :: ResearchProgress }
 
-newtype Duration = Duration { unDuration :: Integer }
+newtype DurationAdvancedHelper a = DurationAdvanced { unDurationAdvanced :: a }
 
 newtype Seconds = Seconds { unSeconds :: Integer } deriving (Enum, Eq, Num)
 
@@ -121,7 +121,7 @@ lineNeedMoreSeeds :: Seconds -> ErrorLogLine
 lineNeedMoreSeeds s = ErrorLogLine
   $ Data.Text.concat ["Tick ", pack (show s), ": You need more seeds."]
 
-initializeSeed :: (Eq a, Num a) => DurationTreeSeeds (Duration2 a) -> TreeSeeds a -> TreeSeeds a
+initializeSeed :: (Eq a, Num a) => DurationTreeSeeds (Duration a) -> TreeSeeds a -> TreeSeeds a
 initializeSeed duration =
   TreeSeeds
     . changeFirst (== NotGrowing)
@@ -163,5 +163,8 @@ isoHelperPrice
   -> p (Paperclips a) (f (Paperclips a))
 isoHelperPrice = iso HelperPrice unHelperPrice
 
-startResearch :: Duration -> ResearchProgress
-startResearch (Duration n) = ResearchInProgress n
+startResearch :: DurationAdvancedHelper (Duration Integer) -> ResearchProgress
+startResearch = f . unDurationAdvanced
+      where
+        f Instant = ResearchDone
+        f (Ticks n) = ResearchInProgress n

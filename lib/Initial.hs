@@ -13,7 +13,8 @@ config :: Config
 config = Config (Constants (HelperInc (Helpers 1))) prices
 
 researchAreas :: ResearchAreas
-researchAreas = ResearchAreas (ResearchComp (Duration 10) NotResearched)
+-- researchAreas = ResearchAreas (ResearchComp (Duration 10) NotResearched)
+researchAreas = ResearchAreas (ResearchComp (DurationAdvanced $ Ticks 20) NotResearched)
 
 resources :: Resources
 resources = Resources elements (Storage (Paperclips 1000)) (WaterTank 100)

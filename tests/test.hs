@@ -18,13 +18,14 @@ defaultConfig = Config
   (Prices (AdvancedHelperPrice $ Paperclips 5) (ProgPrice 2) (TreePrice 1))
 
 state1 :: MyState
-state1 = MyState defaultConfig
-                 []
-                 []
-                 (ResearchAreas (ResearchComp (Duration 20) NotResearched))
-                 Main.resources
-                 (Seconds 0)
-                 (IsStarted True)
+state1 = MyState
+  defaultConfig
+  []
+  []
+  (ResearchAreas (ResearchComp (DurationAdvanced $ Ticks 20) NotResearched))
+  Main.resources
+  (Seconds 0)
+  (IsStarted True)
 
 resources :: Resources
 resources = Resources Main.elements (Storage (Paperclips 1000)) (WaterTank 100)
