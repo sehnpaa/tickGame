@@ -82,7 +82,7 @@ researchAdvancedHelper s p price progress duration =
 plantASeed
   :: (Num a, Ord a)
   => Seconds
-  -> DurationTreeSeeds (Duration a)
+  -> DurationTreeSeeds a
   -> TreePrice a
   -> TreeSeeds a
   -> Either ErrorLogLine (TreeSeeds a)

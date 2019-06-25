@@ -15,9 +15,9 @@ constants :: Lens' Config Constants
 constants f state =
     (\constants' -> state { _constants = constants' }) <$> f (_constants state)
 
-treeSeedDuration :: Lens' (Element acquirement d f a) (d (Duration a))
+treeSeedDuration :: Lens' (Element acquirement d f a) (d a)
 treeSeedDuration f state =
-    (\a' -> state { _duration2 = a' }) <$> f (_duration2 state)
+    (\a' -> state { _duration = a' }) <$> f (_duration state)
 
 helperInc :: Lens' Constants (HelperInc (Helpers Integer))
 helperInc f state =

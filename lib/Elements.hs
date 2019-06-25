@@ -17,14 +17,14 @@ data Elements = Elements
 data Element acquire duration f a = Element
   { _cost :: acquire (Cost a)
   , _count :: f a
-  , _duration2 :: duration (Duration a) }
+  , _duration :: duration a }
 
-newtype DurationPaperclips a = DurationPaperclips { unDurationPaperclips :: a }
-newtype DurationHelpers a = DurationHelpers { unDurationHelpers :: a }
-newtype DurationTrees a = DurationTrees { unDurationTrees :: a }
-newtype DurationTreeSeeds a = DurationTreeSeeds { unDurationTreeSeeds :: a }
-newtype DurationWater a = DurationWater { unDurationWater :: a }
-newtype DurationWood a = DurationWood { unDurationWood :: a }
+newtype DurationPaperclips a = DurationPaperclips { unDurationPaperclips :: Duration a }
+newtype DurationHelpers a = DurationHelpers { unDurationHelpers :: Duration a }
+newtype DurationTrees a = DurationTrees { unDurationTrees :: Duration a }
+newtype DurationTreeSeeds a = DurationTreeSeeds { unDurationTreeSeeds :: Duration a }
+newtype DurationWater a = DurationWater { unDurationWater :: Duration a }
+newtype DurationWood a = DurationWood { unDurationWood :: Duration a }
 
 data Duration a = Instant | Ticks a
 

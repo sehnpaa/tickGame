@@ -121,7 +121,7 @@ lineNeedMoreSeeds :: Seconds -> ErrorLogLine
 lineNeedMoreSeeds s = ErrorLogLine
   $ Data.Text.concat ["Tick ", pack (show s), ": You need more seeds."]
 
-initializeSeed :: (Eq a, Num a) => DurationTreeSeeds (Duration a) -> TreeSeeds a -> TreeSeeds a
+initializeSeed :: (Eq a, Num a) => DurationTreeSeeds a -> TreeSeeds a -> TreeSeeds a
 initializeSeed duration =
   TreeSeeds
     . changeFirst (== NotGrowing)
