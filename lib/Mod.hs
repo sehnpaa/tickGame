@@ -8,6 +8,8 @@ import           Control.Applicative            ( liftA2 )
 import           Control.Lens                   ( Lens'
                                                 , Profunctor
                                                 , iso
+                                                , over
+                                                , set
                                                 , view
                                                 , withIso
                                                 )
@@ -92,7 +94,26 @@ data MyEvent
   | Tick
   deriving (Eq, Show)
 
----
+applyAction :: Action a -> MyState a -> MyState a
+applyAction (SetP p) state =
+  set (resources . elements . elementPaperclips . count) p state
+applyAction (SetH h) state =
+  set (resources . elements . elementHelpers . count) h state
+applyAction (SetE err) state = over errorLog (\errs -> err : errs) state
+applyAction (SetR r) state =
+  set (researchAreas . advancedHelperResearch . researchCompProgress) r state
+applyAction (SetTreeSeeds s) state =
+  set (resources . elements . elementTreeSeeds . count) s state
+applyAction (SetTrees t) state =
+  set (resources . elements . elementTrees . count) t state
+applyAction (SetAdvancedHelperResearchProgress p) state =
+  set (researchAreas . advancedHelperResearch . researchCompProgress) p state
+applyAction (SetHelperInc i) state =
+  set (config . constants . helperInc) i state
+applyAction (SetProgs ps) state =
+  set (resources . elements . elementTreeSeeds . count . progs) ps state
+applyAction (SetWater w) state =
+  set (resources . elements . elementWater . count) w state
 
 addHelperWork
   :: Num a => HelperInc (Helpers a) -> Helpers a -> Paperclips a -> Paperclips a
@@ -150,46 +171,45 @@ config f state =
 
 helperInc :: Lens' (Constants a) (HelperInc (Helpers a))
 helperInc f state =
-    (\inc' -> state { _helperInc = inc' }) <$> f (_helperInc state)
+  (\inc' -> state { _helperInc = inc' }) <$> f (_helperInc state)
 
 actions :: Lens' (MyState a) [Action a]
 actions f state =
-    (\actions' -> state { _actions = actions' }) <$> f (_actions state)
+  (\actions' -> state { _actions = actions' }) <$> f (_actions state)
 
 errorLog :: Lens' (MyState a) [ErrorLogLine]
 errorLog f state =
-    (\errorLog' -> state { _errorLog = errorLog' }) <$> f (_errorLog state)
+  (\errorLog' -> state { _errorLog = errorLog' }) <$> f (_errorLog state)
 
 resources :: Lens' (MyState a) (Resources a)
 resources f state =
-    (\resources' -> state { _resources = resources' }) <$> f (_resources state)
+  (\resources' -> state { _resources = resources' }) <$> f (_resources state)
 
 researchAreas :: Lens' (MyState a) (ResearchAreas a)
 researchAreas f state =
-    (\areas' -> state { _researchAreas = areas' }) <$> f (_researchAreas state)
+  (\areas' -> state { _researchAreas = areas' }) <$> f (_researchAreas state)
 
 seconds :: Lens' (MyState a) (Seconds a)
 seconds f state =
-    (\seconds' -> state { _seconds = seconds' }) <$> f (_seconds state)
+  (\seconds' -> state { _seconds = seconds' }) <$> f (_seconds state)
 
 isStarted :: Lens' (MyState a) IsStarted
 isStarted f state =
-    (\isStarted' -> state { _isStarted = isStarted' }) <$> f (_isStarted state)
+  (\isStarted' -> state { _isStarted = isStarted' }) <$> f (_isStarted state)
 
 researchCompProgress :: Lens' (ResearchComp a) (ResearchProgress a)
 researchCompProgress f state =
-    (\progress' -> state { _researchCompProgress = progress' })
-        <$> f (_researchCompProgress state)
+  (\progress' -> state { _researchCompProgress = progress' })
+    <$> f (_researchCompProgress state)
 
 advancedHelperResearch :: Lens' (ResearchAreas a) (ResearchComp a)
 advancedHelperResearch f state = (\a -> state { _advancedHelperResearch = a })
-    <$> f (_advancedHelperResearch state)
+  <$> f (_advancedHelperResearch state)
 
-researchCompDuration
-    :: Lens' (ResearchComp a) (DurationAdvancedHelper a)
+researchCompDuration :: Lens' (ResearchComp a) (DurationAdvancedHelper a)
 researchCompDuration f state =
-    undefined (\duration -> state { _researchCompDuration = duration })
-        <$> f (_researchCompDuration state)
+  (\duration -> state { _researchCompDuration = duration })
+    <$> f (_researchCompDuration state)
 
 
 
