@@ -15,7 +15,7 @@ main = defaultMain tests
 defaultConfig :: Config Integer
 defaultConfig = Config
   (Constants (HelperInc (Helpers 1)))
-  (Prices (AdvancedHelperPrice $ Paperclips 5) (ProgPrice 2))
+  (Prices (AdvancedHelperPrice $ Paperclips 5))
 
 state1 :: MyState Integer
 state1 = MyState
@@ -43,9 +43,21 @@ elements = Elements
            (Helpers 0)
            (DurationHelpers Instant)
   )
-  (Element (AcquireTrees (TreesFromTreeSeeds treeCost))
-           (Trees 0)
-           (DurationTrees Instant)
+  (Element
+    (AcquireTrees
+      (TreesFromTreeSeeds treeCost)
+      (TreeSeedCostPerTick
+        (Cost (Paperclips 0)
+              (Helpers 0)
+              (Trees 0)
+              (TreeSeeds [])
+              (Water 2)
+              (Wood 0)
+        )
+      )
+    )
+    (Trees 0)
+    (DurationTrees Instant)
   )
   (Element (AcquireTreeSeeds (BuyTreeSeeds Main.treeSeedCost))
            (TreeSeeds (replicate 10 NotGrowing))

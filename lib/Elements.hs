@@ -30,8 +30,13 @@ data AcquireHelpers cost = AcquireHelpers
 
 newtype HelpersManually cost = HelpersManually { unHelpersManually :: cost }
 
-newtype AcquireTrees cost = AcquireTrees { unAcquireTrees :: TreesFromTreeSeeds cost }
 newtype TreesFromTreeSeeds cost = TreesFromTreeSeeds { unTreesFromTreeSeeds :: cost }
+newtype TreeSeedCostPerTick cost = TreeSeedCostPerTick { unTreeSeedCostPerTick :: cost }
+
+data AcquireTrees cost = AcquireTrees
+  { _treesFromTreeSeeds :: TreesFromTreeSeeds cost
+  , _treeSeedCostPerTick :: TreeSeedCostPerTick cost }
+makeLenses ''AcquireTrees
 
 newtype AcquireTreeSeeds cost = AcquireTreeSeeds { unAcquireTreeSeeds :: BuyTreeSeeds cost }
 newtype BuyTreeSeeds cost = BuyTreeSeeds { unBuyTreeSeeds :: cost }

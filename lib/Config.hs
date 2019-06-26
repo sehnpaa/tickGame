@@ -21,8 +21,7 @@ instance Applicative HelperInc where
   HelperInc f <*> HelperInc a = HelperInc (f a)
 
 data Prices a = Prices
-  { _advancedHelperPrice :: AdvancedHelperPrice (Paperclips a)
-  , _progPrice :: ProgPrice a }
+  { _advancedHelperPrice :: AdvancedHelperPrice (Paperclips a) }
 
 newtype AdvancedHelperPrice a = AdvancedHelperPrice { unAdvancedHelperPrice :: a }
 
@@ -44,7 +43,3 @@ advancedHelperPrice :: Lens' (Prices a) (AdvancedHelperPrice (Paperclips a))
 advancedHelperPrice f state =
   (\price' -> state { _advancedHelperPrice = price' })
     <$> f (_advancedHelperPrice state)
-
-progPrice :: Lens' (Prices a) (ProgPrice a)
-progPrice f state =
-  (\price' -> state { _progPrice = price' }) <$> f (_progPrice state)

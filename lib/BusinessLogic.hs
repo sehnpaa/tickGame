@@ -34,7 +34,7 @@ seedWork
   :: (Num a, Ord a, Show a)
   => Seconds a
   -> Water a
-  -> ProgPrice a
+  -> TreeSeedCostPerTick (Cost a)
   -> [Prog a]
   -> Trees a
   -> Either

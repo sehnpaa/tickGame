@@ -27,12 +27,13 @@ seedWork
       :: (Num a, Ord a, Show a)
       => MyState a
       -> Either (ErrorLogLine, [Prog a]) (Water a, [Prog a], Trees a)
-seedWork = arg5 BL.seedWork
-                seconds
-                (resources . elements . elementWater . count)
-                (config . prices . progPrice)
-                (resources . elements . elementTreeSeeds . count . progs)
-                (resources . elements . elementTrees . count)
+seedWork = arg5
+      BL.seedWork
+      seconds
+      (resources . elements . elementWater . count)
+      (resources . elements . elementTrees . cost . treeSeedCostPerTick)
+      (resources . elements . elementTreeSeeds . count . progs)
+      (resources . elements . elementTrees . count)
 
 buyHelper
       :: (Enum a, Num a, Ord a, Show a)

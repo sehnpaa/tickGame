@@ -6,8 +6,7 @@ import           Mod
 import           Resources
 
 prices :: Prices Integer
-prices =
-    Prices (AdvancedHelperPrice $ Paperclips 5) (ProgPrice 2)
+prices = Prices (AdvancedHelperPrice $ Paperclips 5)
 
 config :: Config Integer
 config = Config (Constants (HelperInc (Helpers 1))) Initial.prices
@@ -34,9 +33,21 @@ elements = Elements
              (Helpers 0)
              (DurationHelpers Instant)
     )
-    (Element (AcquireTrees (TreesFromTreeSeeds treeCost))
-             (Trees 0)
-             (DurationTrees Instant)
+    (Element
+        (AcquireTrees
+            (TreesFromTreeSeeds treeCost)
+            (TreeSeedCostPerTick
+                (Cost (Paperclips 0)
+                      (Helpers 0)
+                      (Trees 0)
+                      (TreeSeeds [])
+                      (Water 2)
+                      (Wood 0)
+                )
+            )
+        )
+        (Trees 0)
+        (DurationTrees Instant)
     )
     (Element (AcquireTreeSeeds (BuyTreeSeeds Initial.treeSeedCost))
              (TreeSeeds (replicate 10 NotGrowing))
