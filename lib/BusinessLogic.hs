@@ -85,13 +85,12 @@ plantASeed
   :: (Num a, Ord a, Show a)
   => Seconds a
   -> DurationTreeSeeds a
-  -> TreePrice a
   -> TreeSeeds a
   -> Either ErrorLogLine (TreeSeeds a)
-plantASeed s dur price seeds =
-  if unTreePrice price > countNotGrowingSeeds seeds
-    then Left $ lineNeedMoreSeeds s
-    else Right $ initializeSeed dur seeds
+plantASeed s dur seeds =
+  if countNotGrowingSeeds seeds > 0
+    then Right $ initializeASeed dur seeds
+    else Left $ lineNeedMoreSeeds s
 
 buyASeed
   :: (Num a, Ord a, Show a)

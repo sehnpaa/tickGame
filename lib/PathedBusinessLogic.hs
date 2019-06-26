@@ -66,10 +66,9 @@ plantASeed
       :: (Num a, Ord a, Show a)
       => MyState a
       -> Either ErrorLogLine (TreeSeeds a)
-plantASeed = arg4 BL.plantASeed
+plantASeed = arg3 BL.plantASeed
                   seconds
                   (resources . elements . elementTreeSeeds . duration)
-                  (config . prices . treePrice)
                   (resources . elements . elementTreeSeeds . count)
 
 buyASeed

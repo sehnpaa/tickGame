@@ -7,7 +7,7 @@ import           Resources
 
 prices :: Prices Integer
 prices =
-    Prices (AdvancedHelperPrice $ Paperclips 5) (ProgPrice 2) (TreePrice 1)
+    Prices (AdvancedHelperPrice $ Paperclips 5) (ProgPrice 2)
 
 config :: Config Integer
 config = Config (Constants (HelperInc (Helpers 1))) Initial.prices

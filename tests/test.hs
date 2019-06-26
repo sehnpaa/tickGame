@@ -15,7 +15,7 @@ main = defaultMain tests
 defaultConfig :: Config Integer
 defaultConfig = Config
   (Constants (HelperInc (Helpers 1)))
-  (Prices (AdvancedHelperPrice $ Paperclips 5) (ProgPrice 2) (TreePrice 1))
+  (Prices (AdvancedHelperPrice $ Paperclips 5) (ProgPrice 2))
 
 state1 :: MyState Integer
 state1 = MyState

@@ -22,16 +22,13 @@ instance Applicative HelperInc where
 
 data Prices a = Prices
   { _advancedHelperPrice :: AdvancedHelperPrice (Paperclips a)
-  , _progPrice :: ProgPrice a
-  , _treePrice :: TreePrice a }
+  , _progPrice :: ProgPrice a }
 
 newtype AdvancedHelperPrice a = AdvancedHelperPrice { unAdvancedHelperPrice :: a }
 
 newtype HelperPrice a = HelperPrice { unHelperPrice :: Paperclips a }
 
 newtype ProgPrice a = ProgPrice { unProgPrice :: a }
-
-newtype TreePrice a = TreePrice { unTreePrice :: a }
 
 newtype TreeSeedPrice = TreeSeedPrice { unTreeSeedPrice :: Paperclips Integer }
 
@@ -47,10 +44,6 @@ advancedHelperPrice :: Lens' (Prices a) (AdvancedHelperPrice (Paperclips a))
 advancedHelperPrice f state =
   (\price' -> state { _advancedHelperPrice = price' })
     <$> f (_advancedHelperPrice state)
-
-treePrice :: Lens' (Prices a) (TreePrice a)
-treePrice f state =
-  (\treePrice' -> state { _treePrice = treePrice' }) <$> f (_treePrice state)
 
 progPrice :: Lens' (Prices a) (ProgPrice a)
 progPrice f state =
