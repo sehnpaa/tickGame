@@ -11,7 +11,6 @@ import           Control.Lens                   ( Lens'
                                                 , over
                                                 , set
                                                 , view
-                                                , withIso
                                                 )
 import           Data.Text                      ( Text
                                                 , concat
@@ -38,6 +37,7 @@ data Action a
   = SetP (Paperclips a)
   | SetH (Helpers a)
   | SetE ErrorLogLine
+  | SetEnergy (Energy a)
   | SetR (ResearchProgress a)
   | SetTreeSeeds (TreeSeeds a)
   | SetTrees (Trees a)
@@ -86,6 +86,7 @@ data MyEvent
   = Start
   | CreatePaperclip
   | CreateHelper
+  | GenerateEnergy
   | PumpWater
   | PlantASeed
   | BuyASeed
@@ -100,6 +101,8 @@ applyAction (SetP p) state =
 applyAction (SetH h) state =
   set (resources . elements . elementHelpers . count) h state
 applyAction (SetE err) state = over errorLog (\errs -> err : errs) state
+applyAction (SetEnergy e) state =
+  set (resources . elements . elementEnergy . count) e state
 applyAction (SetR r) state =
   set (researchAreas . advancedHelperResearch . researchCompProgress) r state
 applyAction (SetTreeSeeds s) state =
@@ -124,9 +127,15 @@ productOfHelperWork :: Num a => HelperInc (Helpers a) -> Helpers a -> Helpers a
 productOfHelperWork inc h = liftA2 (*) h $ Iso.unwrap isoHelperInc inc
 
 calcRemainingWater
-  :: (Num a, Ord a) => TreeSeedCostPerTick (Cost a) -> [Prog a] -> Water a -> Maybe (Water a)
+  :: (Num a, Ord a)
+  => TreeSeedCostPerTick (Cost a)
+  -> [Prog a]
+  -> Water a
+  -> Maybe (Water a)
 calcRemainingWater price progs water =
-  let cost = calcWaterCost progs (unWater $ view waterCost $ unTreeSeedCostPerTick price)
+  let cost = calcWaterCost
+        progs
+        (unWater $ view waterCost $ unTreeSeedCostPerTick price)
   in  case cost > water of
         True  -> Nothing
         False -> Just $ Iso.under2 isoWater (-) water cost

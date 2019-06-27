@@ -11,6 +11,7 @@ import           Control.Applicative            ( liftA2 )
 data Duration a = Instant | Ticks a
 
 newtype DurationPaperclips a = DurationPaperclips { unDurationPaperclips :: Duration a }
+newtype DurationEnergy a = DurationEnergy { unDurationEnergy :: Duration a }
 newtype DurationHelpers a = DurationHelpers { unDurationHelpers :: Duration a }
 newtype DurationTrees a = DurationTrees { unDurationTrees :: Duration a }
 newtype DurationTreeSeeds a = DurationTreeSeeds { _durationTreeSeeds :: Duration a }
@@ -25,6 +26,12 @@ data AcquirePaperclips cost = AcquirePaperclips
 
 newtype PaperclipsManually cost = PaperclipsManually { unPaperclipsManually :: cost }
 newtype PaperclipsFromHelper cost = PaperclipsFromHelper { unPaperclipsFromHelper :: cost }
+
+data EnergyManually cost = EnergyManually { _energyManually :: cost }
+
+data AcquireEnergy cost = AcquireEnergy
+  { _acquireEnergyManually :: EnergyManually cost }
+makeLenses ''AcquireEnergy
 
 data AcquireHelpers cost = AcquireHelpers
   { _helpersManually :: HelpersManually cost }
@@ -57,6 +64,16 @@ instance Applicative Paperclips where
 
 instance Show (Paperclips Integer) where
   show (Paperclips a) = show a
+
+newtype Energy a = Energy { _energy :: a } deriving (Eq, Functor, Ord)
+makeLenses ''Energy
+
+instance Applicative Energy where
+  pure = Energy
+  Energy f <*> Energy a = Energy (f a)
+
+instance Show (Energy Integer) where
+  show (Energy a) = show a
 
 newtype Helpers a = Helpers { unHelpers :: a } deriving (Enum, Eq, Functor, Ord)
 
@@ -101,6 +118,7 @@ instance Show (Wood Integer) where
 
 data Cost a = Cost
   { _paperclipCost :: Paperclips a
+  , _energyCost :: Energy a
   , _helpersCost :: Helpers a
   , _treesCost :: Trees a
   , _treeSeedsCost :: TreeSeeds a
@@ -116,6 +134,7 @@ makeLenses ''Element
 
 data Elements a = Elements
   { _elementsPaperclips :: Element AcquirePaperclips DurationPaperclips Paperclips a
+  , _elementEnergy :: Element AcquireEnergy DurationEnergy Energy a
   , _helpers :: Element AcquireHelpers DurationHelpers Helpers a
   , _trees :: Element AcquireTrees DurationTrees Trees a
   , _elementsTreeSeeds :: Element AcquireTreeSeeds DurationTreeSeeds TreeSeeds a
@@ -181,6 +200,10 @@ payWithPaperclips
   -> Cost a
   -> Either PaymentError (Paperclips a)
 payWithPaperclips = payWith paperclipCost
+
+payWithEnergy
+  :: (Num a, Ord a) => Energy a -> Cost a -> Either PaymentError (Energy a)
+payWithEnergy = payWith energyCost
 
 -- toWallet paperclipCost
 -- toWallet :: Monoid m => ASetter (Cost m) t a b -> b -> t

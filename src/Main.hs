@@ -26,6 +26,7 @@ import           GI.Gtk.Declarative.App.Simple
 import           Lib                            ( buyASeed
                                                 , buyHelper
                                                 , createPaperclip
+                                                , generateEnergy
                                                 , nextTick
                                                 , pumpWater
                                                 , researchAdvancedHelper
@@ -81,6 +82,7 @@ buttons = container
   , widget Button [#label := "Create paperclip", on #clicked CreatePaperclip]
   , widget Button [#label := "Create helper", on #clicked CreateHelper]
   , widget Button [#label := "Pump water", on #clicked PumpWater]
+  , widget Button [#label := "Generate energy", on #clicked GenerateEnergy]
   , widget Button [#label := "Buy a seed", on #clicked BuyASeed]
   , widget Button [#label := "Plant a seed", on #clicked PlantASeed]
   , widget
@@ -101,6 +103,7 @@ stats state = container
   , statProperty "Storage"                  (viewStorage state)
   , statProperty "Water"                    (viewWater state)
   , statProperty "Water tank"               (viewWaterTank state)
+  , statProperty "Energy"                   (viewEnergy state)
   , statProperty "Tree seeds"               (viewTreeSeeds state)
   , statProperty "Trees"                    (viewTrees state)
   , statProperty "Wood"                     (viewWood state)
@@ -126,6 +129,7 @@ update' state event = case (unIsStarted (viewIsStarted state), event) of
   (True , BuyASeed       ) -> Transition (buyASeed state) (pure Nothing)
   (True , CreatePaperclip) -> Transition (createPaperclip state) (pure Nothing)
   (True , CreateHelper   ) -> Transition (buyHelper state) (pure Nothing)
+  (True , GenerateEnergy ) -> Transition (generateEnergy state) (pure Nothing)
   (True , PumpWater      ) -> Transition (pumpWater state) (pure Nothing)
   (True , PlantASeed     ) -> Transition (plantASeed state) (pure Nothing)
   (True, ResearchAdvancedHelper) ->

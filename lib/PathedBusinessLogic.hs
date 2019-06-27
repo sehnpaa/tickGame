@@ -83,6 +83,16 @@ buyASeed = arg4
       (resources . elements . elementPaperclips . count)
       (resources . elements . elementTreeSeeds . count)
 
+generateEnergy
+      :: (Enum a, Num a, Ord a, Show a)
+      => MyState a
+      -> Either ErrorLogLine (Energy a)
+generateEnergy = arg3
+      BL.generateEnergy
+      seconds
+      (resources . elements . elementEnergy . cost . acquireEnergyManually)
+      (resources . elements . elementEnergy . count)
+
 createPaperclip :: (Enum a, Ord a) => MyState a -> Paperclips a
 createPaperclip = arg2 BL.createPaperclip
                        (resources . elements . elementPaperclips . count)

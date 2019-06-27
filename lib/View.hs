@@ -9,6 +9,9 @@ import           Resources
 viewActions :: MyState a -> [Action a]
 viewActions = view actions
 
+viewEnergy :: MyState a -> Energy a
+viewEnergy = view (resources . elements . elementEnergy . count)
+
 viewErrorLog :: MyState a -> [ErrorLogLine]
 viewErrorLog = view errorLog
 

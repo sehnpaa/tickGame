@@ -29,6 +29,10 @@ elements = Elements
         (Paperclips 0)
         (DurationPaperclips Instant)
     )
+    (Element (AcquireEnergy (EnergyManually noCost))
+             (Energy 20)
+             (DurationEnergy Instant)
+    )
     (Element (AcquireHelpers (HelpersManually helperCost))
              (Helpers 0)
              (DurationHelpers Instant)
@@ -38,6 +42,7 @@ elements = Elements
             (TreesFromTreeSeeds treeCost)
             (TreeSeedCostPerTick
                 (Cost (Paperclips 0)
+                      (Energy 0)
                       (Helpers 0)
                       (Trees 0)
                       (TreeSeeds [])
@@ -66,11 +71,17 @@ paperclipManuallyCost :: Cost Integer
 paperclipManuallyCost = noCost
 
 helperCost :: Cost Integer
-helperCost =
-    Cost (Paperclips 10) (Helpers 0) (Trees 0) (TreeSeeds []) (Water 0) (Wood 0)
+helperCost = Cost (Paperclips 10)
+                  (Energy 0)
+                  (Helpers 0)
+                  (Trees 0)
+                  (TreeSeeds [])
+                  (Water 0)
+                  (Wood 0)
 
 treeCost :: Cost Integer
 treeCost = Cost (Paperclips 0)
+                (Energy 0)
                 (Helpers 0)
                 (Trees 0)
                 (TreeSeeds [GrowingDone])
@@ -79,6 +90,7 @@ treeCost = Cost (Paperclips 0)
 
 treeSeedCost :: Cost Integer
 treeSeedCost = Cost (Paperclips 100)
+                    (Energy 0)
                     (Helpers 0)
                     (Trees 0)
                     (TreeSeeds [])
@@ -92,8 +104,13 @@ woodCost :: Cost Integer
 woodCost = noCost
 
 noCost :: Cost Integer
-noCost =
-  Cost (Paperclips 0) (Helpers 0) (Trees 0) (TreeSeeds []) (Water 0) (Wood 0)
+noCost = Cost (Paperclips 0)
+              (Energy 0)
+              (Helpers 0)
+              (Trees 0)
+              (TreeSeeds [])
+              (Water 0)
+              (Wood 0)
 
 getInitialState :: MyState Integer
 getInitialState = MyState Initial.config

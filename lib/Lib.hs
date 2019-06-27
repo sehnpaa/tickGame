@@ -19,7 +19,7 @@ import qualified Initial                       as Initial
 import           Mod
 import           Resources
 import qualified PathedBusinessLogic           as PBL
-import Utils
+import           Utils
 
 nextTick :: (Enum a, Num a, Ord a, Show a) => MyState a -> MyState a
 nextTick = handleActions . addSecond . helperWork . seedWork . researchWork
@@ -41,7 +41,8 @@ researchWork state =
 seedWork :: (Num a, Ord a, Show a) => MyState a -> MyState a
 seedWork state =
   addActions state
-    $ withExtendedError SetE
+    $ withExtendedError
+        SetE
         (\p -> SetProgs p : [])
         (\(w, p, t) -> SetWater w : SetProgs p : SetTrees t : [])
     $ PBL.seedWork state
@@ -89,6 +90,13 @@ buyASeed state =
     $ addActions state
     $ withError SetE (\(s, p) -> SetTreeSeeds s : SetP p : [])
     $ PBL.buyASeed state
+
+generateEnergy :: (Enum a, Num a, Ord a, Show a) => MyState a -> MyState a
+generateEnergy state =
+  handleActions
+    $ addActions state
+    $ withError SetE (\e -> SetEnergy e : [])
+    $ PBL.generateEnergy state
 
 setStarted :: MyState a -> MyState a
 setStarted = over isStarted (const $ IsStarted True)

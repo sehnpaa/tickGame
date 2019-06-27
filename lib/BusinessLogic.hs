@@ -15,7 +15,7 @@ helperWork
   -> HelperInc (Helpers a)
   -> Storage (Paperclips a)
   -> Paperclips a
-helperWork p h inc storage = limitByStorage storage $ addHelperWork inc h p
+helperWork p h inc s = limitByStorage s $ addHelperWork inc h p
 
 researchWork
   :: (Eq a, Num a)
@@ -38,17 +38,17 @@ seedWork
   -> Either
        (ErrorLogLine, [Prog a])
        (Water a, [Prog a], Trees a)
-seedWork s water price progs ts =
+seedWork s w price progs ts =
   let ts'    = additionalTrees progs
       progs' = filter (not . isGrowingDone) $ progressGrowing progs
   in  if any isGrowing progs
-        then case calcRemainingWater price progs water of
+        then case calcRemainingWater price progs w of
           Nothing -> Left
             ( mkErrorLogLine s "Not enough water for the seeds."
             , removeGrowingSeeds progs
             )
-          Just water' -> Right $ (water', progs', ts + ts')
-        else Right $ (water, progs, ts)
+          Just w' -> Right $ (w', progs', ts + ts')
+        else Right $ (w, progs, ts)
 
 buyHelper
   :: (Enum a, Num a, Ord a, Show a)
@@ -97,11 +97,15 @@ buyASeed
   -> Paperclips a
   -> TreeSeeds a
   -> Either ErrorLogLine (TreeSeeds a, Paperclips a)
-buyASeed s (BuyTreeSeeds c) p (TreeSeeds seeds) =
-  case payWithPaperclips p c of
-    Left  _  -> Left $ mkErrorLogLine s "Not enough paperclips."
-    Right p' -> Right $ (TreeSeeds $ seeds ++ [NotGrowing], p')
+buyASeed s (BuyTreeSeeds c) p (TreeSeeds seeds) = case payWithPaperclips p c of
+  Left  _  -> Left $ mkErrorLogLine s "Not enough paperclips."
+  Right p' -> Right $ (TreeSeeds $ seeds ++ [NotGrowing], p')
+
+generateEnergy :: (Enum a, Num a, Ord a, Show a) => Seconds a -> EnergyManually (Cost a) -> Energy a -> Either ErrorLogLine (Energy a)
+generateEnergy s (EnergyManually c) e = case payWithEnergy e c of
+  Left _ -> Left $ mkErrorLogLine s "Can not generate energy."
+  Right e' -> Right $ fmap succ e'
 
 createPaperclip
   :: (Enum a, Ord a) => Paperclips a -> Storage (Paperclips a) -> Paperclips a
-createPaperclip p storage = min (unStorage storage) $ fmap succ p
+createPaperclip p s = min (unStorage s) $ fmap succ p

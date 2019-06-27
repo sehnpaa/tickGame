@@ -13,9 +13,8 @@ main :: IO ()
 main = defaultMain tests
 
 defaultConfig :: Config Integer
-defaultConfig = Config
-  (Constants (HelperInc (Helpers 1)))
-  (Prices (AdvancedHelperPrice $ Paperclips 5))
+defaultConfig = Config (Constants (HelperInc (Helpers 1)))
+                       (Prices (AdvancedHelperPrice $ Paperclips 5))
 
 state1 :: MyState Integer
 state1 = MyState
@@ -33,11 +32,14 @@ resources = Resources Main.elements (Storage (Paperclips 1000)) (WaterTank 100)
 elements :: Elements Integer
 elements = Elements
   (Element
-    (AcquirePaperclips (PaperclipsManually Main.paperclipManuallyCost)
-                       (PaperclipsFromHelper noCost)
+    (AcquirePaperclips (PaperclipsManually noCost) (PaperclipsFromHelper noCost)
     )
     (Paperclips 0)
     (DurationPaperclips Instant)
+  )
+  (Element (AcquireEnergy (EnergyManually noCost))
+           (Energy 20)
+           (DurationEnergy Instant)
   )
   (Element (AcquireHelpers (HelpersManually helperCost))
            (Helpers 0)
@@ -45,9 +47,10 @@ elements = Elements
   )
   (Element
     (AcquireTrees
-      (TreesFromTreeSeeds treeCost)
+      (TreesFromTreeSeeds noCost)
       (TreeSeedCostPerTick
         (Cost (Paperclips 0)
+              (Energy 0)
               (Helpers 0)
               (Trees 0)
               (TreeSeeds [])
@@ -59,7 +62,7 @@ elements = Elements
     (Trees 0)
     (DurationTrees Instant)
   )
-  (Element (AcquireTreeSeeds (BuyTreeSeeds Main.treeSeedCost))
+  (Element (AcquireTreeSeeds (BuyTreeSeeds noCost))
            (TreeSeeds (replicate 10 NotGrowing))
            (DurationTreeSeeds $ Ticks 20)
   )
@@ -70,22 +73,23 @@ elements = Elements
   )
   (Element (AcquireWood (WoodManually noCost)) (Wood 0) (DurationWood Instant))
 
-paperclipManuallyCost :: Cost Integer
-paperclipManuallyCost = noCost
-
 helperCost :: Cost Integer
-helperCost =
-  Cost (Paperclips 10) (Helpers 0) (Trees 0) (TreeSeeds []) (Water 0) (Wood 0)
-
-treeCost :: Cost Integer
-treeCost = noCost
-
-treeSeedCost :: Cost Integer
-treeSeedCost = noCost
+helperCost = Cost (Paperclips 10)
+                  (Energy 0)
+                  (Helpers 0)
+                  (Trees 0)
+                  (TreeSeeds [])
+                  (Water 0)
+                  (Wood 0)
 
 noCost :: Cost Integer
-noCost =
-  Cost (Paperclips 0) (Helpers 0) (Trees 0) (TreeSeeds []) (Water 0) (Wood 0)
+noCost = Cost (Paperclips 0)
+              (Energy 0)
+              (Helpers 0)
+              (Trees 0)
+              (TreeSeeds [])
+              (Water 0)
+              (Wood 0)
 
 tests :: TestTree
 tests = testGroup "Tests" [unitTests]
