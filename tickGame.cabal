@@ -20,10 +20,10 @@ library tickGameLib
       Initial
       Iso
       LensUtils
-      Mod
       NaturalTransformation
       PathedBusinessLogic
       Resources
+      State
       Utils
     build-depends:
         base >=4.11 && <5

@@ -2,7 +2,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Mod where
+module State where
 
 import           Control.Applicative            ( liftA2 )
 import           Control.Lens                   ( Lens'
@@ -24,7 +24,7 @@ import           NaturalTransformation
 import           Resources
 import           Utils
 
-data MyState a = MyState
+data State a = State
   { _config :: Config a
   , _actions :: [Action a]
   , _errorLog :: [ErrorLogLine]
@@ -95,7 +95,7 @@ data MyEvent
   | Tick
   deriving (Eq, Show)
 
-applyAction :: Action a -> MyState a -> MyState a
+applyAction :: Action a -> State a -> State a
 applyAction (SetP p) state =
   set (resources . elements . elementPaperclips . count) p state
 applyAction (SetH h) state =
@@ -155,7 +155,8 @@ lineNeedMoreSeeds (Seconds s) = ErrorLogLine
 concatErrors :: (Show a) => Seconds a -> ErrorCount PaymentError -> ErrorLogLine
 concatErrors s errorCount = case errorCount of
   OneError e -> mkErrorLogLine s (paymentErrorToText e)
-  TwoErrors e1 e2 -> mkErrorLogLine s (paymentErrorToText e1 <> " " <> paymentErrorToText e2)
+  TwoErrors e1 e2 ->
+    mkErrorLogLine s (paymentErrorToText e1 <> " " <> paymentErrorToText e2)
 
 initializeASeed
   :: (Eq a, Num a) => DurationTreeSeeds a -> TreeSeeds a -> TreeSeeds a
@@ -173,7 +174,7 @@ decPaperclipsWith' (AdvancedHelperPrice hp) p = liftA2 (-) p hp
 
 ---
 
-config :: Lens' (MyState a) (Config a)
+config :: Lens' (State a) (Config a)
 config f state =
   (\config' -> state { _config = config' }) <$> f (_config state)
 
@@ -181,27 +182,27 @@ helperInc :: Lens' (Constants a) (HelperInc (Helpers a))
 helperInc f state =
   (\inc' -> state { _helperInc = inc' }) <$> f (_helperInc state)
 
-actions :: Lens' (MyState a) [Action a]
+actions :: Lens' (State a) [Action a]
 actions f state =
   (\actions' -> state { _actions = actions' }) <$> f (_actions state)
 
-errorLog :: Lens' (MyState a) [ErrorLogLine]
+errorLog :: Lens' (State a) [ErrorLogLine]
 errorLog f state =
   (\errorLog' -> state { _errorLog = errorLog' }) <$> f (_errorLog state)
 
-resources :: Lens' (MyState a) (Resources a)
+resources :: Lens' (State a) (Resources a)
 resources f state =
   (\resources' -> state { _resources = resources' }) <$> f (_resources state)
 
-researchAreas :: Lens' (MyState a) (ResearchAreas a)
+researchAreas :: Lens' (State a) (ResearchAreas a)
 researchAreas f state =
   (\areas' -> state { _researchAreas = areas' }) <$> f (_researchAreas state)
 
-seconds :: Lens' (MyState a) (Seconds a)
+seconds :: Lens' (State a) (Seconds a)
 seconds f state =
   (\seconds' -> state { _seconds = seconds' }) <$> f (_seconds state)
 
-isStarted :: Lens' (MyState a) IsStarted
+isStarted :: Lens' (State a) IsStarted
 isStarted f state =
   (\isStarted' -> state { _isStarted = isStarted' }) <$> f (_isStarted state)
 
@@ -215,9 +216,8 @@ advancedHelperResearch f state = (\a -> state { _advancedHelperResearch = a })
   <$> f (_advancedHelperResearch state)
 
 researchCompDuration :: Lens' (ResearchComp a) (DurationAdvancedHelper a)
-researchCompDuration f state =
-  (\dur -> state { _researchCompDuration = dur })
-    <$> f (_researchCompDuration state)
+researchCompDuration f state = (\dur -> state { _researchCompDuration = dur })
+  <$> f (_researchCompDuration state)
 
 
 

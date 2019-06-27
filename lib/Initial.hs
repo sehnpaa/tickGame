@@ -2,8 +2,8 @@ module Initial where
 
 import           Config
 import           Elements
-import           Mod
 import           Resources
+import           State
 
 prices :: Prices Integer
 prices = Prices (AdvancedHelperPrice $ Paperclips 5)
@@ -106,8 +106,8 @@ noCost = Cost (Paperclips 0)
               (Water 0)
               (Wood 0)
 
-getInitialState :: MyState Integer
-getInitialState = MyState Initial.config
+getInitialState :: State Integer
+getInitialState = State Initial.config
                           []
                           []
                           Initial.researchAreas

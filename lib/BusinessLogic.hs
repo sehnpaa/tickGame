@@ -4,8 +4,8 @@ module BusinessLogic where
 
 import           Config
 import           Elements
-import           Mod
 import           Resources
+import           State
 import           Utils
 
 helperWork
@@ -43,10 +43,11 @@ seedWork s w price ps ts =
       progs' = filter (not . isGrowingDone) $ progressGrowing ps
   in  if any isGrowing ps
         then case calcRemainingWater price ps w of
-          Nothing -> Left
-            ( mkErrorLogLine s "Not enough water for the seeds."
-            , removeGrowingSeeds ps
-            )
+          Nothing ->
+            Left
+              ( mkErrorLogLine s "Not enough water for the seeds."
+              , removeGrowingSeeds ps
+              )
           Just w' -> Right $ (w', progs', ts + ts')
         else Right $ (w, ps, ts)
 
