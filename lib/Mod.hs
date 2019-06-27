@@ -148,20 +148,14 @@ initializeASeed
 initializeASeed duration =
   TreeSeeds
     . changeFirst (== NotGrowing) (const $ f $ view durationTreeSeeds duration)
-    . unTreeSeeds
+    . view treeSeeds
  where
   f Instant   = GrowingDone
   f (Ticks n) = Growing n
 
-decPaperclipsWith :: Num a => Cost a -> Paperclips a -> Paperclips a
-decPaperclipsWith c p = under2 isoPaperclips (-) p $ view paperclipCost c
-
 decPaperclipsWith'
   :: Num a => AdvancedHelperPrice (Paperclips a) -> Paperclips a -> Paperclips a
-decPaperclipsWith' hp p = withIso
-  isoAdvancedHelperPrice
-  (\_ eli price -> Iso.under2 isoPaperclips (-) p (eli price))
-  hp
+decPaperclipsWith' (AdvancedHelperPrice hp) p = liftA2 (-) p hp
 
 ---
 

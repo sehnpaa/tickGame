@@ -61,7 +61,7 @@ additionalTrees = Trees . fromIntegral . length . filter
 
 countNotGrowingSeeds :: Num a => TreeSeeds a -> a
 countNotGrowingSeeds =
-  fromIntegral . length . filter isNotGrowing . unTreeSeeds
+  fromIntegral . length . filter isNotGrowing . view treeSeeds
 
 isNotGrowing :: Prog a -> Bool
 isNotGrowing a = case a of
@@ -76,13 +76,6 @@ progressGrowing = map
     Growing n   -> Growing (n - 1)
     GrowingDone -> GrowingDone
   )
-
-needMorePaperclips :: Ord a => Cost a -> Paperclips a -> Bool
-needMorePaperclips c p = (view paperclipCost c) > p
-
-needMorePaperclips' :: Ord a => BuyTreeSeeds (Cost a) -> Paperclips a -> Bool
-needMorePaperclips' c p =
-  unPaperclips (view paperclipCost $ unBuyTreeSeeds c) > unPaperclips p
 
 ---
 
@@ -102,21 +95,9 @@ isoHelpers
   :: (Profunctor p, Functor f) => p (Helpers a) (f (Helpers a)) -> p a (f a)
 isoHelpers = iso Helpers unHelpers
 
-isoPaperclips
-  :: (Profunctor p, Functor f)
-  => p (Paperclips a) (f (Paperclips a))
-  -> p a (f a)
-isoPaperclips = iso Paperclips unPaperclips
-
 isoStorage
   :: (Profunctor p, Functor f) => p (Storage a) (f (Storage a)) -> p a (f a)
 isoStorage = iso Storage unStorage
-
-isoTreeSeeds
-  :: (Profunctor p, Functor f)
-  => p (TreeSeeds a) (f (TreeSeeds a))
-  -> p [Prog a] (f [Prog a])
-isoTreeSeeds = iso TreeSeeds unTreeSeeds
 
 isoWater :: (Profunctor p, Functor f) => p (Water a) (f (Water a)) -> p a (f a)
 isoWater = iso Water unWater

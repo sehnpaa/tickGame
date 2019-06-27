@@ -6,6 +6,7 @@
 module Elements where
 
 import           Control.Lens
+import           Control.Applicative            ( liftA2 )
 
 data Duration a = Instant | Ticks a
 
@@ -47,7 +48,8 @@ newtype WaterManually cost = WaterManually { unWaterManually :: cost }
 newtype AcquireWood cost = AcquireWood { unAcquireWood :: WoodManually cost }
 newtype WoodManually cost = WoodManually { unWoodManually :: cost }
 
-newtype Paperclips a = Paperclips { unPaperclips :: a } deriving (Enum, Eq, Functor, Ord)
+data Paperclips a = Paperclips { _paperclips :: a } deriving (Eq, Functor, Ord)
+makeLenses ''Paperclips
 
 instance Applicative Paperclips where
   pure = Paperclips
@@ -70,11 +72,6 @@ newtype Trees a = Trees { unTrees :: a } deriving (Enum, Eq, Num, Ord)
 instance Show (Trees Integer) where
   show (Trees a) = show a
 
-newtype TreeSeeds a = TreeSeeds { unTreeSeeds :: [Prog a]} deriving (Eq)
-
-instance Show (TreeSeeds Integer) where
-  show (TreeSeeds a) = show a
-
 data Prog a = NotGrowing | Growing a | GrowingDone deriving (Eq)
 
 instance Show (Prog Integer) where
@@ -86,7 +83,13 @@ instance Show (Prog Integer) where
     noun _ = "ticks"
   show GrowingDone = show "Growing done"
 
-newtype Water a = Water { unWater :: a } deriving (Eq, Functor, Ord)
+newtype TreeSeeds a = TreeSeeds { _treeSeeds :: [Prog a]} deriving (Eq)
+makeLenses ''TreeSeeds
+
+instance Show (TreeSeeds Integer) where
+  show (TreeSeeds a) = show a
+
+newtype Water a = Water { unWater :: a } deriving (Eq, Ord)
 
 instance Show (Water Integer) where
   show (Water a) = show a
@@ -112,10 +115,10 @@ data Element acquire duration f a = Element
 makeLenses ''Element
 
 data Elements a = Elements
-  { _paperclips :: Element AcquirePaperclips DurationPaperclips Paperclips a
+  { _elementsPaperclips :: Element AcquirePaperclips DurationPaperclips Paperclips a
   , _helpers :: Element AcquireHelpers DurationHelpers Helpers a
   , _trees :: Element AcquireTrees DurationTrees Trees a
-  , _treeSeeds :: Element AcquireTreeSeeds DurationTreeSeeds TreeSeeds a
+  , _elementsTreeSeeds :: Element AcquireTreeSeeds DurationTreeSeeds TreeSeeds a
   , _water :: Element AcquireWater DurationWater Water a
   , _wood :: Element AcquireWood DurationWood Wood a }
 makeLenses ''Elements
@@ -132,8 +135,8 @@ elementPaperclips
        (Elements a)
        (Element AcquirePaperclips DurationPaperclips Paperclips a)
 elementPaperclips f state =
-  (\paperclips' -> state { _paperclips = paperclips' })
-    <$> f (_paperclips state)
+  (\paperclips' -> state { _elementsPaperclips = paperclips' })
+    <$> f (_elementsPaperclips state)
 
 elementHelpers
   :: Lens' (Elements a) (Element AcquireHelpers DurationHelpers Helpers a)
@@ -151,10 +154,49 @@ elementTrees f state =
 elementTreeSeeds
   :: Lens' (Elements a) (Element AcquireTreeSeeds DurationTreeSeeds TreeSeeds a)
 elementTreeSeeds f state =
-  (\treeSeeds' -> state { _treeSeeds = treeSeeds' }) <$> f (_treeSeeds state)
+  (\treeSeeds' -> state { _elementsTreeSeeds = treeSeeds' })
+    <$> f (_elementsTreeSeeds state)
 
 progs :: Lens' (TreeSeeds a) [Prog a]
-progs f state = TreeSeeds <$> f (unTreeSeeds state)
+progs f state = TreeSeeds <$> f (view treeSeeds state)
 
 elementWood :: Lens' (Elements a) (Element AcquireWood DurationWood Wood a)
 elementWood f state = (\wood' -> state { _wood = wood' }) <$> f (_wood state)
+
+data PaymentError = PaymentError
+
+payWith
+  :: (Ord (f c), Num c, Applicative f)
+  => Getting (f c) s (f c)
+  -> f c
+  -> s
+  -> Either PaymentError (f c)
+payWith f p c =
+  let c' = view f c
+  in  if c' <= p then Right $ liftA2 (-) p c' else Left PaymentError
+
+payWithPaperclips
+  :: (Num a, Ord a)
+  => Paperclips a
+  -> Cost a
+  -> Either PaymentError (Paperclips a)
+payWithPaperclips = payWith paperclipCost
+
+-- toWallet paperclipCost
+-- toWallet :: Monoid m => ASetter (Cost m) t a b -> b -> t
+-- toWallet f p = set f p noCostG
+
+-- noCostG :: (Monoid a) => Cost a
+-- noCostG = Cost (Paperclips mempty)
+--                (Helpers mempty)
+--                (Trees mempty)
+--                (TreeSeeds mempty)
+--                (Water mempty)
+--                (Wood mempty)
+
+-- pPaperclips
+--   :: (Num a, Ord a) => (Cost a) -> Paperclips a -> Either PaymentError (Paperclips a)
+-- pPaperclips need owning =
+--   let n = view (paperclipCost . paperclips) need
+--       o = view paperclips owning
+--   in  if o >= n then Right $ Paperclips $ o - n else Left PaymentError

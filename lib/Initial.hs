@@ -93,7 +93,7 @@ woodCost = noCost
 
 noCost :: Cost Integer
 noCost =
-    Cost (Paperclips 0) (Helpers 0) (Trees 0) (TreeSeeds []) (Water 0) (Wood 0)
+  Cost (Paperclips 0) (Helpers 0) (Trees 0) (TreeSeeds []) (Water 0) (Wood 0)
 
 getInitialState :: MyState Integer
 getInitialState = MyState Initial.config

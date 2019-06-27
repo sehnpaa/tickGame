@@ -2,8 +2,6 @@
 
 module BusinessLogic where
 
-import           Control.Lens
-
 import           Config
 import           Elements
 import           Mod
@@ -59,25 +57,26 @@ buyHelper
   -> Paperclips a
   -> Helpers a
   -> Either ErrorLogLine (Helpers a, Paperclips a)
-buyHelper s cost p h = if needMorePaperclips (unHelpersManually cost) p
-  then Left (lineNeedMorePaperclips s)
-  else Right (succ h, decPaperclipsWith (unHelpersManually cost) p)
+buyHelper s (HelpersManually c) p h = case payWithPaperclips p c of
+  Left  _    -> Left $ lineNeedMorePaperclips s
+  Right newP -> Right (succ h, newP)
 
 pumpWater :: (Enum a, Num a, Ord a) => Water a -> WaterTank a -> Water a
 pumpWater w tank = Water $ min (unWaterTank tank) (succ $ unWater w)
 
 researchAdvancedHelper
-  :: (Num a, Ord a, Show a) => Seconds a
+  :: (Num a, Ord a, Show a)
+  => Seconds a
   -> Paperclips a
   -> AdvancedHelperPrice (Paperclips a)
   -> ResearchProgress a
   -> DurationAdvancedHelper a
   -> Either ErrorLogLine (Paperclips a, ResearchProgress a)
-researchAdvancedHelper s p price progress duration =
+researchAdvancedHelper s p price progress dur =
   case (unAdvancedHelperPrice price > p, progress) of
     (True, NotResearched) -> Left $ mkErrorLogLine s "Not enough paperclips."
     (False, NotResearched) ->
-      Right (decPaperclipsWith' price p, startResearch duration)
+      Right (decPaperclipsWith' price p, startResearch dur)
     (_, ResearchInProgress _) -> Left $ mkErrorLogLine s "Already in progress."
     (_, ResearchDone        ) -> Left $ mkErrorLogLine s "Already done."
 
@@ -87,10 +86,9 @@ plantASeed
   -> DurationTreeSeeds a
   -> TreeSeeds a
   -> Either ErrorLogLine (TreeSeeds a)
-plantASeed s dur seeds =
-  if countNotGrowingSeeds seeds > 0
-    then Right $ initializeASeed dur seeds
-    else Left $ lineNeedMoreSeeds s
+plantASeed s dur seeds = if countNotGrowingSeeds seeds > 0
+  then Right $ initializeASeed dur seeds
+  else Left $ lineNeedMoreSeeds s
 
 buyASeed
   :: (Num a, Ord a, Show a)
@@ -99,15 +97,10 @@ buyASeed
   -> Paperclips a
   -> TreeSeeds a
   -> Either ErrorLogLine (TreeSeeds a, Paperclips a)
-buyASeed s cost p (TreeSeeds seeds) = if needMorePaperclips' cost p
-  then Left $ mkErrorLogLine s "Not enough paperclips."
-  else
-    Right
-      $ ( TreeSeeds $ seeds ++ [NotGrowing]
-        , Paperclips
-        $ (unPaperclips p)
-        - (unPaperclips $ view paperclipCost $ unBuyTreeSeeds cost)
-        )
+buyASeed s (BuyTreeSeeds c) p (TreeSeeds seeds) =
+  case payWithPaperclips p c of
+    Left  _  -> Left $ mkErrorLogLine s "Not enough paperclips."
+    Right p' -> Right $ (TreeSeeds $ seeds ++ [NotGrowing], p')
 
 createPaperclip
   :: (Enum a, Ord a) => Paperclips a -> Storage (Paperclips a) -> Paperclips a
