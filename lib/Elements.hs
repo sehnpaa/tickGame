@@ -7,6 +7,7 @@ module Elements where
 
 import           Control.Lens
 import           Control.Applicative            ( liftA2 )
+import qualified Data.Text                     as T
 
 data Duration a = Instant | Ticks a
 
@@ -190,6 +191,14 @@ elementWood f state = (\wood' -> state { _wood = wood' }) <$> f (_wood state)
 
 data PaymentError = PaymentError | NotEnoughEnergy | NotEnoughPaperclips
 
+paymentErrorToText :: PaymentError -> T.Text
+paymentErrorToText e = case e of
+  PaymentError        -> T.pack "Paymenterror"
+  NotEnoughEnergy     -> T.pack "Not enough energy."
+  NotEnoughPaperclips -> T.pack "Not enough paperclips."
+
+data ErrorCount a = OneError a | TwoErrors a a
+
 payWith
   :: (Ord (f c), Num c, Applicative f)
   => Getting (f c) s (f c)
@@ -231,14 +240,24 @@ payWithEnergy = payWith energyCost
 --   in  if o >= n then Right $ Paperclips $ o - n else Left PaymentError
 
 calcEnergyPaperclipsCombo
-      :: (Num a, Ord a) => CostSpecific a
-         -> Energy a -> Paperclips a -> Either [PaymentError] (Energy a, Paperclips a)
-calcEnergyPaperclipsCombo (CostEnergyPaperclips ce cp) e p = case concat [enoughEnergy ce e, enoughPaperclips cp p] of
-  [] -> Right (liftA2 (-) e ce, liftA2 (-) p cp)
-  errors -> Left errors
+  :: (Num a, Ord a)
+  => CostSpecific a
+  -> Energy a
+  -> Paperclips a
+  -> Either (ErrorCount PaymentError) (Energy a, Paperclips a)
+calcEnergyPaperclipsCombo (CostEnergyPaperclips ce cp) e p =
+  case (enoughEnergy ce e, enoughPaperclips cp p) of
+    (Just e1, Just e2) -> Left $ TwoErrors e1 e2
+    (Just e1, Nothing) -> Left $ OneError e1
+    (Nothing, Just e2) -> Left $ OneError e2
+    (Nothing, Nothing) -> Right (liftA2 (-) e ce, liftA2 (-) p cp)
 
-enoughEnergy :: (Ord a) => Energy a -> Energy a -> [PaymentError]
-enoughEnergy (Energy ce) (Energy e) = if ce <= e then [] else [NotEnoughEnergy]
+enoughEnergy :: (Ord a) => Energy a -> Energy a -> Maybe PaymentError
+enoughEnergy (Energy ce) (Energy e) =
+  if ce <= e then Nothing else Just NotEnoughEnergy
 
-enoughPaperclips :: (Ord a) => Paperclips a -> Paperclips a -> [PaymentError]
-enoughPaperclips (Paperclips cp) (Paperclips p) = if cp <= p then [] else [NotEnoughPaperclips]
+enoughPaperclips
+  :: (Ord a) => Paperclips a -> Paperclips a -> Maybe PaymentError
+enoughPaperclips (Paperclips cp) (Paperclips p) =
+  if cp <= p then Nothing else Just NotEnoughPaperclips
+

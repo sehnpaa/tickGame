@@ -132,13 +132,13 @@ calcRemainingWater
   -> [Prog a]
   -> Water a
   -> Maybe (Water a)
-calcRemainingWater price progs water =
-  let cost = calcWaterCost
-        progs
+calcRemainingWater price ps w =
+  let calculatedCost = calcWaterCost
+        ps
         (unWater $ view waterCost $ unTreeSeedCostPerTick price)
-  in  case cost > water of
+  in  case calculatedCost > w of
         True  -> Nothing
-        False -> Just $ Iso.under2 isoWater (-) water cost
+        False -> Just $ Iso.under2 isoWater (-) w calculatedCost
 
 lineNeedMorePaperclips :: (Show a) => Seconds a -> ErrorLogLine
 lineNeedMorePaperclips (Seconds s) = ErrorLogLine
@@ -152,11 +152,16 @@ lineNeedMoreSeeds :: (Show a) => Seconds a -> ErrorLogLine
 lineNeedMoreSeeds (Seconds s) = ErrorLogLine
   $ Data.Text.concat ["Tick ", pack (show s), ": You need more seeds."]
 
+concatErrors :: (Show a) => Seconds a -> ErrorCount PaymentError -> ErrorLogLine
+concatErrors s errorCount = case errorCount of
+  OneError e -> mkErrorLogLine s (paymentErrorToText e)
+  TwoErrors e1 e2 -> mkErrorLogLine s (paymentErrorToText e1 <> " " <> paymentErrorToText e2)
+
 initializeASeed
   :: (Eq a, Num a) => DurationTreeSeeds a -> TreeSeeds a -> TreeSeeds a
-initializeASeed duration =
+initializeASeed dur =
   TreeSeeds
-    . changeFirst (== NotGrowing) (const $ f $ view durationTreeSeeds duration)
+    . changeFirst (== NotGrowing) (const $ f $ view durationTreeSeeds dur)
     . view treeSeeds
  where
   f Instant   = GrowingDone
@@ -211,7 +216,7 @@ advancedHelperResearch f state = (\a -> state { _advancedHelperResearch = a })
 
 researchCompDuration :: Lens' (ResearchComp a) (DurationAdvancedHelper a)
 researchCompDuration f state =
-  (\duration -> state { _researchCompDuration = duration })
+  (\dur -> state { _researchCompDuration = dur })
     <$> f (_researchCompDuration state)
 
 

@@ -37,8 +37,8 @@ limitByStorage :: Ord a => Storage a -> a -> a
 limitByStorage s = min (Iso.unwrap isoStorage s)
 
 calcWaterCost :: Num a => [Prog a] -> a -> Water a
-calcWaterCost progs waterPerSeed =
-  let numberOfGrowingSeeds = fromIntegral . length . filter isGrowing $ progs
+calcWaterCost ps waterPerSeed =
+  let numberOfGrowingSeeds = fromIntegral . length . filter isGrowing $ ps
   in  Water $ waterPerSeed * numberOfGrowingSeeds
 
 removeGrowingSeeds :: [Prog a] -> [Prog a]

@@ -38,17 +38,17 @@ seedWork
   -> Either
        (ErrorLogLine, [Prog a])
        (Water a, [Prog a], Trees a)
-seedWork s w price progs ts =
-  let ts'    = additionalTrees progs
-      progs' = filter (not . isGrowingDone) $ progressGrowing progs
-  in  if any isGrowing progs
-        then case calcRemainingWater price progs w of
+seedWork s w price ps ts =
+  let ts'    = additionalTrees ps
+      progs' = filter (not . isGrowingDone) $ progressGrowing ps
+  in  if any isGrowing ps
+        then case calcRemainingWater price ps w of
           Nothing -> Left
             ( mkErrorLogLine s "Not enough water for the seeds."
-            , removeGrowingSeeds progs
+            , removeGrowingSeeds ps
             )
           Just w' -> Right $ (w', progs', ts + ts')
-        else Right $ (w, progs, ts)
+        else Right $ (w, ps, ts)
 
 buyHelper
   :: (Enum a, Num a, Ord a, Show a)
@@ -59,7 +59,7 @@ buyHelper
   -> Helpers a
   -> Either ErrorLogLine (Helpers a, Energy a, Paperclips a)
 buyHelper s (HelpersManually c) p e h = case calcEnergyPaperclipsCombo c e p of
-  Left  _        -> Left $ mkErrorLogLine s "Missing resources."
+  Left  errors   -> Left $ concatErrors s errors
   Right (e', p') -> Right (succ h, e', p')
 
 pumpWater :: (Enum a, Num a, Ord a) => Water a -> WaterTank a -> Water a
