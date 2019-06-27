@@ -59,7 +59,7 @@ buyHelper :: (Enum a, Num a, Ord a, Show a) => MyState a -> MyState a
 buyHelper state =
   handleActions
     $ addActions state
-    $ withError SetE (\(h, p) -> SetH h : SetP p : [])
+    $ withError SetE (\(h, e, p) -> SetH h : SetEnergy e : SetP p : [])
     $ PBL.buyHelper state
 
 pumpWater :: (Enum a, Num a, Ord a) => MyState a -> MyState a

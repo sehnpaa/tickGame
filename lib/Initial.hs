@@ -33,9 +33,9 @@ elements = Elements
              (Energy 20)
              (DurationEnergy Instant)
     )
-    (Element (AcquireHelpers (HelpersManually helperCost))
-             (Helpers 0)
-             (DurationHelpers Instant)
+    (Element2 (AcquireHelpers (HelpersManually helperCost))
+              (Helpers 0)
+              (DurationHelpers Instant)
     )
     (Element
         (AcquireTrees
@@ -70,14 +70,8 @@ elements = Elements
 paperclipManuallyCost :: Cost Integer
 paperclipManuallyCost = noCost
 
-helperCost :: Cost Integer
-helperCost = Cost (Paperclips 10)
-                  (Energy 0)
-                  (Helpers 0)
-                  (Trees 0)
-                  (TreeSeeds [])
-                  (Water 0)
-                  (Wood 0)
+helperCost :: CostSpecific Integer
+helperCost = CostEnergyPaperclips (Energy 10) (Paperclips 10)
 
 treeCost :: Cost Integer
 treeCost = Cost (Paperclips 0)

@@ -10,7 +10,7 @@ import           Resources
 helperWork :: (Num a, Ord a) => MyState a -> Paperclips a
 helperWork = arg4 BL.helperWork
                   (resources . elements . elementPaperclips . count)
-                  (resources . elements . elementHelpers . count)
+                  (resources . elements . elementHelpers . count2)
                   (config . constants . helperInc)
                   (resources . storage)
 
@@ -38,13 +38,14 @@ seedWork = arg5
 buyHelper
       :: (Enum a, Num a, Ord a, Show a)
       => MyState a
-      -> Either ErrorLogLine (Helpers a, Paperclips a)
-buyHelper = arg4
+      -> Either ErrorLogLine (Helpers a, Energy a, Paperclips a)
+buyHelper = arg5
       BL.buyHelper
       seconds
-      (resources . elements . elementHelpers . cost . helpersManually)
+      (resources . elements . elementHelpers . cost2 . acquireHelpersManually)
       (resources . elements . elementPaperclips . count)
-      (resources . elements . elementHelpers . count)
+      (resources . elements . elementEnergy . count)
+      (resources . elements . elementHelpers . count2)
 
 pumpWater :: (Enum a, Num a, Ord a) => MyState a -> Water a
 pumpWater = arg2 BL.pumpWater

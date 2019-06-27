@@ -99,7 +99,7 @@ applyAction :: Action a -> MyState a -> MyState a
 applyAction (SetP p) state =
   set (resources . elements . elementPaperclips . count) p state
 applyAction (SetH h) state =
-  set (resources . elements . elementHelpers . count) h state
+  set (resources . elements . elementHelpers . count2) h state
 applyAction (SetE err) state = over errorLog (\errs -> err : errs) state
 applyAction (SetEnergy e) state =
   set (resources . elements . elementEnergy . count) e state

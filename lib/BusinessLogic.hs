@@ -53,13 +53,14 @@ seedWork s w price progs ts =
 buyHelper
   :: (Enum a, Num a, Ord a, Show a)
   => Seconds a
-  -> HelpersManually (Cost a)
+  -> HelpersManually (CostSpecific a)
   -> Paperclips a
+  -> Energy a
   -> Helpers a
-  -> Either ErrorLogLine (Helpers a, Paperclips a)
-buyHelper s (HelpersManually c) p h = case payWithPaperclips p c of
-  Left  _    -> Left $ lineNeedMorePaperclips s
-  Right newP -> Right (succ h, newP)
+  -> Either ErrorLogLine (Helpers a, Energy a, Paperclips a)
+buyHelper s (HelpersManually c) p e h = case calcEnergyPaperclipsCombo c e p of
+  Left  _        -> Left $ mkErrorLogLine s "Missing resources."
+  Right (e', p') -> Right (succ h, e', p')
 
 pumpWater :: (Enum a, Num a, Ord a) => Water a -> WaterTank a -> Water a
 pumpWater w tank = Water $ min (unWaterTank tank) (succ $ unWater w)
@@ -101,9 +102,14 @@ buyASeed s (BuyTreeSeeds c) p (TreeSeeds seeds) = case payWithPaperclips p c of
   Left  _  -> Left $ mkErrorLogLine s "Not enough paperclips."
   Right p' -> Right $ (TreeSeeds $ seeds ++ [NotGrowing], p')
 
-generateEnergy :: (Enum a, Num a, Ord a, Show a) => Seconds a -> EnergyManually (Cost a) -> Energy a -> Either ErrorLogLine (Energy a)
+generateEnergy
+  :: (Enum a, Num a, Ord a, Show a)
+  => Seconds a
+  -> EnergyManually (Cost a)
+  -> Energy a
+  -> Either ErrorLogLine (Energy a)
 generateEnergy s (EnergyManually c) e = case payWithEnergy e c of
-  Left _ -> Left $ mkErrorLogLine s "Can not generate energy."
+  Left  _  -> Left $ mkErrorLogLine s "Can not generate energy."
   Right e' -> Right $ fmap succ e'
 
 createPaperclip

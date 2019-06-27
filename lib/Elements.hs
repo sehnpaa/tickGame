@@ -33,10 +33,12 @@ data AcquireEnergy cost = AcquireEnergy
   { _acquireEnergyManually :: EnergyManually cost }
 makeLenses ''AcquireEnergy
 
-data AcquireHelpers cost = AcquireHelpers
-  { _helpersManually :: HelpersManually cost }
+newtype HelpersManually cost = HelpersManually { _helpersManually :: cost }
+makeLenses ''HelpersManually
 
-newtype HelpersManually cost = HelpersManually { unHelpersManually :: cost }
+data AcquireHelpers cost = AcquireHelpers
+  { _acquireHelpersManually :: HelpersManually cost }
+makeLenses ''AcquireHelpers
 
 newtype TreesFromTreeSeeds cost = TreesFromTreeSeeds { unTreesFromTreeSeeds :: cost }
 newtype TreeSeedCostPerTick cost = TreeSeedCostPerTick { unTreeSeedCostPerTick :: cost }
@@ -126,25 +128,29 @@ data Cost a = Cost
   , _woodCost :: Wood a }
 makeLenses ''Cost
 
+data CostSpecific a = CostEnergyPaperclips (Energy a) (Paperclips a)
+
 data Element acquire duration f a = Element
   { _cost :: acquire (Cost a)
   , _count :: f a
   , _duration :: duration a }
 makeLenses ''Element
 
+data Element2 acquire duration f a = Element2
+  { _cost2 :: acquire (CostSpecific a)
+  , _count2 :: f a
+  , _duration2 :: duration a }
+makeLenses ''Element2
+
 data Elements a = Elements
   { _elementsPaperclips :: Element AcquirePaperclips DurationPaperclips Paperclips a
   , _elementEnergy :: Element AcquireEnergy DurationEnergy Energy a
-  , _helpers :: Element AcquireHelpers DurationHelpers Helpers a
+  , _helpers :: Element2 AcquireHelpers DurationHelpers Helpers a
   , _trees :: Element AcquireTrees DurationTrees Trees a
   , _elementsTreeSeeds :: Element AcquireTreeSeeds DurationTreeSeeds TreeSeeds a
   , _water :: Element AcquireWater DurationWater Water a
   , _wood :: Element AcquireWood DurationWood Wood a }
 makeLenses ''Elements
-
-helpersManually :: Lens' (AcquireHelpers (Cost a)) (HelpersManually (Cost a))
-helpersManually f state =
-  (\a -> state { _helpersManually = a }) <$> f (_helpersManually state)
 
 buyTreeSeeds :: Lens' (AcquireTreeSeeds (Cost a)) (BuyTreeSeeds (Cost a))
 buyTreeSeeds f state = AcquireTreeSeeds <$> f (unAcquireTreeSeeds state)
@@ -158,7 +164,7 @@ elementPaperclips f state =
     <$> f (_elementsPaperclips state)
 
 elementHelpers
-  :: Lens' (Elements a) (Element AcquireHelpers DurationHelpers Helpers a)
+  :: Lens' (Elements a) (Element2 AcquireHelpers DurationHelpers Helpers a)
 elementHelpers f state =
   (\helpers' -> state { _helpers = helpers' }) <$> f (_helpers state)
 
@@ -182,7 +188,7 @@ progs f state = TreeSeeds <$> f (view treeSeeds state)
 elementWood :: Lens' (Elements a) (Element AcquireWood DurationWood Wood a)
 elementWood f state = (\wood' -> state { _wood = wood' }) <$> f (_wood state)
 
-data PaymentError = PaymentError
+data PaymentError = PaymentError | NotEnoughEnergy | NotEnoughPaperclips
 
 payWith
   :: (Ord (f c), Num c, Applicative f)
@@ -223,3 +229,16 @@ payWithEnergy = payWith energyCost
 --   let n = view (paperclipCost . paperclips) need
 --       o = view paperclips owning
 --   in  if o >= n then Right $ Paperclips $ o - n else Left PaymentError
+
+calcEnergyPaperclipsCombo
+      :: (Num a, Ord a) => CostSpecific a
+         -> Energy a -> Paperclips a -> Either [PaymentError] (Energy a, Paperclips a)
+calcEnergyPaperclipsCombo (CostEnergyPaperclips ce cp) e p = case concat [enoughEnergy ce e, enoughPaperclips cp p] of
+  [] -> Right (liftA2 (-) e ce, liftA2 (-) p cp)
+  errors -> Left errors
+
+enoughEnergy :: (Ord a) => Energy a -> Energy a -> [PaymentError]
+enoughEnergy (Energy ce) (Energy e) = if ce <= e then [] else [NotEnoughEnergy]
+
+enoughPaperclips :: (Ord a) => Paperclips a -> Paperclips a -> [PaymentError]
+enoughPaperclips (Paperclips cp) (Paperclips p) = if cp <= p then [] else [NotEnoughPaperclips]
