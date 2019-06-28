@@ -35,7 +35,7 @@ import           Lib                            ( buyASeed
                                                 , plantASeed
                                                 , IsStarted(..)
                                                 , MyEvent(..)
-                                                , MyState(..)
+                                                , State(..)
                                                 , getInitialState
                                                 )
 import           View
@@ -43,7 +43,7 @@ import           View
 main :: IO ()
 main = void $ run app
 
-view' :: MyState Integer -> AppView Window MyEvent
+view' :: State Integer -> AppView Window MyEvent
 view' state =
   bin
       Window
@@ -94,7 +94,7 @@ buttons = container
 margin :: BoxChild MyEvent
 margin = container Box [#widthRequest := 10] []
 
-stats :: MyState Integer -> BoxChild MyEvent
+stats :: State Integer -> BoxChild MyEvent
 stats state = container
   Box
   [#orientation := OrientationVertical]
@@ -122,7 +122,7 @@ statProperty labelText n = container
 ticker :: IO (Maybe MyEvent)
 ticker = fmap (const (Just Tick)) (threadDelay 1000000)
 
-update' :: MyState Integer -> MyEvent -> Transition (MyState Integer) MyEvent
+update' :: State Integer -> MyEvent -> Transition (State Integer) MyEvent
 update' state event = case (unIsStarted (viewIsStarted state), event) of
   (False, Start          ) -> Transition (setStarted state) ticker
   (_    , ExitApplication) -> Exit
@@ -138,7 +138,7 @@ update' state event = case (unIsStarted (viewIsStarted state), event) of
   (True , Tick ) -> Transition (nextTick state) ticker
   (False, _    ) -> Transition state (pure Nothing)
 
-app :: App Window (MyState Integer) MyEvent
+app :: App Window (State Integer) MyEvent
 app = App { view         = view'
           , update       = update'
           , inputs       = []

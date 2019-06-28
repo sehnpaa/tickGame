@@ -16,8 +16,8 @@ defaultConfig :: Config Integer
 defaultConfig = Config (Constants (HelperInc (Helpers 1)))
                        (Prices (AdvancedHelperPrice $ Paperclips 5))
 
-state1 :: MyState Integer
-state1 = MyState
+state1 :: State Integer
+state1 = State
   defaultConfig
   []
   []
