@@ -99,7 +99,7 @@ applyAction :: Action a -> State a -> State a
 applyAction (SetP p) state =
   set (resources . elements . elementPaperclips . count) p state
 applyAction (SetH h) state =
-  set (resources . elements . elementHelpers . count2) h state
+  set (resources . elements . elementHelpers . count) h state
 applyAction (SetE err) state = over errorLog (\errs -> err : errs) state
 applyAction (SetEnergy e) state =
   set (resources . elements . elementEnergy . count) e state
@@ -128,14 +128,14 @@ productOfHelperWork inc h = liftA2 (*) h $ Iso.unwrap isoHelperInc inc
 
 calcRemainingWater
   :: (Num a, Ord a)
-  => TreeSeedCostPerTick (Cost a)
+  => TreeSeedCostPerTick a
   -> [Prog a]
   -> Water a
   -> Maybe (Water a)
 calcRemainingWater price ps w =
   let calculatedCost = calcWaterCost
         ps
-        (unWater $ view waterCost $ unTreeSeedCostPerTick price)
+        (unWater $ view costWater $ unTreeSeedCostPerTick price)
   in  case calculatedCost > w of
         True  -> Nothing
         False -> Just $ Iso.under2 isoWater (-) w calculatedCost

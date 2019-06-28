@@ -10,7 +10,7 @@ import           State
 helperWork :: (Num a, Ord a) => State a -> Paperclips a
 helperWork = arg4 BL.helperWork
                   (resources . elements . elementPaperclips . count)
-                  (resources . elements . elementHelpers . count2)
+                  (resources . elements . elementHelpers . count)
                   (config . constants . helperInc)
                   (resources . storage)
 
@@ -31,7 +31,7 @@ seedWork = arg5
       BL.seedWork
       seconds
       (resources . elements . elementWater . count)
-      (resources . elements . elementTrees . cost . treeSeedCostPerTick)
+      (resources . elements . elementTrees . cost . acquireTreeSeedCostPerTick)
       (resources . elements . elementTreeSeeds . count . progs)
       (resources . elements . elementTrees . count)
 
@@ -42,10 +42,10 @@ buyHelper
 buyHelper = arg5
       BL.buyHelper
       seconds
-      (resources . elements . elementHelpers . cost2 . acquireHelpersManually)
+      (resources . elements . elementHelpers . cost . acquireHelpersManually)
       (resources . elements . elementPaperclips . count)
       (resources . elements . elementEnergy . count)
-      (resources . elements . elementHelpers . count2)
+      (resources . elements . elementHelpers . count)
 
 pumpWater :: (Enum a, Num a, Ord a) => State a -> Water a
 pumpWater = arg2 BL.pumpWater
@@ -80,17 +80,16 @@ buyASeed
 buyASeed = arg4
       BL.buyASeed
       seconds
-      (resources . elements . elementTreeSeeds . cost . buyTreeSeeds)
+      (resources . elements . elementTreeSeeds . cost . acquireBuyTreeSeeds)
       (resources . elements . elementPaperclips . count)
       (resources . elements . elementTreeSeeds . count)
 
 generateEnergy
       :: (Enum a, Num a, Ord a, Show a)
       => State a
-      -> Either ErrorLogLine (Energy a)
-generateEnergy = arg3
+      -> Energy a
+generateEnergy = arg2
       BL.generateEnergy
-      seconds
       (resources . elements . elementEnergy . cost . acquireEnergyManually)
       (resources . elements . elementEnergy . count)
 

@@ -32,48 +32,43 @@ resources = Resources Main.elements (Storage (Paperclips 1000)) (WaterTank 100)
 elements :: Elements Integer
 elements = Elements
   (Element
-    (AcquirePaperclips (PaperclipsManually noCost) (PaperclipsFromHelper noCost)
+    (AcquirePaperclips (PaperclipsManually NoCost) (PaperclipsFromHelper NoCost)
     )
     (Paperclips 0)
     (DurationPaperclips Instant)
   )
-  (Element (AcquireEnergy (EnergyManually noCost))
+  (Element (AcquireEnergy (EnergyManually NoCost))
            (Energy 20)
            (DurationEnergy Instant)
   )
-  (Element2 (AcquireHelpers (HelpersManually helperCost))
+  (Element (AcquireHelpers (HelpersManually helperCost))
             (Helpers 0)
             (DurationHelpers Instant)
   )
   (Element
     (AcquireTrees
-      (TreesFromTreeSeeds noCost)
+      (TreesFromTreeSeeds (CostTreeSeeds (TreeSeeds [GrowingDone])))
       (TreeSeedCostPerTick
-        (Cost (Paperclips 0)
-              (Energy 0)
-              (Helpers 0)
-              (Trees 0)
-              (TreeSeeds [])
+        (CostWater 
               (Water 2)
-              (Wood 0)
         )
       )
     )
     (Trees 0)
     (DurationTrees Instant)
   )
-  (Element (AcquireTreeSeeds (BuyTreeSeeds noCost))
+  (Element (AcquireTreeSeeds (BuyTreeSeeds (CostPaperclips (Paperclips 10))))
            (TreeSeeds (replicate 10 NotGrowing))
            (DurationTreeSeeds $ Ticks 20)
   )
 
-  (Element (AcquireWater (WaterManually noCost))
+  (Element (AcquireWater (WaterManually NoCost))
            (Water 100)
            (DurationWater Instant)
   )
-  (Element (AcquireWood (WoodManually noCost)) (Wood 0) (DurationWood Instant))
+  (Element (AcquireWood (WoodManually NoCost)) (Wood 0) (DurationWood Instant))
 
-helperCost :: CostSpecific Integer
+helperCost :: CostEnergyPaperclips Integer
 helperCost = CostEnergyPaperclips (Energy 10) (Paperclips 10)
 
 noCost :: Cost Integer

@@ -95,7 +95,7 @@ generateEnergy :: (Enum a, Num a, Ord a, Show a) => State a -> State a
 generateEnergy state =
   handleActions
     $ addActions state
-    $ withError SetE (\e -> SetEnergy e : [])
+    $ (\e -> SetEnergy e : [])
     $ PBL.generateEnergy state
 
 setStarted :: State a -> State a

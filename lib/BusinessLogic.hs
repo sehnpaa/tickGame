@@ -32,7 +32,7 @@ seedWork
   :: (Num a, Ord a, Show a)
   => Seconds a
   -> Water a
-  -> TreeSeedCostPerTick (Cost a)
+  -> TreeSeedCostPerTick a
   -> [Prog a]
   -> Trees a
   -> Either
@@ -54,7 +54,7 @@ seedWork s w price ps ts =
 buyHelper
   :: (Enum a, Num a, Ord a, Show a)
   => Seconds a
-  -> HelpersManually (CostSpecific a)
+  -> HelpersManually a
   -> Paperclips a
   -> Energy a
   -> Helpers a
@@ -95,7 +95,7 @@ plantASeed s dur seeds = if countNotGrowingSeeds seeds > 0
 buyASeed
   :: (Num a, Ord a, Show a)
   => Seconds a
-  -> BuyTreeSeeds (Cost a)
+  -> BuyTreeSeeds a
   -> Paperclips a
   -> TreeSeeds a
   -> Either ErrorLogLine (TreeSeeds a, Paperclips a)
@@ -105,13 +105,10 @@ buyASeed s (BuyTreeSeeds c) p (TreeSeeds seeds) = case payWithPaperclips p c of
 
 generateEnergy
   :: (Enum a, Num a, Ord a, Show a)
-  => Seconds a
-  -> EnergyManually (Cost a)
+  => EnergyManually a
   -> Energy a
-  -> Either ErrorLogLine (Energy a)
-generateEnergy s (EnergyManually c) e = case payWithEnergy e c of
-  Left  _  -> Left $ mkErrorLogLine s "Can not generate energy."
-  Right e' -> Right $ fmap succ e'
+  -> Energy a
+generateEnergy (EnergyManually c) = freeEnergy c
 
 createPaperclip
   :: (Enum a, Ord a) => Paperclips a -> Storage (Paperclips a) -> Paperclips a

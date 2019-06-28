@@ -23,79 +23,43 @@ elements :: Elements Integer
 elements = Elements
     (Element
         (AcquirePaperclips
-            (PaperclipsManually Initial.paperclipManuallyCost)
-            (PaperclipsFromHelper noCost)
+            (PaperclipsManually NoCost)
+            (PaperclipsFromHelper NoCost)
         )
         (Paperclips 0)
         (DurationPaperclips Instant)
     )
-    (Element (AcquireEnergy (EnergyManually noCost))
+    (Element (AcquireEnergy (EnergyManually NoCost))
              (Energy 20)
              (DurationEnergy Instant)
     )
-    (Element2 (AcquireHelpers (HelpersManually helperCost))
-              (Helpers 0)
-              (DurationHelpers Instant)
+    (Element
+        (AcquireHelpers
+            (HelpersManually (CostEnergyPaperclips (Energy 10) (Paperclips 10)))
+        )
+        (Helpers 0)
+        (DurationHelpers Instant)
     )
     (Element
         (AcquireTrees
-            (TreesFromTreeSeeds treeCost)
-            (TreeSeedCostPerTick
-                (Cost (Paperclips 0)
-                      (Energy 0)
-                      (Helpers 0)
-                      (Trees 0)
-                      (TreeSeeds [])
-                      (Water 2)
-                      (Wood 0)
-                )
-            )
+            (TreesFromTreeSeeds (CostTreeSeeds (TreeSeeds [GrowingDone])))
+            (TreeSeedCostPerTick (CostWater (Water 2)))
         )
         (Trees 0)
         (DurationTrees Instant)
     )
-    (Element (AcquireTreeSeeds (BuyTreeSeeds Initial.treeSeedCost))
+    (Element (AcquireTreeSeeds (BuyTreeSeeds (CostPaperclips (Paperclips 100))))
              (TreeSeeds (replicate 10 NotGrowing))
              (DurationTreeSeeds $ Ticks 20)
     )
-    (Element (AcquireWater (WaterManually Initial.waterCost))
+    (Element (AcquireWater (WaterManually NoCost))
              (Water 100)
              (DurationWater Instant)
     )
-    (Element (AcquireWood (WoodManually Initial.woodCost))
+    (Element (AcquireWood (WoodManually NoCost))
              (Wood 0)
              (DurationWood Instant)
     )
-
-paperclipManuallyCost :: Cost Integer
-paperclipManuallyCost = noCost
-
-helperCost :: CostSpecific Integer
-helperCost = CostEnergyPaperclips (Energy 10) (Paperclips 10)
-
-treeCost :: Cost Integer
-treeCost = Cost (Paperclips 0)
-                (Energy 0)
-                (Helpers 0)
-                (Trees 0)
-                (TreeSeeds [GrowingDone])
-                (Water 0)
-                (Wood 0)
-
-treeSeedCost :: Cost Integer
-treeSeedCost = Cost (Paperclips 100)
-                    (Energy 0)
-                    (Helpers 0)
-                    (Trees 0)
-                    (TreeSeeds [])
-                    (Water 0)
-                    (Wood 0)
-
-waterCost :: Cost Integer
-waterCost = noCost
-
-woodCost :: Cost Integer
-woodCost = noCost
 
 noCost :: Cost Integer
 noCost = Cost (Paperclips 0)
@@ -108,9 +72,9 @@ noCost = Cost (Paperclips 0)
 
 getInitialState :: State Integer
 getInitialState = State Initial.config
-                          []
-                          []
-                          Initial.researchAreas
-                          Initial.resources
-                          (Seconds 0)
-                          (IsStarted False)
+                        []
+                        []
+                        Initial.researchAreas
+                        Initial.resources
+                        (Seconds 0)
+                        (IsStarted False)

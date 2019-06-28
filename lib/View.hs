@@ -19,7 +19,7 @@ viewPaperclips :: State a -> Paperclips a
 viewPaperclips = view (resources . elements . elementPaperclips . count)
 
 viewHelpers :: State a -> Helpers a
-viewHelpers = view (resources . elements . elementHelpers . count2)
+viewHelpers = view (resources . elements . elementHelpers . count)
 
 viewStorage :: State a -> Storage (Paperclips a)
 viewStorage = view (resources . storage)
