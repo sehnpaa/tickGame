@@ -23,6 +23,7 @@ library tickGameLib
       NaturalTransformation
       PathedBusinessLogic
       Resources
+      Source
       State
       Utils
     build-depends:
@@ -31,6 +32,7 @@ library tickGameLib
       , gi-gtk-declarative
       , gi-gtk-declarative-app-simple
       , lens
+      , megaparsec
       , tasty
       , tasty-hunit
       , tasty-quickcheck
@@ -66,4 +68,5 @@ test-suite test-foo
       , tasty
       , tasty-hunit
       , tasty-quickcheck
+      , text
       , tickGameLib

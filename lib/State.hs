@@ -1,6 +1,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module State where
 
@@ -8,6 +9,7 @@ import           Control.Applicative            ( liftA2 )
 import           Control.Lens                   ( Lens'
                                                 , Profunctor
                                                 , iso
+                                                , makeLenses
                                                 , over
                                                 , set
                                                 , view
@@ -22,16 +24,8 @@ import           Elements
 import           Iso
 import           NaturalTransformation
 import           Resources
+import           Source
 import           Utils
-
-data State a = State
-  { _config :: Config a
-  , _actions :: [Action a]
-  , _errorLog :: [ErrorLogLine]
-  , _researchAreas :: ResearchAreas a
-  , _resources :: Resources a
-  , _seconds :: Seconds a
-  , _isStarted :: IsStarted }
 
 data Action a
   = SetP (Paperclips a)
@@ -82,6 +76,18 @@ newtype IsStarted = IsStarted { unIsStarted :: Bool }
 instance Show IsStarted where
   show (IsStarted a) = show a
 
+data State a = State
+  { _config :: Config a
+  , _actions :: [Action a]
+  , _errorLog :: [ErrorLogLine]
+  , _researchAreas :: ResearchAreas a
+  , _resources :: Resources a
+  , _seconds :: Seconds a
+  , _source :: Source a
+  , _isStarted :: IsStarted }
+makeLenses ''State
+
+
 data MyEvent
   = Start
   | CreatePaperclip
@@ -93,6 +99,7 @@ data MyEvent
   | ResearchAdvancedHelper
   | ExitApplication
   | Tick
+  | Compile Text
   deriving (Eq, Show)
 
 applyAction :: Action a -> State a -> State a
@@ -174,37 +181,9 @@ decPaperclipsWith' (AdvancedHelperPrice hp) p = liftA2 (-) p hp
 
 ---
 
-config :: Lens' (State a) (Config a)
-config f state =
-  (\config' -> state { _config = config' }) <$> f (_config state)
-
 helperInc :: Lens' (Constants a) (HelperInc (Helpers a))
 helperInc f state =
   (\inc' -> state { _helperInc = inc' }) <$> f (_helperInc state)
-
-actions :: Lens' (State a) [Action a]
-actions f state =
-  (\actions' -> state { _actions = actions' }) <$> f (_actions state)
-
-errorLog :: Lens' (State a) [ErrorLogLine]
-errorLog f state =
-  (\errorLog' -> state { _errorLog = errorLog' }) <$> f (_errorLog state)
-
-resources :: Lens' (State a) (Resources a)
-resources f state =
-  (\resources' -> state { _resources = resources' }) <$> f (_resources state)
-
-researchAreas :: Lens' (State a) (ResearchAreas a)
-researchAreas f state =
-  (\areas' -> state { _researchAreas = areas' }) <$> f (_researchAreas state)
-
-seconds :: Lens' (State a) (Seconds a)
-seconds f state =
-  (\seconds' -> state { _seconds = seconds' }) <$> f (_seconds state)
-
-isStarted :: Lens' (State a) IsStarted
-isStarted f state =
-  (\isStarted' -> state { _isStarted = isStarted' }) <$> f (_isStarted state)
 
 researchCompProgress :: Lens' (ResearchComp a) (ResearchProgress a)
 researchCompProgress f state =

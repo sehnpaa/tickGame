@@ -3,6 +3,7 @@ module Main where
 import           Data.List                      ( nub
                                                 , permutations
                                                 )
+import           Data.Text                      ( empty )
 import           Test.Tasty
 import           Test.Tasty.HUnit
 
@@ -24,6 +25,7 @@ state1 = State
   (ResearchAreas (ResearchComp (DurationAdvanced $ Ticks 20) NotResearched))
   Main.resources
   (Seconds 0)
+  (Source empty empty Nothing)
   (IsStarted True)
 
 resources :: Resources Integer
@@ -42,17 +44,13 @@ elements = Elements
            (DurationEnergy Instant)
   )
   (Element (AcquireHelpers (HelpersManually helperCost))
-            (Helpers 0)
-            (DurationHelpers Instant)
+           (Helpers 0)
+           (DurationHelpers Instant)
   )
   (Element
     (AcquireTrees
       (TreesFromTreeSeeds (CostTreeSeeds (TreeSeeds [GrowingDone])))
-      (TreeSeedCostPerTick
-        (CostWater 
-              (Water 2)
-        )
-      )
+      (TreeSeedCostPerTick (CostWater (Water 2)))
     )
     (Trees 0)
     (DurationTrees Instant)
@@ -91,5 +89,5 @@ unitTests = testGroup
   ]
 
 isCommutative :: Eq a => a -> [a -> a] -> Bool
-isCommutative empty =
-  (\x -> length x == 1) . nub . map (foldr id empty) . permutations
+isCommutative zero =
+  (\x -> length x == 1) . nub . map (foldr id zero) . permutations

@@ -14,17 +14,22 @@ import           Data.Text                      ( append
                                                 )
 import           GI.Gtk                         ( Box(..)
                                                 , Button(..)
+                                                , Entry(..)
                                                 , Label(..)
                                                 , ListBox(..)
                                                 , ListBoxRow(..)
                                                 , Orientation(..)
                                                 , Window(..)
                                                 )
+
+import           GI.Gtk.Objects.Entry           ( entryGetBuffer )
+import           GI.Gtk.Objects.EntryBuffer     ( entryBufferGetText )
 import           GI.Gtk.Declarative
 import           GI.Gtk.Declarative.App.Simple
 
 import           Lib                            ( buyASeed
                                                 , buyHelper
+                                                , compile
                                                 , createPaperclip
                                                 , generateEnergy
                                                 , nextTick
@@ -72,7 +77,13 @@ view' state =
         , container Box
                     [#orientation := OrientationVertical]
                     [widget Label [#label := "here"]]
+        , widget Entry
+                 [#text := viewSource state, onM #changed requestCompilation]
+        , widget Label [#label := viewSourceStatus state]
         ]
+
+requestCompilation :: Entry -> IO MyEvent
+requestCompilation c = fmap Compile (entryGetBuffer c >>= entryBufferGetText)
 
 buttons :: BoxChild MyEvent
 buttons = container
@@ -134,9 +145,10 @@ update' state event = case (unIsStarted (viewIsStarted state), event) of
   (True , PlantASeed     ) -> Transition (plantASeed state) (pure Nothing)
   (True, ResearchAdvancedHelper) ->
     Transition (researchAdvancedHelper state) (pure Nothing)
-  (True , Start) -> Transition state (pure Nothing)
-  (True , Tick ) -> Transition (nextTick state) ticker
-  (False, _    ) -> Transition state (pure Nothing)
+  (True , Start    ) -> Transition state (pure Nothing)
+  (True , Tick     ) -> Transition (nextTick state) ticker
+  (True , Compile t) -> Transition (compile t state) (pure Nothing)
+  (False, _        ) -> Transition state (pure Nothing)
 
 app :: App Window (State Integer) MyEvent
 app = App { view         = view'

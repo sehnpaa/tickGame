@@ -3,6 +3,7 @@ module Lib
   , module Config
   , module Elements
   , module Lib
+  , module Source
   , module State
   , module Resources
   )
@@ -12,17 +13,34 @@ import           Control.Lens                   ( over
                                                 , set
                                                 , view
                                                 )
+import           Data.Text                      ( Text
+                                                , pack
+                                                )
 
 import           Config
 import           Elements
 import qualified Initial                       as Initial
+import           Source
 import           State
 import           Resources
 import qualified PathedBusinessLogic           as PBL
 import           Utils
 
 nextTick :: (Enum a, Num a, Ord a, Show a) => State a -> State a
-nextTick = handleActions . addSecond . helperWork . seedWork . researchWork
+nextTick =
+  handleActions . helperWork . seedWork . researchWork . runCode . addSecond
+
+runCode :: (Eq a, Num a) => State a -> State a
+runCode state =
+  addActions state $ run (view seconds state) (view (source . sourceExpr) state)
+
+run :: (Eq a, Num a) => Seconds a -> Maybe (Expr a) -> [Action a]
+run _ Nothing     = []
+run s (Just expr) = exprToActions s expr
+
+exprToActions :: (Eq a, Num a) => Seconds a -> (Expr a) -> [Action a]
+exprToActions (Seconds s) (SyncPaperclipsWithSeconds s' p) =
+  if s == s' then [SetP p] else []
 
 handleActions :: State a -> State a
 handleActions state =
@@ -97,6 +115,11 @@ generateEnergy state =
     $ addActions state
     $ (\e -> SetEnergy e : [])
     $ PBL.generateEnergy state
+
+compile :: Text -> State Integer -> State Integer
+compile text = set source $ case ff text of
+  Nothing -> Source text (pack "Not ok.") Nothing
+  Just x  -> Source text (pack "OK!") (Just x)
 
 setStarted :: State a -> State a
 setStarted = over isStarted (const $ IsStarted True)

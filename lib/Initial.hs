@@ -1,8 +1,11 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Initial where
 
 import           Config
 import           Elements
 import           Resources
+import           Source
 import           State
 
 prices :: Prices Integer
@@ -22,9 +25,8 @@ resources =
 elements :: Elements Integer
 elements = Elements
     (Element
-        (AcquirePaperclips
-            (PaperclipsManually NoCost)
-            (PaperclipsFromHelper NoCost)
+        (AcquirePaperclips (PaperclipsManually NoCost)
+                           (PaperclipsFromHelper NoCost)
         )
         (Paperclips 0)
         (DurationPaperclips Instant)
@@ -48,17 +50,16 @@ elements = Elements
         (Trees 0)
         (DurationTrees Instant)
     )
-    (Element (AcquireTreeSeeds (BuyTreeSeeds (CostPaperclips (Paperclips 100))))
-             (TreeSeeds (replicate 10 NotGrowing))
-             (DurationTreeSeeds $ Ticks 20)
+    (Element
+        (AcquireTreeSeeds (BuyTreeSeeds (CostPaperclips (Paperclips 100))))
+        (TreeSeeds (replicate 10 NotGrowing))
+        (DurationTreeSeeds $ Ticks 20)
     )
     (Element (AcquireWater (WaterManually NoCost))
              (Water 100)
              (DurationWater Instant)
     )
-    (Element (AcquireWood (WoodManually NoCost))
-             (Wood 0)
-             (DurationWood Instant)
+    (Element (AcquireWood (WoodManually NoCost)) (Wood 0) (DurationWood Instant)
     )
 
 noCost :: Cost Integer
@@ -77,4 +78,5 @@ getInitialState = State Initial.config
                         Initial.researchAreas
                         Initial.resources
                         (Seconds 0)
+                        (Source "" "" Nothing)
                         (IsStarted False)
