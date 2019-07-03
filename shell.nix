@@ -7,9 +7,10 @@ let
 
   inherit (nixpkgs) pkgs;
 
-  f = { mkDerivation, base, gi-gtk, gi-gtk-declarative
-      , gi-gtk-declarative-app-simple, lens, megaparsec, stdenv, tasty
-      , tasty-hunit, tasty-quickcheck, text, tuple, vector
+  f = { mkDerivation, async, base, bytestring, gi-gdk, gi-gtk
+      , gi-gtk-declarative, gi-gtk-declarative-app-simple, lens
+      , megaparsec, stdenv, tasty, tasty-hunit, tasty-quickcheck, text
+      , tuple, vector
       }:
       mkDerivation {
         pname = "tickGame";
@@ -22,8 +23,9 @@ let
           megaparsec tasty tasty-hunit tasty-quickcheck text tuple
         ];
         executableHaskellDepends = [
-          base gi-gtk gi-gtk-declarative gi-gtk-declarative-app-simple tasty
-          tasty-hunit tasty-quickcheck text vector
+          async base bytestring gi-gdk gi-gtk gi-gtk-declarative
+          gi-gtk-declarative-app-simple tasty tasty-hunit tasty-quickcheck
+          text vector
         ];
         testHaskellDepends = [
           base lens tasty tasty-hunit tasty-quickcheck text

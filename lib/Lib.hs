@@ -41,6 +41,8 @@ run s (Just expr) = exprToActions s expr
 exprToActions :: (Eq a, Num a) => Seconds a -> (Expr a) -> [Action a]
 exprToActions (Seconds s) (SyncPaperclipsWithSeconds s' p) =
   if s == s' then [SetP p] else []
+exprToActions (Seconds s) (Special s' p) =
+  if s == s' then [SetP (fmap (*10) p)] else []
 
 handleActions :: State a -> State a
 handleActions state =

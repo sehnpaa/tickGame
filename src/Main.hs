@@ -5,13 +5,16 @@
 module Main where
 
 import           Control.Concurrent             ( threadDelay )
+import           Control.Concurrent.Async       ( async )
 import           Control.Monad                  ( void )
+import           Data.ByteString                ( ByteString )
 import           Data.Functor                   ( (<&>) )
 import           Data.Vector                    ( fromList )
 import           Data.Text                      ( append
                                                 , pack
                                                 , Text
                                                 )
+import qualified GI.Gdk                        as Gdk
 import           GI.Gtk                         ( Box(..)
                                                 , Button(..)
                                                 , Entry(..)
@@ -20,12 +23,22 @@ import           GI.Gtk                         ( Box(..)
                                                 , ListBoxRow(..)
                                                 , Orientation(..)
                                                 , Window(..)
+                                                , cssProviderLoadFromData
+                                                , cssProviderNew
+                                                , styleContextAddProviderForScreen
                                                 )
+import qualified GI.Gtk                        as Gtk
 
 import           GI.Gtk.Objects.Entry           ( entryGetBuffer )
 import           GI.Gtk.Objects.EntryBuffer     ( entryBufferGetText )
 import           GI.Gtk.Declarative
-import           GI.Gtk.Declarative.App.Simple
+import           GI.Gtk.Declarative.App.Simple  ( App(..)
+                                                , AppView
+                                                , Transition(..)
+                                                , runLoop
+                                                , update
+                                                , view
+                                                )
 
 import           Lib                            ( buyASeed
                                                 , buyHelper
@@ -46,7 +59,33 @@ import           Lib                            ( buyASeed
 import           View
 
 main :: IO ()
-main = void $ run app
+main = do
+  void $ Gtk.init Nothing
+
+  -- Set up screen and CSS provider
+  screen <- maybe (fail "No screen?!") return =<< Gdk.screenGetDefault
+  p      <- cssProviderNew
+  cssProviderLoadFromData p styles
+  styleContextAddProviderForScreen
+    screen
+    p
+    (fromIntegral Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
+  -- Start main loop
+  void . async $ do
+    void $ runLoop app
+    Gtk.mainQuit
+  Gtk.main
+
+styles :: ByteString
+styles = mconcat
+  [ "button { border: 2px solid gray; font-weight: 800; }"
+  , ".selected { background: white; border: 2px solid black; }"
+  , ".red { color: red; }"
+  , ".green { color: green; }"
+  , ".blue { color: blue; }"
+  , ".yellow { color: goldenrod; }"
+  ]
 
 view' :: State Integer -> AppView Window MyEvent
 view' state =
