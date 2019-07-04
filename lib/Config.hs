@@ -1,5 +1,6 @@
 {-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Config where
 
@@ -7,23 +8,24 @@ import           Control.Lens
 
 import           Elements
 
-data Config a = Config
-  { _constants :: Constants a
-  , _prices :: Prices a }
-
-data Constants a = Constants
-  { _helperInc :: HelperInc (Helpers a) }
-
-newtype HelperInc a = HelperInc { unHelperInc :: a} deriving (Functor)
-
-instance Applicative HelperInc where
-  pure = HelperInc
-  HelperInc f <*> HelperInc a = HelperInc (f a)
+newtype AdvancedHelperPrice a = AdvancedHelperPrice { unAdvancedHelperPrice :: a }
 
 data Prices a = Prices
   { _advancedHelperPrice :: AdvancedHelperPrice (Paperclips a) }
 
-newtype AdvancedHelperPrice a = AdvancedHelperPrice { unAdvancedHelperPrice :: a }
+data Config a = Config
+  { _constants :: Constants a
+  , _prices :: Prices a }
+
+newtype HelperInc a = HelperInc { unHelperInc :: a} deriving (Functor)
+
+data Constants a = Constants
+  { _helperInc :: HelperInc (Helpers a) }
+makeLenses ''Constants
+
+instance Applicative HelperInc where
+  pure = HelperInc
+  HelperInc f <*> HelperInc a = HelperInc (f a)
 
 newtype HelperPrice a = HelperPrice { unHelperPrice :: Paperclips a }
 

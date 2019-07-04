@@ -6,10 +6,7 @@
 module State where
 
 import           Control.Applicative            ( liftA2 )
-import           Control.Lens                   ( Lens'
-                                                , Profunctor
-                                                , iso
-                                                , makeLenses
+import           Control.Lens                   ( makeLenses
                                                 , over
                                                 , set
                                                 , view
@@ -58,14 +55,16 @@ instance Show (ResearchProgress Integer) where
     noun _ = "ticks"
   show ResearchDone = "Research done"
 
-data ResearchAreas a = ResearchAreas
-  { _advancedHelperResearch :: ResearchComp a}
+newtype DurationAdvancedHelper a = DurationAdvanced { unDurationAdvanced :: Duration a }
 
 data ResearchComp a = ResearchComp
   { _researchCompDuration :: DurationAdvancedHelper a
   , _researchCompProgress :: ResearchProgress a }
+makeLenses ''ResearchComp
 
-newtype DurationAdvancedHelper a = DurationAdvanced { unDurationAdvanced :: Duration a }
+data ResearchAreas a = ResearchAreas
+  { _advancedHelperResearch :: ResearchComp a}
+makeLenses ''ResearchAreas
 
 newtype Seconds a = Seconds { unSeconds :: a } deriving (Enum, Eq)
 
@@ -108,31 +107,40 @@ data ButtonData = ButtonData
   , _buttonEvent :: ButtonEvent }
 makeLenses ''ButtonData
 
-newtype EventStart = EventStart { _eventStartButtonData :: ButtonData }
+newtype EventStart =
+  EventStart { _eventStartButtonData :: ButtonData }
 makeLenses ''EventStart
 
-newtype EventCreatePaperclip = EventCreatePaperclip { _eventCreatePaperclipButtonData :: ButtonData }
+newtype EventCreatePaperclip =
+  EventCreatePaperclip { _eventCreatePaperclipButtonData :: ButtonData }
 makeLenses ''EventCreatePaperclip
 
-newtype EventCreateHelper = EventCreateHelper { _eventCreateHelperButtonData :: ButtonData }
+newtype EventCreateHelper =
+  EventCreateHelper { _eventCreateHelperButtonData :: ButtonData }
 makeLenses ''EventCreateHelper
 
-newtype EventPumpWater = EventPumpWater { _eventPumpWaterButtonData :: ButtonData }
+newtype EventPumpWater =
+  EventPumpWater { _eventPumpWaterButtonData :: ButtonData }
 makeLenses ''EventPumpWater
 
-newtype EventGenerateEnergy = EventGenerateEnergy { _eventGenerateEnergyButtonData :: ButtonData }
+newtype EventGenerateEnergy =
+  EventGenerateEnergy { _eventGenerateEnergyButtonData :: ButtonData }
 makeLenses ''EventGenerateEnergy
 
-newtype EventBuyASeed = EventBuyASeed { _eventBuyASeedButtonData :: ButtonData }
+newtype EventBuyASeed =
+  EventBuyASeed { _eventBuyASeedButtonData :: ButtonData }
 makeLenses ''EventBuyASeed
 
-newtype EventPlantASeed = EventPlantASeed { _eventPlantASeedButtonData :: ButtonData }
+newtype EventPlantASeed =
+  EventPlantASeed { _eventPlantASeedButtonData :: ButtonData }
 makeLenses ''EventPlantASeed
 
-newtype EventResearchAdvancedHelper = EventResearchAdvancedHelper { _eventResearchAdvancedHelperButtonData :: ButtonData }
+newtype EventResearchAdvancedHelper =
+  EventResearchAdvancedHelper { _eventResearchAdvancedHelperButtonData :: ButtonData }
 makeLenses ''EventResearchAdvancedHelper
 
-newtype EventExitApplication = EventExitApplication { _eventExitApplicationButtonData :: ButtonData }
+newtype EventExitApplication =
+  EventExitApplication { _eventExitApplicationButtonData :: ButtonData }
 makeLenses ''EventExitApplication
 
 data Events = Events
@@ -147,9 +155,15 @@ data Events = Events
   , _eventExitApplication :: EventExitApplication }
 makeLenses ''Events
 
-data Button = ButtonStart | ButtonCreatePaperclip | ButtonCreateHelper | ButtonPumpWater |
-  ButtonGenerateEnergy |
-  ButtonBuyASeed | ButtonPlantASeed | ButtonResearchAdvancedHelper
+data Button
+  = ButtonStart
+  | ButtonCreatePaperclip
+  | ButtonCreateHelper
+  | ButtonPumpWater
+  | ButtonGenerateEnergy
+  | ButtonBuyASeed
+  | ButtonPlantASeed
+  | ButtonResearchAdvancedHelper
   | ButtonExitApplication
 
 newtype Title = Title Text
@@ -169,7 +183,6 @@ data State a = State
   , _title :: Title
   , _isStarted :: IsStarted }
 makeLenses ''State
-
 
 applyAction :: Action a -> State a -> State a
 applyAction (SetP p) state =
@@ -200,7 +213,7 @@ addHelperWork inc h p =
   liftA2 (+) p $ unNat helpersToPaperclips $ productOfHelperWork inc h
 
 productOfHelperWork :: Num a => HelperInc (Helpers a) -> Helpers a -> Helpers a
-productOfHelperWork inc h = liftA2 (*) h $ Iso.unwrap isoHelperInc inc
+productOfHelperWork (HelperInc inc) h = liftA2 (*) h inc
 
 calcRemainingWater
   :: (Num a, Ord a)
@@ -234,60 +247,22 @@ concatErrors s errorCount = case errorCount of
   TwoErrors e1 e2 ->
     mkErrorLogLine s (paymentErrorToText e1 <> " " <> paymentErrorToText e2)
 
+-- When we initialize a seed, we take the first NotGrowing seed (if any) and
+-- 'move it forward' to Growing or GrowingDone (depending on DurationTreeSeeds)
 initializeASeed
   :: (Eq a, Num a) => DurationTreeSeeds a -> TreeSeeds a -> TreeSeeds a
 initializeASeed dur =
   TreeSeeds
-    . changeFirst (== NotGrowing) (const $ f $ view durationTreeSeeds dur)
+    . changeFirst (== NotGrowing)
+                  (const $ moveItForward $ view durationTreeSeeds dur)
     . view treeSeeds
  where
-  f Instant   = GrowingDone
-  f (Ticks n) = Growing n
+  moveItForward Instant   = GrowingDone
+  moveItForward (Ticks n) = Growing n
 
 decPaperclipsWith'
   :: Num a => AdvancedHelperPrice (Paperclips a) -> Paperclips a -> Paperclips a
 decPaperclipsWith' (AdvancedHelperPrice hp) p = liftA2 (-) p hp
-
----
-
-helperInc :: Lens' (Constants a) (HelperInc (Helpers a))
-helperInc f state =
-  (\inc' -> state { _helperInc = inc' }) <$> f (_helperInc state)
-
-researchCompProgress :: Lens' (ResearchComp a) (ResearchProgress a)
-researchCompProgress f state =
-  (\progress' -> state { _researchCompProgress = progress' })
-    <$> f (_researchCompProgress state)
-
-advancedHelperResearch :: Lens' (ResearchAreas a) (ResearchComp a)
-advancedHelperResearch f state = (\a -> state { _advancedHelperResearch = a })
-  <$> f (_advancedHelperResearch state)
-
-researchCompDuration :: Lens' (ResearchComp a) (DurationAdvancedHelper a)
-researchCompDuration f state = (\dur -> state { _researchCompDuration = dur })
-  <$> f (_researchCompDuration state)
-
-
-
-isoAdvancedHelperPrice
-  :: (Profunctor p, Functor f)
-  => p
-       (AdvancedHelperPrice (Paperclips a))
-       (f (AdvancedHelperPrice (Paperclips a)))
-  -> p (Paperclips a) (f (Paperclips a))
-isoAdvancedHelperPrice = iso AdvancedHelperPrice unAdvancedHelperPrice
-
-isoHelperInc
-  :: (Profunctor p, Functor f)
-  => p (HelperInc (b a)) (f (HelperInc (b a)))
-  -> p (b a) (f (b a))
-isoHelperInc = iso HelperInc unHelperInc
-
-isoHelperPrice
-  :: (Profunctor p, Functor f)
-  => p (HelperPrice a) (f (HelperPrice a))
-  -> p (Paperclips a) (f (Paperclips a))
-isoHelperPrice = iso HelperPrice unHelperPrice
 
 startResearch :: DurationAdvancedHelper a -> (ResearchProgress a)
 startResearch = f . unDurationAdvanced
