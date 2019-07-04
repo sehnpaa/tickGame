@@ -76,17 +76,7 @@ newtype IsStarted = IsStarted { unIsStarted :: Bool }
 instance Show IsStarted where
   show (IsStarted a) = show a
 
-data State a = State
-  { _config :: Config a
-  , _actions :: [Action a]
-  , _errorLog :: [ErrorLogLine]
-  , _researchAreas :: ResearchAreas a
-  , _resources :: Resources a
-  , _seconds :: Seconds a
-  , _source :: Source a
-  , _isStarted :: IsStarted }
-makeLenses ''State
-
+data Status = Enabled | Disabled
 
 data MyEvent
   = Start
@@ -101,6 +91,66 @@ data MyEvent
   | Tick
   | Compile Text
   deriving (Eq, Show)
+
+data ButtonData = ButtonData { _buttonData :: (Text, Status, MyEvent) }
+makeLenses ''ButtonData
+
+newtype EventStart = EventStart { _eventStartButtonData :: ButtonData }
+makeLenses ''EventStart
+
+newtype EventCreatePaperclip = EventCreatePaperclip { _eventCreatePaperclipButtonData :: ButtonData }
+makeLenses ''EventCreatePaperclip
+
+newtype EventCreateHelper = EventCreateHelper { _eventCreateHelperButtonData :: ButtonData }
+makeLenses ''EventCreateHelper
+
+newtype EventPumpWater = EventPumpWater { _eventPumpWaterButtonData :: ButtonData }
+makeLenses ''EventPumpWater
+
+newtype EventGenerateEnergy = EventGenerateEnergy { _eventGenerateEnergyButtonData :: ButtonData }
+makeLenses ''EventGenerateEnergy
+
+newtype EventBuyASeed = EventBuyASeed { _eventBuyASeedButtonData :: ButtonData }
+makeLenses ''EventBuyASeed
+
+newtype EventPlantASeed = EventPlantASeed { _eventPlantASeedButtonData :: ButtonData }
+makeLenses ''EventPlantASeed
+
+newtype EventResearchAdvancedHelper = EventResearchAdvancedHelper { _eventResearchAdvancedHelperButtonData :: ButtonData }
+makeLenses ''EventResearchAdvancedHelper
+
+newtype EventExitApplication = EventExitApplication { _eventExitApplicationButtonData :: ButtonData }
+makeLenses ''EventExitApplication
+
+data Events = Events
+  { _eventStart :: EventStart
+  , _eventCreatePaperclip :: EventCreatePaperclip
+  , _eventCreateHelper :: EventCreateHelper
+  , _eventPumpWater :: EventPumpWater
+  , _eventGenerateEnergy :: EventGenerateEnergy
+  , _eventBuyASeed :: EventBuyASeed
+  , _eventPlantASeed :: EventPlantASeed
+  , _eventResearchAdvancedHelper :: EventResearchAdvancedHelper
+  , _eventExitApplication :: EventExitApplication }
+makeLenses ''Events
+
+data Button = ButtonStart | ButtonCreatePaperclip | ButtonCreateHelper | ButtonPumpWater |
+  ButtonGenerateEnergy |
+  ButtonBuyASeed | ButtonPlantASeed | ButtonResearchAdvancedHelper
+  | ButtonExitApplication
+
+data State a = State
+  { _config :: Config a
+  , _actions :: [Action a]
+  , _errorLog :: [ErrorLogLine]
+  , _events :: Events
+  , _researchAreas :: ResearchAreas a
+  , _resources :: Resources a
+  , _seconds :: Seconds a
+  , _source :: Source a
+  , _isStarted :: IsStarted }
+makeLenses ''State
+
 
 applyAction :: Action a -> State a -> State a
 applyAction (SetP p) state =

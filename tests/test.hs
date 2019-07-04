@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Main where
 
 import           Data.List                      ( nub
@@ -22,6 +24,23 @@ state1 = State
   defaultConfig
   []
   []
+  (Events
+    (EventStart (ButtonData ("Start game", Enabled, Start)))
+    (EventCreatePaperclip
+      (ButtonData ("Create Paperclip", Enabled, CreatePaperclip))
+    )
+    (EventCreateHelper (ButtonData ("Create helper", Enabled, CreateHelper)))
+    (EventPumpWater (ButtonData ("Pump water", Enabled, PumpWater)))
+    (EventGenerateEnergy
+      (ButtonData ("Generate energy", Enabled, GenerateEnergy))
+    )
+    (EventBuyASeed (ButtonData ("Buy a seed", Enabled, BuyASeed)))
+    (EventPlantASeed (ButtonData ("Plant a seed", Enabled, PlantASeed)))
+    (EventResearchAdvancedHelper
+      (ButtonData ("Research advanced helper", Enabled, ResearchAdvancedHelper))
+    )
+    (EventExitApplication (ButtonData ("Exit", Enabled, ExitApplication)))
+  )
   (ResearchAreas (ResearchComp (DurationAdvanced $ Ticks 20) NotResearched))
   Main.resources
   (Seconds 0)

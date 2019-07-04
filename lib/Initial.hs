@@ -72,11 +72,32 @@ noCost = Cost (Paperclips 0)
               (Wood 0)
 
 getInitialState :: State Integer
-getInitialState = State Initial.config
-                        []
-                        []
-                        Initial.researchAreas
-                        Initial.resources
-                        (Seconds 0)
-                        (Source "" "" Nothing)
-                        (IsStarted False)
+getInitialState = State
+    Initial.config
+    []
+    []
+    (Events
+        (EventStart (ButtonData ("Start game", Enabled, Start)))
+        (EventCreatePaperclip
+            (ButtonData ("Create Paperclip", Enabled, CreatePaperclip))
+        )
+        (EventCreateHelper (ButtonData ("Create helper", Enabled, CreateHelper))
+        )
+        (EventPumpWater (ButtonData ("Pump water", Enabled, PumpWater)))
+        (EventGenerateEnergy
+            (ButtonData ("Generate energy", Enabled, GenerateEnergy))
+        )
+        (EventBuyASeed (ButtonData ("Buy a seed", Enabled, BuyASeed)))
+        (EventPlantASeed (ButtonData ("Plant a seed", Enabled, PlantASeed)))
+        (EventResearchAdvancedHelper
+            (ButtonData
+                ("Research advanced helper", Enabled, ResearchAdvancedHelper)
+            )
+        )
+        (EventExitApplication (ButtonData ("Exit", Enabled, ExitApplication)))
+    )
+    Initial.researchAreas
+    Initial.resources
+    (Seconds 0)
+    (Source "" "" Nothing)
+    (IsStarted False)

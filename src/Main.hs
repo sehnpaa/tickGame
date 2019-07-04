@@ -9,7 +9,11 @@ import           Control.Concurrent.Async       ( async )
 import           Control.Monad                  ( void )
 import           Data.ByteString                ( ByteString )
 import           Data.Functor                   ( (<&>) )
-import           Data.Vector                    ( fromList )
+import           Data.Maybe                     ( catMaybes )
+import           Data.Vector                    ( Vector
+                                                , fromList
+                                                , toList
+                                                )
 import           Data.Text                      ( append
                                                 , pack
                                                 , Text
@@ -51,9 +55,12 @@ import           Lib                            ( buyASeed
                                                 , setStarted
                                                 , unErrorLogLine
                                                 , plantASeed
+                                                , Button(..)
+                                                , ButtonData(..)
                                                 , IsStarted(..)
                                                 , MyEvent(..)
                                                 , State(..)
+                                                , Status(..)
                                                 , getInitialState
                                                 )
 import           View
@@ -105,7 +112,7 @@ view' state =
         , container
           Box
           [#orientation := OrientationHorizontal, #widthRequest := 300]
-          [buttons, margin, stats state]
+          [buttons state, margin, stats state]
         , container
           ListBox
           []
@@ -124,22 +131,30 @@ view' state =
 requestCompilation :: Entry -> IO MyEvent
 requestCompilation c = fmap Compile (entryGetBuffer c >>= entryBufferGetText)
 
-buttons :: BoxChild MyEvent
-buttons = container
+createButtons :: State a -> Vector (BoxChild MyEvent)
+createButtons state = fromList $ catMaybes $ toList $ fmap
+  createButton
+  [ viewButtonData ButtonStart                  state
+  , viewButtonData ButtonCreatePaperclip        state
+  , viewButtonData ButtonCreateHelper           state
+  , viewButtonData ButtonPumpWater              state
+  , viewButtonData ButtonGenerateEnergy         state
+  , viewButtonData ButtonBuyASeed               state
+  , viewButtonData ButtonPlantASeed             state
+  , viewButtonData ButtonResearchAdvancedHelper state
+  , viewButtonData ButtonExitApplication        state
+  ]
+
+createButton :: ButtonData -> Maybe (BoxChild MyEvent)
+createButton (ButtonData (t, Enabled, e)) =
+  Just $ widget Button [#label := t, on #clicked e]
+createButton (ButtonData (_, Disabled, _)) = Nothing
+
+buttons :: State a -> BoxChild MyEvent
+buttons state = container
   Box
   [#orientation := OrientationVertical, #widthRequest := 150]
-  [ widget Button [#label := "Start game", on #clicked Start]
-  , widget Button [#label := "Create paperclip", on #clicked CreatePaperclip]
-  , widget Button [#label := "Create helper", on #clicked CreateHelper]
-  , widget Button [#label := "Pump water", on #clicked PumpWater]
-  , widget Button [#label := "Generate energy", on #clicked GenerateEnergy]
-  , widget Button [#label := "Buy a seed", on #clicked BuyASeed]
-  , widget Button [#label := "Plant a seed", on #clicked PlantASeed]
-  , widget
-    Button
-    [#label := "Research advanced helper", on #clicked ResearchAdvancedHelper]
-  , widget Button [#label := "Exit", on #clicked ExitApplication]
-  ]
+  (createButtons state)
 
 margin :: BoxChild MyEvent
 margin = container Box [#widthRequest := 10] []

@@ -56,3 +56,28 @@ viewSourceStatus = view (source . sourceStatus)
 
 viewIsStarted :: State a -> IsStarted
 viewIsStarted = view isStarted
+
+viewCreatePaperclip :: State a -> EventCreatePaperclip
+viewCreatePaperclip = view (events . eventCreatePaperclip)
+
+viewButtonData :: Button -> State a -> ButtonData
+viewButtonData ButtonStart = view (events . eventStart . eventStartButtonData)
+viewButtonData ButtonCreatePaperclip =
+    view (events . eventCreatePaperclip . eventCreatePaperclipButtonData)
+viewButtonData ButtonCreateHelper =
+    view (events . eventCreateHelper . eventCreateHelperButtonData)
+viewButtonData ButtonPumpWater =
+    view (events . eventPumpWater . eventPumpWaterButtonData)
+viewButtonData ButtonGenerateEnergy =
+    view (events . eventGenerateEnergy . eventGenerateEnergyButtonData)
+viewButtonData ButtonBuyASeed =
+    view (events . eventBuyASeed . eventBuyASeedButtonData)
+viewButtonData ButtonPlantASeed =
+    view (events . eventPlantASeed . eventPlantASeedButtonData)
+viewButtonData ButtonResearchAdvancedHelper = view
+    ( events
+    . eventResearchAdvancedHelper
+    . eventResearchAdvancedHelperButtonData
+    )
+viewButtonData ButtonExitApplication =
+    view (events . eventExitApplication . eventExitApplicationButtonData)
