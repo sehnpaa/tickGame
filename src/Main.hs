@@ -9,10 +9,9 @@ import           Control.Concurrent.Async       ( async )
 import           Control.Monad                  ( void )
 import           Data.ByteString                ( ByteString )
 import           Data.Functor                   ( (<&>) )
-import           Data.Maybe                     ( catMaybes )
 import           Data.Vector                    ( Vector
                                                 , fromList
-                                                , toList
+                                                , mapMaybe
                                                 )
 import           Data.Text                      ( append
                                                 , pack
@@ -132,7 +131,7 @@ requestCompilation :: Entry -> IO MyEvent
 requestCompilation c = fmap Compile (entryGetBuffer c >>= entryBufferGetText)
 
 createButtons :: State a -> Vector (BoxChild MyEvent)
-createButtons state = fromList $ catMaybes $ toList $ fmap
+createButtons state = mapMaybe
   createButton
   [ viewButtonData ButtonStart                  state
   , viewButtonData ButtonCreatePaperclip        state
