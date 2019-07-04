@@ -55,6 +55,9 @@ import           Lib                            ( buyASeed
                                                 , unErrorLogLine
                                                 , plantASeed
                                                 , Button(..)
+                                                , ButtonEvent(..)
+                                                , ButtonTitle(..)
+                                                , ButtonStatus(..)
                                                 , ButtonData(..)
                                                 , IsStarted(..)
                                                 , MyEvent(..)
@@ -145,9 +148,9 @@ createButtons state = mapMaybe
   ]
 
 createButton :: ButtonData -> Maybe (BoxChild MyEvent)
-createButton (ButtonData (t, Enabled, e)) =
-  Just $ widget Button [#label := t, on #clicked e]
-createButton (ButtonData (_, Disabled, _)) = Nothing
+createButton (ButtonData (ButtonTitle t) (ButtonStatus Enabled) (ButtonEvent e))
+  = Just $ widget Button [#label := t, on #clicked e]
+createButton (ButtonData _ (ButtonStatus Disabled) _) = Nothing
 
 buttons :: State a -> BoxChild MyEvent
 buttons state = container

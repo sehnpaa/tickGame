@@ -93,7 +93,19 @@ data MyEvent
   | Compile Text
   deriving (Eq, Show)
 
-data ButtonData = ButtonData { _buttonData :: (Text, Status, MyEvent) }
+newtype ButtonTitle = ButtonTitle Text
+
+instance Show ButtonTitle where
+  show (ButtonTitle t) = unpack t
+
+newtype ButtonStatus = ButtonStatus Status
+
+newtype ButtonEvent = ButtonEvent MyEvent
+
+data ButtonData = ButtonData
+  { _buttonTitle :: ButtonTitle
+  , _buttonStatus :: ButtonStatus
+  , _buttonEvent :: ButtonEvent }
 makeLenses ''ButtonData
 
 newtype EventStart = EventStart { _eventStartButtonData :: ButtonData }

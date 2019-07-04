@@ -71,34 +71,72 @@ noCost = Cost (Paperclips 0)
               (Water 0)
               (Wood 0)
 
-getInitialState :: State Integer
-getInitialState = State
-    Initial.config
-    []
-    []
-    (Events
-        (EventStart (ButtonData ("Start game", Enabled, Start)))
-        (EventCreatePaperclip
-            (ButtonData ("Create Paperclip", Enabled, CreatePaperclip))
+events :: Events
+events = Events
+    (EventStart
+        (ButtonData (ButtonTitle "Start game")
+                    (ButtonStatus Enabled)
+                    (ButtonEvent Start)
         )
-        (EventCreateHelper (ButtonData ("Create helper", Enabled, CreateHelper))
-        )
-        (EventPumpWater (ButtonData ("Pump water", Enabled, PumpWater)))
-        (EventGenerateEnergy
-            (ButtonData ("Generate energy", Enabled, GenerateEnergy))
-        )
-        (EventBuyASeed (ButtonData ("Buy a seed", Enabled, BuyASeed)))
-        (EventPlantASeed (ButtonData ("Plant a seed", Enabled, PlantASeed)))
-        (EventResearchAdvancedHelper
-            (ButtonData
-                ("Research advanced helper", Enabled, ResearchAdvancedHelper)
-            )
-        )
-        (EventExitApplication (ButtonData ("Exit", Enabled, ExitApplication)))
     )
-    Initial.researchAreas
-    Initial.resources
-    (Seconds 0)
-    (Source "" "" Nothing)
-    (Title "tickGame")
-    (IsStarted False)
+    (EventCreatePaperclip
+        (ButtonData (ButtonTitle "Create Paperclip")
+                    (ButtonStatus Enabled)
+                    (ButtonEvent CreatePaperclip)
+        )
+    )
+    (EventCreateHelper
+        (ButtonData (ButtonTitle "Create helper")
+                    (ButtonStatus Enabled)
+                    (ButtonEvent CreateHelper)
+        )
+    )
+    (EventPumpWater
+        (ButtonData (ButtonTitle "Pump water")
+                    (ButtonStatus Enabled)
+                    (ButtonEvent PumpWater)
+        )
+    )
+    (EventGenerateEnergy
+        (ButtonData (ButtonTitle "Generate energy")
+                    (ButtonStatus Enabled)
+                    (ButtonEvent GenerateEnergy)
+        )
+    )
+    (EventBuyASeed
+        (ButtonData (ButtonTitle "Buy a seed")
+                    (ButtonStatus Enabled)
+                    (ButtonEvent BuyASeed)
+        )
+    )
+    (EventPlantASeed
+        (ButtonData (ButtonTitle "Plant a seed")
+                    (ButtonStatus Enabled)
+                    (ButtonEvent PlantASeed)
+        )
+    )
+    (EventResearchAdvancedHelper
+        (ButtonData (ButtonTitle "Research advanced helper")
+                    (ButtonStatus Enabled)
+                    (ButtonEvent ResearchAdvancedHelper)
+        )
+    )
+    (EventExitApplication
+        (ButtonData (ButtonTitle "Exit")
+                    (ButtonStatus Enabled)
+                    (ButtonEvent ExitApplication)
+        )
+    )
+
+
+getInitialState :: State Integer
+getInitialState = State Initial.config
+                        []
+                        []
+                        Initial.events
+                        Initial.researchAreas
+                        Initial.resources
+                        (Seconds 0)
+                        (Source "" "" Nothing)
+                        (Title "tickGame")
+                        (IsStarted False)
