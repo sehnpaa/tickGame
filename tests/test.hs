@@ -45,6 +45,7 @@ state1 = State
   Main.resources
   (Seconds 0)
   (Source empty empty Nothing)
+  (Title "tickGame")
   (IsStarted True)
 
 resources :: Resources Integer

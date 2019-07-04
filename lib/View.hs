@@ -81,3 +81,6 @@ viewButtonData ButtonResearchAdvancedHelper = view
     )
 viewButtonData ButtonExitApplication =
     view (events . eventExitApplication . eventExitApplicationButtonData)
+
+viewTitle :: State a -> Title
+viewTitle = view title

@@ -17,6 +17,7 @@ import           Control.Lens                   ( Lens'
 import           Data.Text                      ( Text
                                                 , concat
                                                 , pack
+                                                , unpack
                                                 )
 
 import           Config
@@ -139,6 +140,11 @@ data Button = ButtonStart | ButtonCreatePaperclip | ButtonCreateHelper | ButtonP
   ButtonBuyASeed | ButtonPlantASeed | ButtonResearchAdvancedHelper
   | ButtonExitApplication
 
+newtype Title = Title Text
+
+instance Show Title where
+  show (Title t) = unpack t
+
 data State a = State
   { _config :: Config a
   , _actions :: [Action a]
@@ -148,6 +154,7 @@ data State a = State
   , _resources :: Resources a
   , _seconds :: Seconds a
   , _source :: Source a
+  , _title :: Title
   , _isStarted :: IsStarted }
 makeLenses ''State
 

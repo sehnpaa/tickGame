@@ -97,7 +97,7 @@ view' :: State Integer -> AppView Window MyEvent
 view' state =
   bin
       Window
-      [ #title := "Hello"
+      [ #title := (pack . show $ viewTitle state)
       , on #deleteEvent (const (True, ExitApplication))
       , #widthRequest := 600
       , #heightRequest := 300
@@ -107,7 +107,7 @@ view' state =
         [#orientation := OrientationVertical]
         [ container Box
                     [#orientation := OrientationHorizontal]
-                    [widget Label [#label := "tickGame"]]
+                    [widget Label [#label := (pack . show $ viewTitle state)]]
         , container
           Box
           [#orientation := OrientationHorizontal, #widthRequest := 300]

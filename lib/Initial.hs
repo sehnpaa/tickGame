@@ -100,4 +100,5 @@ getInitialState = State
     Initial.resources
     (Seconds 0)
     (Source "" "" Nothing)
+    (Title "tickGame")
     (IsStarted False)
