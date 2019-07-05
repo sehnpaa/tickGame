@@ -22,6 +22,7 @@ import           Elements
 import           Iso
 import           NaturalTransformation
 import           Resources
+import           Seconds
 import           Source
 import           Utils
 
@@ -65,11 +66,6 @@ makeLenses ''ResearchComp
 data ResearchAreas a = ResearchAreas
   { _advancedHelperResearch :: ResearchComp a}
 makeLenses ''ResearchAreas
-
-newtype Seconds a = Seconds { unSeconds :: a } deriving (Enum, Eq)
-
-instance Show (Seconds Integer) where
-  show (Seconds a) = show a
 
 newtype IsStarted = IsStarted { unIsStarted :: Bool }
 
@@ -184,7 +180,7 @@ data State a = State
   , _isStarted :: IsStarted }
 makeLenses ''State
 
-applyAction :: Action a -> State a -> State a
+applyAction :: Num a => Action a -> State a -> State a
 applyAction (SetP p) state =
   set (resources . elements . elementPaperclips . count) p state
 applyAction (SetH h) state =

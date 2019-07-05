@@ -5,6 +5,7 @@ import           Data.Text                      ( Text )
 
 import           Elements
 import           Resources
+import           Seconds
 import           Source
 import           State
 

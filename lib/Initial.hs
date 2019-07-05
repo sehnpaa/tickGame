@@ -5,6 +5,7 @@ module Initial where
 import           Config
 import           Elements
 import           Resources
+import           Seconds
 import           Source
 import           State
 

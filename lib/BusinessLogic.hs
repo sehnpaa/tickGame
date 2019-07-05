@@ -5,6 +5,7 @@ module BusinessLogic where
 import           Config
 import           Elements
 import           Resources
+import           Seconds
 import           State
 import           Utils
 
@@ -104,10 +105,7 @@ buyASeed s (BuyTreeSeeds c) p (TreeSeeds seeds) = case payWithPaperclips p c of
   Right p' -> Right $ (TreeSeeds $ seeds ++ [NotGrowing], p')
 
 generateEnergy
-  :: (Enum a, Num a, Ord a, Show a)
-  => EnergyManually a
-  -> Energy a
-  -> Energy a
+  :: (Enum a, Num a, Ord a, Show a) => EnergyManually a -> Energy a -> Energy a
 generateEnergy (EnergyManually c) = freeEnergy c
 
 createPaperclip

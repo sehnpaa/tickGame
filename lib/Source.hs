@@ -4,15 +4,16 @@
 module Source where
 
 import           Control.Lens
-import           Data.Text
+import           Data.Text                      ( Text )
 import           Data.Void                      ( Void )
 import           Text.Megaparsec
 import           Text.Megaparsec.Char
-import           Text.Megaparsec.Char.Lexer
+import           Text.Megaparsec.Char.Lexer     ( decimal )
 
 import           Elements
+import           Seconds
 
-data Expr a = SyncPaperclipsWithSeconds a (Paperclips a) | Special a (Paperclips a)
+data Expr a = SyncPaperclipsWithSeconds a (Paperclips a) | AddPaperclips [Seconds a]
 
 data Source a = Source
   { _sourceText :: Text
@@ -22,11 +23,11 @@ makeLenses ''Source
 
 type Parser = Parsec Void Text
 
-ff :: Integral a => Text -> Maybe (Expr a)
-ff = parseMaybe parseExpr
+parse :: Integral a => Text -> Maybe (Expr a)
+parse = parseMaybe parseExpr
 
 parseExpr :: Integral a => Parser (Expr a)
-parseExpr = parseSpecial <|> parseSyncPaperclipsWithSeconds
+parseExpr = parseAddPaperclips <|> parseSyncPaperclipsWithSeconds
 
 parseSyncPaperclipsWithSeconds :: Integral a => Parser (Expr a)
 parseSyncPaperclipsWithSeconds = do
@@ -35,9 +36,16 @@ parseSyncPaperclipsWithSeconds = do
   _ <- char ';'
   return $ SyncPaperclipsWithSeconds n (Paperclips n)
 
-parseSpecial :: Integral a => Parser (Expr a)
-parseSpecial = do
-  _ <- string "secret: "
-  n <- decimal
-  _ <- char ';'
-  return $ Special n (Paperclips n)
+parseAddPaperclips :: Integral a => Parser (Expr a)
+parseAddPaperclips = do
+  _  <- string "if second in "
+  ns <- listOfNumbers
+  _  <- char ';'
+  return $ AddPaperclips $ fmap Seconds ns
+
+listOfNumbers :: Integral a => Parser [a]
+listOfNumbers = do
+  _  <- char '['
+  ns <- decimal `sepBy` (char ',')
+  _  <- char ']'
+  return $ fmap fromInteger ns

@@ -3,6 +3,7 @@ module Lib
   , module Config
   , module Elements
   , module Lib
+  , module Seconds
   , module Source
   , module State
   , module Resources
@@ -20,6 +21,7 @@ import           Data.Text                      ( Text
 import           Config
 import           Elements
 import qualified Initial                       as Initial
+import           Seconds
 import           Source
 import           State
 import           Resources
@@ -31,20 +33,24 @@ nextTick =
   handleActions . helperWork . seedWork . researchWork . runCode . addSecond
 
 runCode :: (Eq a, Num a) => State a -> State a
-runCode state =
-  addActions state $ run (view seconds state) (view (source . sourceExpr) state)
+runCode state = addActions state $ run
+  (view seconds state)
+  (view (resources . elements . elementPaperclips . count) state)
+  (view (source . sourceExpr) state)
 
-run :: (Eq a, Num a) => Seconds a -> Maybe (Expr a) -> [Action a]
-run _ Nothing     = []
-run s (Just expr) = exprToActions s expr
+run
+  :: (Eq a, Num a) => Seconds a -> Paperclips a -> Maybe (Expr a) -> [Action a]
+run _ _ Nothing     = []
+run s p (Just expr) = exprToActions s p expr
 
-exprToActions :: (Eq a, Num a) => Seconds a -> (Expr a) -> [Action a]
-exprToActions (Seconds s) (SyncPaperclipsWithSeconds s' p) =
+exprToActions
+  :: (Eq a, Num a) => Seconds a -> Paperclips a -> (Expr a) -> [Action a]
+exprToActions (Seconds s) _ (SyncPaperclipsWithSeconds s' p) =
   if s == s' then [SetP p] else []
-exprToActions (Seconds s) (Special s' p) =
-  if s == s' then [SetP (fmap (*10) p)] else []
+exprToActions s p (AddPaperclips ss) =
+  if elem s ss then [SetP $ fmap (+ 10) p] else []
 
-handleActions :: State a -> State a
+handleActions :: Num a => State a -> State a
 handleActions state =
   let as = view actions state in set actions [] $ foldr applyAction state as
 
@@ -70,7 +76,7 @@ seedWork state =
 addSecond :: (Enum a) => State a -> State a
 addSecond = over seconds succ
 
-createPaperclip :: (Enum a, Ord a) => State a -> State a
+createPaperclip :: (Enum a, Num a, Ord a) => State a -> State a
 createPaperclip state =
   handleActions $ addActions state $ (\p -> SetP p : []) $ PBL.createPaperclip
     state
@@ -119,9 +125,12 @@ generateEnergy state =
     $ PBL.generateEnergy state
 
 compile :: Text -> State Integer -> State Integer
-compile text = set source $ case ff text of
-  Nothing -> Source text (pack "Not ok.") Nothing
-  Just x  -> Source text (pack "OK!") (Just x)
+compile text = set
+  source
+  (case parse text of
+    Nothing -> Source text (pack "Not runnable.") Nothing
+    Just x  -> Source text (pack "OK!") (Just x)
+  )
 
 setStarted :: State a -> State a
 setStarted = over isStarted (const $ IsStarted True)

@@ -23,6 +23,7 @@ library tickGameLib
       NaturalTransformation
       PathedBusinessLogic
       Resources
+      Seconds
       Source
       State
       Utils
