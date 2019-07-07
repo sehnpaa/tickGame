@@ -20,7 +20,7 @@ data Expr a = SyncPaperclipsWithSeconds a (Paperclips a) | AddPaperclips [Second
 
 data CustomParseError = NothingToParse | CPE String
 
-newtype SourceText = SourceText Text
+newtype SourceText = SourceText { unSourceText :: Text }
 
 instance Show SourceText where
   show (SourceText a) = unpack a
@@ -32,8 +32,7 @@ instance Show SourceStatus where
 
 data Source a = Source
   { _sourceText :: SourceText
-  , _sourceStatus :: SourceStatus
-  , _sourceExpr :: Either CustomParseError (Expr a) }
+  , _sourceStatus :: SourceStatus }
 makeLenses ''Source
 
 type Parser = Parsec Void Text

@@ -139,6 +139,6 @@ getInitialState = State
     Initial.researchAreas
     Initial.resources
     (Seconds 0)
-    (Source (SourceText "") (SourceStatus "") (Left NothingToParse))
+    (Source (SourceText "") (SourceStatus ""))
     (Title "tickGame")
     (IsStarted False)

@@ -28,15 +28,15 @@ import           Resources
 import qualified PathedBusinessLogic           as PBL
 import           Utils
 
-nextTick :: (Enum a, Num a, Ord a, Show a) => State a -> State a
+nextTick :: (Enum a, Integral a, Num a, Ord a, Show a) => State a -> State a
 nextTick =
   handleActions . helperWork . seedWork . researchWork . runCode . addSecond
 
-runCode :: (Eq a, Num a) => State a -> State a
+runCode :: (Eq a, Integral a, Num a) => State a -> State a
 runCode state = addActions state $ run
   (view seconds state)
   (view (resources . elements . elementPaperclips . count) state)
-  (view (source . sourceExpr) state)
+  (parse (unSourceText $ view (source . sourceText) state))
 
 run
   :: (Eq a, Num a) => Seconds a -> Paperclips a -> Either CustomParseError (Expr a) -> [Action a]
@@ -124,13 +124,13 @@ generateEnergy state =
     $ (\e -> SetEnergy e : [])
     $ PBL.generateEnergy state
 
-compile :: Text -> State Integer -> State Integer
+compile :: Text -> State a -> State a
 compile text = set
   source
-  (case parse text of
-    Left (CPE s) -> Source (SourceText text) (SourceStatus $ pack $ "Not runnable: " ++ s) (Left $ CPE s)
-    Left NothingToParse -> Source (SourceText text) (SourceStatus $ pack $ "Nothing to parse.") (Left NothingToParse)
-    Right x -> Source (SourceText text) (SourceStatus $ pack "OK!") (Right x)
+  (case parse text :: Either CustomParseError (Expr Integer) of
+    Left (CPE s) -> Source (SourceText text) (SourceStatus $ pack $ "Not runnable: " ++ s)
+    Left NothingToParse -> Source (SourceText text) (SourceStatus $ pack $ "Nothing to parse.")
+    Right _ -> Source (SourceText text) (SourceStatus $ pack "OK!")
   )
 
 setStarted :: State a -> State a
