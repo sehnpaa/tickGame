@@ -13,10 +13,9 @@ import           Text.Megaparsec
 import           Text.Megaparsec.Char
 import           Text.Megaparsec.Char.Lexer     ( decimal )
 
-import           Elements
 import           Seconds
 
-data Expr a = SyncPaperclipsWithSeconds a (Paperclips a) | AddPaperclips [Seconds a]
+data Expr a = SyncPaperclipsWithSeconds a | AddPaperclips [Seconds a]
 
 data CustomParseError = NothingToParse | CPE String
 
@@ -50,7 +49,7 @@ parseSyncPaperclipsWithSeconds = do
   _ <- string "if "
   n <- decimal
   _ <- char ';'
-  return $ SyncPaperclipsWithSeconds n (Paperclips n)
+  return $ SyncPaperclipsWithSeconds n
 
 parseAddPaperclips :: Integral a => Parser (Expr a)
 parseAddPaperclips = do

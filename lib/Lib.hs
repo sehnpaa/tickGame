@@ -33,26 +33,7 @@ nextTick =
   handleActions . helperWork . seedWork . researchWork . runCode . addSecond
 
 runCode :: (Eq a, Integral a, Num a) => State a -> State a
-runCode state = addActions state $ run
-  (view seconds state)
-  (view (resources . elements . elementPaperclips . count) state)
-  (parse (unSourceText $ view (source . sourceText) state))
-
-run
-  :: (Eq a, Num a)
-  => Seconds a
-  -> Paperclips a
-  -> Either CustomParseError (Expr a)
-  -> [Action a]
-run _ _ (Left  _   ) = []
-run s p (Right expr) = exprToActions s p expr
-
-exprToActions
-  :: (Eq a, Num a) => Seconds a -> Paperclips a -> (Expr a) -> [Action a]
-exprToActions (Seconds s) _ (SyncPaperclipsWithSeconds s' p) =
-  if s == s' then [SetP p] else []
-exprToActions s p (AddPaperclips ss) =
-  if elem s ss then [SetP $ fmap (+ 10) p] else []
+runCode state = addActions state $ (singleton . SetP) $ PBL.run state
 
 handleActions :: Num a => State a -> State a
 handleActions state =

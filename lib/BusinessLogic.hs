@@ -6,6 +6,7 @@ import           Config
 import           Elements
 import           Resources
 import           Seconds
+import           Source
 import           State
 import           Utils
 
@@ -111,3 +112,17 @@ generateEnergy (EnergyManually c) = freeEnergy c
 createPaperclip
   :: (Enum a, Ord a) => Paperclips a -> Storage (Paperclips a) -> Paperclips a
 createPaperclip p s = min (unStorage s) $ fmap succ p
+
+run
+  :: (Eq a, Integral a, Num a)
+  => Seconds a
+  -> Paperclips a
+  -> SourceText
+  -> Storage (Paperclips a)
+  -> Paperclips a
+run s p (SourceText t) storage' = case parse t of
+  Left _ -> p
+  Right (SyncPaperclipsWithSeconds s') ->
+    if unSeconds s == s' then Paperclips . unSeconds $ s else p
+  Right (AddPaperclips ss) ->
+    if elem s ss then limitByStorage storage' (fmap (+ 10) p) else p

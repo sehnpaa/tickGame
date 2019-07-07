@@ -82,13 +82,13 @@ events = Events
     )
     (EventCreatePaperclip
         (ButtonData (ButtonTitle "Create Paperclip")
-                    (ButtonStatus Disabled)
+                    (ButtonStatus Enabled)
                     (ButtonEvent CreatePaperclip)
         )
     )
     (EventCreateHelper
         (ButtonData (ButtonTitle "Create helper")
-                    (ButtonStatus Hidden)
+                    (ButtonStatus Enabled)
                     (ButtonEvent CreateHelper)
         )
     )

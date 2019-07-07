@@ -5,6 +5,7 @@ import           Config
 import           Elements
 import           LensUtils
 import           Resources
+import           Source
 import           State
 
 helperWork :: (Num a, Ord a) => State a -> Paperclips a
@@ -15,9 +16,7 @@ helperWork = arg4 BL.helperWork
                   (resources . storage)
 
 researchWork
-      :: (Eq a, Num a)
-      => State a
-      -> (ResearchProgress a, HelperInc (Helpers a))
+      :: (Eq a, Num a) => State a -> (ResearchProgress a, HelperInc (Helpers a))
 researchWork = arg2
       BL.researchWork
       (researchAreas . advancedHelperResearch . researchCompProgress)
@@ -65,9 +64,7 @@ researchAdvancedHelper = arg5
       (researchAreas . advancedHelperResearch . researchCompDuration)
 
 plantASeed
-      :: (Num a, Ord a, Show a)
-      => State a
-      -> Either ErrorLogLine (TreeSeeds a)
+      :: (Num a, Ord a, Show a) => State a -> Either ErrorLogLine (TreeSeeds a)
 plantASeed = arg3 BL.plantASeed
                   seconds
                   (resources . elements . elementTreeSeeds . duration)
@@ -84,10 +81,7 @@ buyASeed = arg4
       (resources . elements . elementPaperclips . count)
       (resources . elements . elementTreeSeeds . count)
 
-generateEnergy
-      :: (Enum a, Num a, Ord a, Show a)
-      => State a
-      -> Energy a
+generateEnergy :: (Enum a, Num a, Ord a, Show a) => State a -> Energy a
 generateEnergy = arg2
       BL.generateEnergy
       (resources . elements . elementEnergy . cost . acquireEnergyManually)
@@ -97,3 +91,10 @@ createPaperclip :: (Enum a, Ord a) => State a -> Paperclips a
 createPaperclip = arg2 BL.createPaperclip
                        (resources . elements . elementPaperclips . count)
                        (resources . storage)
+
+run :: (Eq a, Integral a, Num a) => State a -> Paperclips a
+run = arg4 BL.run
+           seconds
+           (resources . elements . elementPaperclips . count)
+           (source . sourceText)
+           (resources . storage)
