@@ -39,9 +39,9 @@ runCode state = addActions state $ run
   (view (source . sourceExpr) state)
 
 run
-  :: (Eq a, Num a) => Seconds a -> Paperclips a -> Maybe (Expr a) -> [Action a]
-run _ _ Nothing     = []
-run s p (Just expr) = exprToActions s p expr
+  :: (Eq a, Num a) => Seconds a -> Paperclips a -> Either CustomParseError (Expr a) -> [Action a]
+run _ _ (Left _) = []
+run s p (Right expr) = exprToActions s p expr
 
 exprToActions
   :: (Eq a, Num a) => Seconds a -> Paperclips a -> (Expr a) -> [Action a]
@@ -128,8 +128,9 @@ compile :: Text -> State Integer -> State Integer
 compile text = set
   source
   (case parse text of
-    Nothing -> Source text (pack "Not runnable.") Nothing
-    Just x  -> Source text (pack "OK!") (Just x)
+    Left (CPE s) -> Source (SourceText text) (SourceStatus $ pack $ "Not runnable: " ++ s) (Left $ CPE s)
+    Left NothingToParse -> Source (SourceText text) (SourceStatus $ pack $ "Nothing to parse.") (Left NothingToParse)
+    Right x -> Source (SourceText text) (SourceStatus $ pack "OK!") (Right x)
   )
 
 setStarted :: State a -> State a

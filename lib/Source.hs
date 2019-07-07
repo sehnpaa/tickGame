@@ -4,7 +4,10 @@
 module Source where
 
 import           Control.Lens
-import           Data.Text                      ( Text )
+import           Control.Arrow                  ( left )
+import           Data.Text                      ( Text
+                                                , unpack
+                                                )
 import           Data.Void                      ( Void )
 import           Text.Megaparsec
 import           Text.Megaparsec.Char
@@ -15,16 +18,30 @@ import           Seconds
 
 data Expr a = SyncPaperclipsWithSeconds a (Paperclips a) | AddPaperclips [Seconds a]
 
+data CustomParseError = NothingToParse | CPE String
+
+newtype SourceText = SourceText Text
+
+instance Show SourceText where
+  show (SourceText a) = unpack a
+
+newtype SourceStatus = SourceStatus Text
+
+instance Show SourceStatus where
+  show (SourceStatus a) = unpack a
+
 data Source a = Source
-  { _sourceText :: Text
-  , _sourceStatus :: Text
-  , _sourceExpr :: Maybe (Expr a) }
+  { _sourceText :: SourceText
+  , _sourceStatus :: SourceStatus
+  , _sourceExpr :: Either CustomParseError (Expr a) }
 makeLenses ''Source
 
 type Parser = Parsec Void Text
 
-parse :: Integral a => Text -> Maybe (Expr a)
-parse = parseMaybe parseExpr
+parse :: Integral a => Text -> Either CustomParseError (Expr a)
+parse t =
+  left (\x -> if t == "" then NothingToParse else CPE $ errorBundlePretty x)
+    $ Text.Megaparsec.parse parseExpr "" t
 
 parseExpr :: Integral a => Parser (Expr a)
 parseExpr = parseAddPaperclips <|> parseSyncPaperclipsWithSeconds

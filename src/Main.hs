@@ -126,8 +126,8 @@ view' state =
                     [#orientation := OrientationVertical]
                     [widget Label [#label := "here"]]
         , widget Entry
-                 [#text := viewSource state, onM #changed requestCompilation]
-        , widget Label [#label := viewSourceStatus state]
+                 [#text := (pack . show $ viewSource state), onM #changed requestCompilation]
+        , widget Label [#label := (pack . show $ viewSourceStatus state)]
         ]
 
 requestCompilation :: Entry -> IO MyEvent

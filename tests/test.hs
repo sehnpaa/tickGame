@@ -85,7 +85,7 @@ state1 = State
   (ResearchAreas (ResearchComp (DurationAdvanced $ Ticks 20) NotResearched))
   Main.resources
   (Seconds 0)
-  (Source empty empty Nothing)
+  (Source (SourceText empty) (SourceStatus empty) (Left NothingToParse))
   (Title "tickGame")
   (IsStarted True)
 

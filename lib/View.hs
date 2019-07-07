@@ -1,7 +1,6 @@
 module View where
 
 import           Control.Lens                   ( view )
-import           Data.Text                      ( Text )
 
 import           Elements
 import           Resources
@@ -49,10 +48,10 @@ viewAdvancedHelperResearch =
 viewSeconds :: State a -> Seconds a
 viewSeconds = view seconds
 
-viewSource :: State a -> Text
+viewSource :: State a -> SourceText
 viewSource = view (source . sourceText)
 
-viewSourceStatus :: State a -> Text
+viewSourceStatus :: State a -> SourceStatus
 viewSourceStatus = view (source . sourceStatus)
 
 viewIsStarted :: State a -> IsStarted

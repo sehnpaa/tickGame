@@ -131,13 +131,14 @@ events = Events
 
 
 getInitialState :: State Integer
-getInitialState = State Initial.config
-                        []
-                        []
-                        Initial.events
-                        Initial.researchAreas
-                        Initial.resources
-                        (Seconds 0)
-                        (Source "" "" Nothing)
-                        (Title "tickGame")
-                        (IsStarted False)
+getInitialState = State
+    Initial.config
+    []
+    []
+    Initial.events
+    Initial.researchAreas
+    Initial.resources
+    (Seconds 0)
+    (Source (SourceText "") (SourceStatus "") (Left NothingToParse))
+    (Title "tickGame")
+    (IsStarted False)
