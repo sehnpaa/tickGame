@@ -39,8 +39,12 @@ runCode state = addActions state $ run
   (parse (unSourceText $ view (source . sourceText) state))
 
 run
-  :: (Eq a, Num a) => Seconds a -> Paperclips a -> Either CustomParseError (Expr a) -> [Action a]
-run _ _ (Left _) = []
+  :: (Eq a, Num a)
+  => Seconds a
+  -> Paperclips a
+  -> Either CustomParseError (Expr a)
+  -> [Action a]
+run _ _ (Left  _   ) = []
 run s p (Right expr) = exprToActions s p expr
 
 exprToActions
@@ -125,12 +129,12 @@ generateEnergy state =
     $ PBL.generateEnergy state
 
 compile :: Text -> State a -> State a
-compile text = set
-  source
+compile text = set (source . sourceText) (SourceText text) . set
+  (source . sourceStatus)
   (case parse text :: Either CustomParseError (Expr Integer) of
-    Left (CPE s) -> Source (SourceText text) (SourceStatus $ pack $ "Not runnable: " ++ s)
-    Left NothingToParse -> Source (SourceText text) (SourceStatus $ pack $ "Nothing to parse.")
-    Right _ -> Source (SourceText text) (SourceStatus $ pack "OK!")
+    Left  (CPE s)        -> SourceStatus $ pack $ "Not runnable:\n" ++ s
+    Left  NothingToParse -> SourceStatus $ pack $ "Nothing to parse."
+    Right _              -> SourceStatus $ pack "OK!"
   )
 
 setStarted :: State a -> State a

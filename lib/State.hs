@@ -72,7 +72,7 @@ newtype IsStarted = IsStarted { unIsStarted :: Bool }
 instance Show IsStarted where
   show (IsStarted a) = show a
 
-data Status = Enabled | Disabled
+data Status = Hidden | Disabled | Enabled
 
 data MyEvent
   = Start

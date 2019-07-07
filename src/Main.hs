@@ -150,7 +150,9 @@ createButtons state = mapMaybe
 createButton :: ButtonData -> Maybe (BoxChild MyEvent)
 createButton (ButtonData (ButtonTitle t) (ButtonStatus Enabled) (ButtonEvent e))
   = Just $ widget Button [#label := t, on #clicked e]
-createButton (ButtonData _ (ButtonStatus Disabled) _) = Nothing
+createButton (ButtonData (ButtonTitle t) (ButtonStatus Disabled) _)
+  = Just $ widget Button [#label := t, #sensitive := False]
+createButton (ButtonData _ (ButtonStatus Hidden) _) = Nothing
 
 buttons :: State a -> BoxChild MyEvent
 buttons state = container
