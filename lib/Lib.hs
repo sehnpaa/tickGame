@@ -24,6 +24,10 @@ import qualified Initial                       as Initial
 import           Seconds
 import           Source
 import           State
+import qualified StateStep                     as SS
+import           StateStep                      ( addActions
+                                                , runS
+                                                )
 import           Resources
 import qualified PathedBusinessLogic           as PBL
 import           Utils
@@ -40,74 +44,38 @@ handleActions state =
   let as = view actions state in set actions [] $ foldr applyAction state as
 
 helperWork :: (Num a, Ord a) => State a -> State a
-helperWork state = addActions state $ (singleton . SetP) $ PBL.helperWork state
+helperWork = runS SS.helperWork
 
 researchWork :: (Eq a, Num a) => State a -> State a
-researchWork state =
-  handleActions
-    $ addActions state
-    $ (\(p, h) -> SetAdvancedHelperResearchProgress p : SetHelperInc h : [])
-    $ PBL.researchWork state
+researchWork = handleActions . runS SS.researchWork
 
 seedWork :: (Num a, Ord a, Show a) => State a -> State a
-seedWork state =
-  addActions state
-    $ withExtendedError
-        SetE
-        (\p -> SetProgs p : [])
-        (\(w, p, t) -> SetWater w : SetProgs p : SetTrees t : [])
-    $ PBL.seedWork state
+seedWork = runS SS.seedWork
 
 addSecond :: (Enum a) => State a -> State a
 addSecond = over seconds succ
 
 createPaperclip :: (Enum a, Num a, Ord a) => State a -> State a
-createPaperclip state =
-  handleActions $ addActions state $ (\p -> SetP p : []) $ PBL.createPaperclip
-    state
+createPaperclip = handleActions . runS SS.createPaperclip
 
 buyHelper :: (Enum a, Num a, Ord a, Show a) => State a -> State a
-buyHelper state =
-  handleActions
-    $ addActions state
-    $ withError SetE (\(h, e, p) -> SetH h : SetEnergy e : SetP p : [])
-    $ PBL.buyHelper state
-
-pumpWater :: (Enum a, Num a, Ord a) => State a -> State a
-pumpWater state =
-  handleActions $ addActions state $ (\w -> SetWater w : []) $ PBL.pumpWater
-    state
-
-addActions :: State a -> [Action a] -> State a
-addActions state newActions = over actions (\as -> newActions ++ as) state
-
-researchAdvancedHelper :: (Num a, Ord a, Show a) => State a -> State a
-researchAdvancedHelper state =
-  handleActions
-    $ addActions state
-    $ withError SetE (\(p, r) -> SetP p : SetR r : [])
-    $ PBL.researchAdvancedHelper state
-
-plantASeed :: (Num a, Ord a, Show a) => State a -> State a
-plantASeed state =
-  handleActions
-    $ addActions state
-    $ withError SetE (\s -> SetTreeSeeds s : [])
-    $ PBL.plantASeed state
+buyHelper = handleActions . runS SS.buyHelper
 
 buyASeed :: (Num a, Ord a, Show a) => State a -> State a
-buyASeed state =
-  handleActions
-    $ addActions state
-    $ withError SetE (\(s, p) -> SetTreeSeeds s : SetP p : [])
-    $ PBL.buyASeed state
+buyASeed = handleActions . runS SS.buyASeed
 
 generateEnergy :: (Enum a, Num a, Ord a, Show a) => State a -> State a
-generateEnergy state =
-  handleActions
-    $ addActions state
-    $ (\e -> SetEnergy e : [])
-    $ PBL.generateEnergy state
+generateEnergy = handleActions . runS SS.generateEnergy
+
+researchAdvancedHelper :: (Num a, Ord a, Show a) => State a -> State a
+researchAdvancedHelper = handleActions . runS SS.researchAdvancedHelper
+
+plantASeed :: (Num a, Ord a, Show a) => State a -> State a
+plantASeed = handleActions . runS SS.plantASeed
+
+pumpWater :: (Enum a, Num a, Ord a) => State a -> State a
+pumpWater = handleActions . runS SS.pumpWater
+
 
 compile :: Text -> State a -> State a
 compile text = set (source . sourceText) (SourceText text) . set
@@ -119,4 +87,4 @@ compile text = set (source . sourceText) (SourceText text) . set
   )
 
 setStarted :: State a -> State a
-setStarted = over isStarted (const $ IsStarted True)
+setStarted = set isStarted (IsStarted True)

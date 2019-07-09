@@ -39,6 +39,19 @@ data Action a
   | SetHelperInc (HelperInc (Helpers a))
   | SetProgs [Prog a]
 
+instance Show (Action Integer) where
+  show (SetP a) = show a
+  show (SetH a) = show a
+  show (SetE a) = show a
+  show (SetEnergy a) = show a
+  show (SetR a) = show a
+  show (SetTreeSeeds a) = show a
+  show (SetTrees a) = show a
+  show (SetWater a) = show a
+  show (SetAdvancedHelperResearchProgress a) = show a
+  show (SetHelperInc (HelperInc a)) = show a
+  show (SetProgs a) = show a
+
 newtype ErrorLogLine = ErrorLogLine { unErrorLogLine :: Text }
 
 instance Show ErrorLogLine where
