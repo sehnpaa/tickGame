@@ -113,6 +113,16 @@ createPaperclip
   :: (Enum a, Ord a) => Paperclips a -> Storage (Paperclips a) -> Paperclips a
 createPaperclip p s = min (unStorage s) $ fmap succ p
 
+extendStorage
+  :: (Num a, Ord a, Show a)
+  => Seconds a
+  -> Wood a
+  -> Storage (Paperclips a)
+  -> Either ErrorLogLine (Storage (Paperclips a), Wood a)
+extendStorage sec (Wood w) s = if w >= 1
+  then Right ((fmap . fmap) (+ 1) s, Wood $ w - 1)
+  else Left $ mkErrorLogLine sec "Not enough paperclips."
+
 run
   :: (Eq a, Integral a, Num a)
   => Seconds a

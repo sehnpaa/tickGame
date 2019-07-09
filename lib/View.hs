@@ -66,6 +66,8 @@ viewButtonData ButtonCreatePaperclip =
     view (events . eventCreatePaperclip . eventCreatePaperclipButtonData)
 viewButtonData ButtonCreateHelper =
     view (events . eventCreateHelper . eventCreateHelperButtonData)
+viewButtonData ButtonExtendStorage =
+    view (events . eventExtendStorage . eventExtendStorageButtonData)
 viewButtonData ButtonPumpWater =
     view (events . eventPumpWater . eventPumpWaterButtonData)
 viewButtonData ButtonGenerateEnergy =

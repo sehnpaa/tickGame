@@ -64,6 +64,9 @@ buyHelper = handleActions . runS SS.buyHelper
 buyASeed :: (Num a, Ord a, Show a) => State a -> State a
 buyASeed = handleActions . runS SS.buyASeed
 
+extendStorage :: (Num a, Ord a, Show a) => State a -> State a
+extendStorage = handleActions . runS SS.extendStorage
+
 generateEnergy :: (Enum a, Num a, Ord a, Show a) => State a -> State a
 generateEnergy = handleActions . runS SS.generateEnergy
 

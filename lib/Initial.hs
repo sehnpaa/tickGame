@@ -60,7 +60,7 @@ elements = Elements
              (Water 100)
              (DurationWater Instant)
     )
-    (Element (AcquireWood (WoodManually NoCost)) (Wood 0) (DurationWood Instant)
+    (Element (AcquireWood (WoodManually NoCost)) (Wood 2) (DurationWood Instant)
     )
 
 noCost :: Cost Integer
@@ -90,6 +90,12 @@ events = Events
         (ButtonData (ButtonTitle "Create helper")
                     (ButtonStatus Enabled)
                     (ButtonEvent CreateHelper)
+        )
+    )
+    (EventExtendStorage
+        (ButtonData (ButtonTitle "Extend storage")
+                    (ButtonStatus Enabled)
+                    (ButtonEvent ExtendStorage)
         )
     )
     (EventPumpWater
@@ -131,14 +137,13 @@ events = Events
 
 
 getInitialState :: State Integer
-getInitialState = State
-    Initial.config
-    []
-    []
-    Initial.events
-    Initial.researchAreas
-    Initial.resources
-    (Seconds 0)
-    (Source (SourceText "") (SourceStatus ""))
-    (Title "tickGame")
-    (IsStarted False)
+getInitialState = State Initial.config
+                        []
+                        []
+                        Initial.events
+                        Initial.researchAreas
+                        Initial.resources
+                        (Seconds 0)
+                        (Source (SourceText "") (SourceStatus ""))
+                        (Title "tickGame")
+                        (IsStarted False)

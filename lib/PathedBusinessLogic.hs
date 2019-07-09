@@ -1,5 +1,11 @@
 module PathedBusinessLogic where
 
+-- The purpose of this module is to enable the type signatures
+-- in BusinessLogic.hs to be very informative.
+
+-- Note: Using lenses to rip out a minimal data set is only
+-- a secondary goal.
+
 import qualified BusinessLogic                 as BL
 import           Config
 import           Elements
@@ -91,6 +97,12 @@ createPaperclip :: (Enum a, Ord a) => State a -> Paperclips a
 createPaperclip = arg2 BL.createPaperclip
                        (resources . elements . elementPaperclips . count)
                        (resources . storage)
+
+extendStorage :: (Num a, Ord a, Show a) => State a -> Either ErrorLogLine (Storage (Paperclips a), Wood a)
+extendStorage = arg3 BL.extendStorage
+  seconds
+  (resources . elements . elementWood . count)
+  (resources . storage)
 
 run :: (Eq a, Integral a, Num a) => State a -> Paperclips a
 run = arg4 BL.run

@@ -51,6 +51,9 @@ buyHelper = toStateStep
 createPaperclip :: (Enum a, Ord a) => StateStep (State a)
 createPaperclip = toStateStep ((\p -> SetP p : []) . PBL.createPaperclip)
 
+extendStorage :: (Num a, Ord a, Show a) => StateStep (State a)
+extendStorage = toStateStep ((withError SetE (\(s, w) -> SetStorage s : SetWood w : [])) . PBL.extendStorage)
+
 generateEnergy :: (Enum a, Num a, Ord a, Show a) => StateStep (State a)
 generateEnergy = toStateStep ((\e -> SetEnergy e : []) . PBL.generateEnergy)
 

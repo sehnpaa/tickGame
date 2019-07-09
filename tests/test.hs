@@ -39,6 +39,12 @@ events = Events
                 (ButtonEvent CreateHelper)
     )
   )
+  (EventExtendStorage
+    (ButtonData (ButtonTitle "Extend storage")
+                (ButtonStatus Enabled)
+                (ButtonEvent ExtendStorage)
+    )
+  )
   (EventPumpWater
     (ButtonData (ButtonTitle "Pump water")
                 (ButtonStatus Enabled)

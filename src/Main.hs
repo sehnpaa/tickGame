@@ -47,6 +47,7 @@ import           Lib                            ( buyASeed
                                                 , buyHelper
                                                 , compile
                                                 , createPaperclip
+                                                , extendStorage
                                                 , generateEnergy
                                                 , nextTick
                                                 , pumpWater
@@ -139,6 +140,7 @@ createButtons state = mapMaybe
   [ viewButtonData ButtonStart                  state
   , viewButtonData ButtonCreatePaperclip        state
   , viewButtonData ButtonCreateHelper           state
+  , viewButtonData ButtonExtendStorage          state
   , viewButtonData ButtonPumpWater              state
   , viewButtonData ButtonGenerateEnergy         state
   , viewButtonData ButtonBuyASeed               state
@@ -198,6 +200,7 @@ update' state event = case (unIsStarted (viewIsStarted state), event) of
   (True , BuyASeed       ) -> Transition (buyASeed state) (pure Nothing)
   (True , CreatePaperclip) -> Transition (createPaperclip state) (pure Nothing)
   (True , CreateHelper   ) -> Transition (buyHelper state) (pure Nothing)
+  (True , ExtendStorage  ) -> Transition (extendStorage state) (pure Nothing)
   (True , GenerateEnergy ) -> Transition (generateEnergy state) (pure Nothing)
   (True , PumpWater      ) -> Transition (pumpWater state) (pure Nothing)
   (True , PlantASeed     ) -> Transition (plantASeed state) (pure Nothing)

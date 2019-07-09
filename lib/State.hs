@@ -32,9 +32,11 @@ data Action a
   | SetE ErrorLogLine
   | SetEnergy (Energy a)
   | SetR (ResearchProgress a)
+  | SetStorage (Storage (Paperclips a))
   | SetTreeSeeds (TreeSeeds a)
   | SetTrees (Trees a)
   | SetWater (Water a)
+  | SetWood (Wood a)
   | SetAdvancedHelperResearchProgress (ResearchProgress a)
   | SetHelperInc (HelperInc (Helpers a))
   | SetProgs [Prog a]
@@ -45,9 +47,11 @@ instance Show (Action Integer) where
   show (SetE a) = show a
   show (SetEnergy a) = show a
   show (SetR a) = show a
+  show (SetStorage (Storage a)) = show a
   show (SetTreeSeeds a) = show a
   show (SetTrees a) = show a
   show (SetWater a) = show a
+  show (SetWood a) = show a
   show (SetAdvancedHelperResearchProgress a) = show a
   show (SetHelperInc (HelperInc a)) = show a
   show (SetProgs a) = show a
@@ -91,6 +95,7 @@ data MyEvent
   = Start
   | CreatePaperclip
   | CreateHelper
+  | ExtendStorage
   | GenerateEnergy
   | PumpWater
   | PlantASeed
@@ -128,6 +133,10 @@ newtype EventCreateHelper =
   EventCreateHelper { _eventCreateHelperButtonData :: ButtonData }
 makeLenses ''EventCreateHelper
 
+newtype EventExtendStorage =
+  EventExtendStorage { _eventExtendStorageButtonData :: ButtonData }
+makeLenses ''EventExtendStorage
+
 newtype EventPumpWater =
   EventPumpWater { _eventPumpWaterButtonData :: ButtonData }
 makeLenses ''EventPumpWater
@@ -156,6 +165,7 @@ data Events = Events
   { _eventStart :: EventStart
   , _eventCreatePaperclip :: EventCreatePaperclip
   , _eventCreateHelper :: EventCreateHelper
+  , _eventExtendStorage :: EventExtendStorage
   , _eventPumpWater :: EventPumpWater
   , _eventGenerateEnergy :: EventGenerateEnergy
   , _eventBuyASeed :: EventBuyASeed
@@ -168,6 +178,7 @@ data Button
   = ButtonStart
   | ButtonCreatePaperclip
   | ButtonCreateHelper
+  | ButtonExtendStorage
   | ButtonPumpWater
   | ButtonGenerateEnergy
   | ButtonBuyASeed
@@ -201,6 +212,7 @@ applyAction (SetH h) state =
 applyAction (SetE err) state = over errorLog (\errs -> err : errs) state
 applyAction (SetEnergy e) state =
   set (resources . elements . elementEnergy . count) e state
+applyAction (SetStorage a) state = set (resources . storage) a state
 applyAction (SetR r) state =
   set (researchAreas . advancedHelperResearch . researchCompProgress) r state
 applyAction (SetTreeSeeds s) state =
@@ -215,6 +227,8 @@ applyAction (SetProgs ps) state =
   set (resources . elements . elementTreeSeeds . count . progs) ps state
 applyAction (SetWater w) state =
   set (resources . elements . elementWater . count) w state
+applyAction (SetWood w) state =
+  set (resources . elements . elementWood . count) w state
 
 addHelperWork
   :: Num a => HelperInc (Helpers a) -> Helpers a -> Paperclips a -> Paperclips a
