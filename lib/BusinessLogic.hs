@@ -101,9 +101,9 @@ buyASeed
   -> Paperclips a
   -> TreeSeeds a
   -> Either ErrorLogLine (TreeSeeds a, Paperclips a)
-buyASeed s (BuyTreeSeeds c) p (TreeSeeds seeds) = case payWithPaperclips p c of
-  Left  _  -> Left $ mkErrorLogLine s "Not enough paperclips."
-  Right p' -> Right $ (TreeSeeds $ seeds ++ [NotGrowing], p')
+buyASeed s (BuyTreeSeeds c) p (TreeSeeds seeds) = case calcPaperclips c p of
+  Left  err -> Left $ concatErrors s err
+  Right p'  -> Right $ (TreeSeeds $ seeds ++ [NotGrowing], p')
 
 generateEnergy
   :: (Enum a, Num a, Ord a, Show a) => EnergyManually a -> Energy a -> Energy a

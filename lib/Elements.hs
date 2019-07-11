@@ -262,3 +262,7 @@ enoughPaperclips
 enoughPaperclips (Paperclips cp) (Paperclips p) =
   if cp <= p then Nothing else Just NotEnoughPaperclips
 
+calcPaperclips :: (Num a, Ord a) => CostPaperclips a -> Paperclips a -> Either (ErrorCount PaymentError) (Paperclips a)
+calcPaperclips (CostPaperclips c) p = case enoughPaperclips c p of
+  Nothing -> Right (liftA2 (-) p c)
+  Just e -> Left $ OneError e
