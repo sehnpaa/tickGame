@@ -6,34 +6,35 @@ module PathedBusinessLogic where
 -- Note: Using lenses to rip out a minimal data set is only
 -- a secondary goal.
 
-import qualified BusinessLogic                 as BL
 import           Config
 import           Elements
 import           LensUtils
 import           Resources
+import           Seconds
 import           Source
 import           State
 
-helperWork :: (Num a, Ord a) => State a -> Paperclips a
-helperWork = arg4 BL.helperWork
-                  (resources . elements . elementPaperclips . count)
+helperWork
+      :: State a
+      -> ( Paperclips a
+         , Helpers a
+         , HelperInc (Helpers a)
+         , Storage (Paperclips a)
+         )
+helperWork = get4 (resources . elements . elementPaperclips . count)
                   (resources . elements . elementHelpers . count)
                   (config . constants . helperInc)
                   (resources . storage)
 
-researchWork
-      :: (Eq a, Num a) => State a -> (ResearchProgress a, HelperInc (Helpers a))
-researchWork = arg2
-      BL.researchWork
+researchWork :: State a -> (ResearchProgress a, HelperInc (Helpers a))
+researchWork = get2
       (researchAreas . advancedHelperResearch . researchCompProgress)
       (config . constants . helperInc)
 
 seedWork
-      :: (Num a, Ord a, Show a)
-      => State a
-      -> Either (ErrorLogLine, [Prog a]) (Water a, [Prog a], Trees a)
-seedWork = arg5
-      BL.seedWork
+      :: State a
+      -> (Seconds a, Water a, TreeSeedCostPerTick a, [Prog a], Trees a)
+seedWork = get5
       seconds
       (resources . elements . elementWater . count)
       (resources . elements . elementTrees . cost . acquireTreeSeedCostPerTick)
@@ -41,72 +42,65 @@ seedWork = arg5
       (resources . elements . elementTrees . count)
 
 buyHelper
-      :: (Enum a, Num a, Ord a, Show a)
-      => State a
-      -> Either ErrorLogLine (Helpers a, Energy a, Paperclips a)
-buyHelper = arg5
-      BL.buyHelper
+      :: State a
+      -> (Seconds a, HelpersManually a, Paperclips a, Energy a, Helpers a)
+buyHelper = get5
       seconds
       (resources . elements . elementHelpers . cost . acquireHelpersManually)
       (resources . elements . elementPaperclips . count)
       (resources . elements . elementEnergy . count)
       (resources . elements . elementHelpers . count)
 
-pumpWater :: (Enum a, Num a, Ord a) => State a -> Water a
-pumpWater = arg2 BL.pumpWater
-                 (resources . elements . elementWater . count)
-                 (resources . waterTank)
+pumpWater :: State a -> (Water a, WaterTank a)
+pumpWater =
+      get2 (resources . elements . elementWater . count) (resources . waterTank)
 
 researchAdvancedHelper
-      :: (Num a, Ord a, Show a)
-      => State a
-      -> Either ErrorLogLine (Paperclips a, ResearchProgress a)
-researchAdvancedHelper = arg5
-      BL.researchAdvancedHelper
+      :: State a
+      -> ( Seconds a
+         , Paperclips a
+         , AdvancedHelperPrice (Paperclips a)
+         , ResearchProgress a
+         , DurationAdvancedHelper a
+         )
+researchAdvancedHelper = get5
       seconds
       (resources . elements . elementPaperclips . count)
       (config . prices . advancedHelperPrice)
       (researchAreas . advancedHelperResearch . researchCompProgress)
       (researchAreas . advancedHelperResearch . researchCompDuration)
 
-plantASeed
-      :: (Num a, Ord a, Show a) => State a -> Either ErrorLogLine (TreeSeeds a)
-plantASeed = arg3 BL.plantASeed
-                  seconds
+plantASeed :: State a -> (Seconds a, DurationTreeSeeds a, TreeSeeds a)
+plantASeed = get3 seconds
                   (resources . elements . elementTreeSeeds . duration)
                   (resources . elements . elementTreeSeeds . count)
 
-buyASeed
-      :: (Num a, Ord a, Show a)
-      => State a
-      -> Either ErrorLogLine (TreeSeeds a, Paperclips a)
-buyASeed = arg4
-      BL.buyASeed
+buyASeed :: State a -> (Seconds a, BuyTreeSeeds a, Paperclips a, TreeSeeds a)
+buyASeed = get4
       seconds
       (resources . elements . elementTreeSeeds . cost . acquireBuyTreeSeeds)
       (resources . elements . elementPaperclips . count)
       (resources . elements . elementTreeSeeds . count)
 
-generateEnergy :: (Enum a, Num a, Ord a, Show a) => State a -> Energy a
-generateEnergy = arg2
-      BL.generateEnergy
+generateEnergy
+      :: (Enum a, Num a, Ord a, Show a)
+      => State a
+      -> (EnergyManually a, Energy a)
+generateEnergy = get2
       (resources . elements . elementEnergy . cost . acquireEnergyManually)
       (resources . elements . elementEnergy . count)
 
-createPaperclip :: (Enum a, Ord a) => State a -> Paperclips a
-createPaperclip = arg2 BL.createPaperclip
-                       (resources . elements . elementPaperclips . count)
+createPaperclip :: State a -> (Paperclips a, Storage (Paperclips a))
+createPaperclip = get2 (resources . elements . elementPaperclips . count)
                        (resources . storage)
 
-extendStorage :: (Num a, Ord a, Show a) => State a -> Either ErrorLogLine (Storage (Paperclips a), Wood a)
-extendStorage = arg3 BL.extendStorage
-  seconds
-  (resources . elements . elementWood . count)
-  (resources . storage)
+extendStorage2 :: State a -> (Seconds a, Wood a, Storage (Paperclips a))
+extendStorage2 = get3 seconds
+                      (resources . elements . elementWood . count)
+                      (resources . storage)
 
-run :: (Eq a, Integral a, Num a) => State a -> Paperclips a
-run = arg4 BL.run
-           seconds
+run :: State a -> (Seconds a, Paperclips a, SourceText, Storage (Paperclips a))
+run = get4 seconds
            (resources . elements . elementPaperclips . count)
            (source . sourceText)
            (resources . storage)

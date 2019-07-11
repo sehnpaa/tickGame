@@ -26,7 +26,6 @@ library tickGameLib
       Seconds
       Source
       State
-      StateStep
       Utils
     build-depends:
         base >=4.11 && <5

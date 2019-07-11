@@ -287,6 +287,9 @@ decPaperclipsWith'
   :: Num a => AdvancedHelperPrice (Paperclips a) -> Paperclips a -> Paperclips a
 decPaperclipsWith' (AdvancedHelperPrice hp) p = liftA2 (-) p hp
 
+addActions :: State a -> [Action a] -> State a
+addActions state newActions = over actions (\as -> newActions ++ as) state
+
 startResearch :: DurationAdvancedHelper a -> (ResearchProgress a)
 startResearch = f . unDurationAdvanced
  where
