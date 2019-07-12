@@ -5,6 +5,7 @@ module Main where
 import           Data.List                      ( nub
                                                 , permutations
                                                 )
+import qualified Data.List.Zipper
 import           Data.Text                      ( empty )
 import           Test.Tasty
 import           Test.Tasty.HUnit
@@ -75,6 +76,18 @@ events = Events
                 (ButtonEvent ResearchAdvancedHelper)
     )
   )
+  (EventPreviousSnapshot
+    (ButtonData (ButtonTitle "Previous snapshot")
+                (ButtonStatus Enabled)
+                (ButtonEvent PreviousSnapshot)
+    )
+  )
+  (EventNextSnapshot
+    (ButtonData (ButtonTitle "Next snapshot")
+                (ButtonStatus Enabled)
+                (ButtonEvent NextSnapshot)
+    )
+  )
   (EventExitApplication
     (ButtonData (ButtonTitle "Exit")
                 (ButtonStatus Enabled)
@@ -91,7 +104,7 @@ state1 = State
   (ResearchAreas (ResearchComp (DurationAdvanced $ Ticks 20) NotResearched))
   Main.resources
   (Seconds 0)
-  (Snapshots [])
+  (Snapshots Data.List.Zipper.empty)
   (Source (SourceText empty) (SourceStatus empty))
   (Title "tickGame")
   (IsStarted True)

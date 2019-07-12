@@ -84,6 +84,16 @@ viewButtonData ButtonResearchAdvancedHelper = view
     . eventResearchAdvancedHelper
     . eventResearchAdvancedHelperButtonData
     )
+viewButtonData ButtonPreviousSnapshot = view
+    ( events
+    . eventPreviousSnapshot
+    . eventPreviousSnapshotButtonData
+    )
+viewButtonData ButtonNextSnapshot = view
+    ( events
+    . eventNextSnapshot
+    . eventNextSnapshotButtonData
+    )
 viewButtonData ButtonExitApplication =
     view (events . eventExitApplication . eventExitApplicationButtonData)
 

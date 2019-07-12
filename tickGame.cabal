@@ -29,6 +29,7 @@ library tickGameLib
       Utils
     build-depends:
         base >=4.11 && <5
+      , ListZipper
       , gi-gtk
       , gi-gtk-declarative
       , gi-gtk-declarative-app-simple
@@ -68,6 +69,7 @@ test-suite test-foo
     default-language: Haskell2010
     build-depends:
         base >=4.11 && <5
+      , ListZipper
       , lens
       , tasty
       , tasty-hunit

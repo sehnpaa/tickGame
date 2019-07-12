@@ -52,6 +52,8 @@ import           Lib                            ( buyASeed
                                                 , nextTick
                                                 , pumpWater
                                                 , researchAdvancedHelper
+                                                , previousSnapshot
+                                                , nextSnapshot
                                                 , setStarted
                                                 , unErrorLogLine
                                                 , plantASeed
@@ -126,8 +128,11 @@ view' state =
         , container Box
                     [#orientation := OrientationVertical]
                     [widget Label [#label := "here"]]
-        , widget Entry
-                 [#text := (pack . show $ viewSource state), onM #changed requestCompilation]
+        , widget
+          Entry
+          [ #text := (pack . show $ viewSource state)
+          , onM #changed requestCompilation
+          ]
         , widget Label [#label := (pack . show $ viewSourceStatus state)]
         ]
 
@@ -146,14 +151,16 @@ createButtons state = mapMaybe
   , viewButtonData ButtonBuyASeed               state
   , viewButtonData ButtonPlantASeed             state
   , viewButtonData ButtonResearchAdvancedHelper state
+  , viewButtonData ButtonPreviousSnapshot       state
+  , viewButtonData ButtonNextSnapshot           state
   , viewButtonData ButtonExitApplication        state
   ]
 
 createButton :: ButtonData -> Maybe (BoxChild MyEvent)
 createButton (ButtonData (ButtonTitle t) (ButtonStatus Enabled) (ButtonEvent e))
   = Just $ widget Button [#label := t, on #clicked e]
-createButton (ButtonData (ButtonTitle t) (ButtonStatus Disabled) _)
-  = Just $ widget Button [#label := t, #sensitive := False]
+createButton (ButtonData (ButtonTitle t) (ButtonStatus Disabled) _) =
+  Just $ widget Button [#label := t, #sensitive := False]
 createButton (ButtonData _ (ButtonStatus Hidden) _) = Nothing
 
 buttons :: State a -> BoxChild MyEvent
@@ -208,9 +215,14 @@ update' state event = case (unIsStarted (viewIsStarted state), event) of
   (True , PlantASeed     ) -> Transition (plantASeed state) (pure Nothing)
   (True, ResearchAdvancedHelper) ->
     Transition (researchAdvancedHelper state) (pure Nothing)
-  (True , Tick     ) -> Transition (nextTick state) ticker
-  (True , Compile t) -> Transition (compile t state) (pure Nothing)
-  (False, _        ) -> Transition state (pure Nothing)
+  (False, PreviousSnapshot) ->
+    Transition (previousSnapshot state) (pure Nothing)
+  (True , PreviousSnapshot) -> Transition state (pure Nothing)
+  (False, NextSnapshot    ) -> Transition (nextSnapshot state) (pure Nothing)
+  (True , NextSnapshot    ) -> Transition state (pure Nothing)
+  (True , Tick            ) -> Transition (nextTick state) ticker
+  (True , Compile t       ) -> Transition (compile t state) (pure Nothing)
+  (False, _               ) -> Transition state (pure Nothing)
 
 app :: App Window (State Integer) MyEvent
 app = App { view         = view'

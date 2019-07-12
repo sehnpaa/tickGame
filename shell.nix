@@ -9,8 +9,8 @@ let
 
   f = { mkDerivation, async, base, bytestring, gi-gdk, gi-gtk
       , gi-gtk-declarative, gi-gtk-declarative-app-simple, lens
-      , megaparsec, stdenv, tasty, tasty-hunit, tasty-quickcheck, text
-      , tuple, vector
+      , ListZipper, megaparsec, stdenv, tasty, tasty-hunit
+      , tasty-quickcheck, text, tuple, vector
       }:
       mkDerivation {
         pname = "tickGame";
@@ -20,7 +20,7 @@ let
         isExecutable = true;
         libraryHaskellDepends = [
           base gi-gtk gi-gtk-declarative gi-gtk-declarative-app-simple lens
-          megaparsec tasty tasty-hunit tasty-quickcheck text tuple
+          ListZipper megaparsec tasty tasty-hunit tasty-quickcheck text tuple
         ];
         executableHaskellDepends = [
           async base bytestring gi-gdk gi-gtk gi-gtk-declarative

@@ -2,6 +2,8 @@
 
 module Initial where
 
+import Data.List.Zipper (empty)
+
 import           Config
 import           Elements
 import           Resources
@@ -128,6 +130,18 @@ events = Events
                     (ButtonEvent ResearchAdvancedHelper)
         )
     )
+    (EventPreviousSnapshot
+        (ButtonData (ButtonTitle "Previous snapshot")
+                    (ButtonStatus Enabled)
+                    (ButtonEvent PreviousSnapshot)
+        )
+    )
+    (EventNextSnapshot
+        (ButtonData (ButtonTitle "Next snapshot")
+                    (ButtonStatus Enabled)
+                    (ButtonEvent NextSnapshot)
+        )
+    )
     (EventExitApplication
         (ButtonData (ButtonTitle "Exit")
                     (ButtonStatus Enabled)
@@ -144,7 +158,7 @@ getInitialState = State Initial.config
                         Initial.researchAreas
                         Initial.resources
                         (Seconds 0)
-                        (Snapshots [])
+                        (Snapshots empty)
                         (Source (SourceText "") (SourceStatus ""))
                         (Title "tickGame")
                         (IsStarted False)

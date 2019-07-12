@@ -16,6 +16,10 @@ import           Control.Lens                   ( over
                                                 , set
                                                 , view
                                                 )
+import           Data.List.Zipper               ( insert
+                                                , left
+                                                , right
+                                                )
 import           Data.Text                      ( Text
                                                 , pack
                                                 )
@@ -34,8 +38,8 @@ import           Utils
 
 nextTick :: (Enum a, Integral a, Num a, Ord a, Show a) => State a -> State a
 nextTick =
-  handleActions
-    . saveSnapshot
+  saveSnapshot
+    . handleActions
     . helperWork
     . seedWork
     . researchWork
@@ -45,7 +49,7 @@ nextTick =
 saveSnapshot :: State a -> State a
 saveSnapshot state =
   let r = view resources state
-  in  over snapshots (\old -> Snapshots $ r : unSnapshots old) state
+  in  over snapshots (\old -> Snapshots $ insert r $ unSnapshots old) state
 
 runCode :: (Eq a, Integral a, Num a) => State a -> State a
 runCode state =
@@ -168,12 +172,23 @@ compile text = set (source . sourceText) (SourceText text) . set
     Right _              -> SourceStatus $ pack "OK!"
   )
 
+previousSnapshot :: State a -> State a
+previousSnapshot =
+  over snapshots (\old -> Snapshots . right . unSnapshots $ old)
+
+nextSnapshot :: State a -> State a
+nextSnapshot = over snapshots (\old -> Snapshots . left . unSnapshots $ old)
+
 setStarted :: Bool -> State a -> State a
 setStarted True =
-  set (events . eventStart . eventStartButtonData . buttonTitle)
-      (ButtonTitle "Pause")
+  saveSnapshot
+    . set (events . eventStart . eventStartButtonData . buttonTitle)
+          (ButtonTitle "Pause")
     . set isStarted (IsStarted True)
-setStarted False =
+setStarted False = clearAllFutureSnapshots .
   set (events . eventStart . eventStartButtonData . buttonTitle)
       (ButtonTitle "Start")
     . set isStarted (IsStarted False)
+
+clearAllFutureSnapshots :: State a -> State a
+clearAllFutureSnapshots = over snapshots (\old -> Snapshots . removeLefts . unSnapshots $ old)

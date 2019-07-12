@@ -11,6 +11,7 @@ import           Control.Lens                   ( makeLenses
                                                 , set
                                                 , view
                                                 )
+import Data.List.Zipper
 import           Data.Text                      ( Text
                                                 , concat
                                                 , pack
@@ -42,19 +43,19 @@ data Action a
   | SetProgs [Prog a]
 
 instance Show (Action Integer) where
-  show (SetP a) = show a
-  show (SetH a) = show a
-  show (SetE a) = show a
-  show (SetEnergy a) = show a
-  show (SetR a) = show a
-  show (SetStorage (Storage a)) = show a
-  show (SetTreeSeeds a) = show a
-  show (SetTrees a) = show a
-  show (SetWater a) = show a
-  show (SetWood a) = show a
-  show (SetAdvancedHelperResearchProgress a) = show a
-  show (SetHelperInc (HelperInc a)) = show a
-  show (SetProgs a) = show a
+  show (SetP                              a            ) = show a
+  show (SetH                              a            ) = show a
+  show (SetE                              a            ) = show a
+  show (SetEnergy                         a            ) = show a
+  show (SetR                              a            ) = show a
+  show (SetStorage                        (Storage a)  ) = show a
+  show (SetTreeSeeds                      a            ) = show a
+  show (SetTrees                          a            ) = show a
+  show (SetWater                          a            ) = show a
+  show (SetWood                           a            ) = show a
+  show (SetAdvancedHelperResearchProgress a            ) = show a
+  show (SetHelperInc                      (HelperInc a)) = show a
+  show (SetProgs                          a            ) = show a
 
 newtype ErrorLogLine = ErrorLogLine { unErrorLogLine :: Text }
 
@@ -101,6 +102,8 @@ data MyEvent
   | PlantASeed
   | BuyASeed
   | ResearchAdvancedHelper
+  | PreviousSnapshot
+  | NextSnapshot
   | ExitApplication
   | Tick
   | Compile Text
@@ -157,6 +160,14 @@ newtype EventResearchAdvancedHelper =
   EventResearchAdvancedHelper { _eventResearchAdvancedHelperButtonData :: ButtonData }
 makeLenses ''EventResearchAdvancedHelper
 
+newtype EventPreviousSnapshot =
+  EventPreviousSnapshot { _eventPreviousSnapshotButtonData :: ButtonData }
+makeLenses ''EventPreviousSnapshot
+
+newtype EventNextSnapshot =
+  EventNextSnapshot { _eventNextSnapshotButtonData :: ButtonData }
+makeLenses ''EventNextSnapshot
+
 newtype EventExitApplication =
   EventExitApplication { _eventExitApplicationButtonData :: ButtonData }
 makeLenses ''EventExitApplication
@@ -171,6 +182,8 @@ data Events = Events
   , _eventBuyASeed :: EventBuyASeed
   , _eventPlantASeed :: EventPlantASeed
   , _eventResearchAdvancedHelper :: EventResearchAdvancedHelper
+  , _eventPreviousSnapshot :: EventPreviousSnapshot
+  , _eventNextSnapshot :: EventNextSnapshot
   , _eventExitApplication :: EventExitApplication }
 makeLenses ''Events
 
@@ -184,12 +197,16 @@ data Button
   | ButtonBuyASeed
   | ButtonPlantASeed
   | ButtonResearchAdvancedHelper
+  | ButtonPreviousSnapshot
+  | ButtonNextSnapshot
   | ButtonExitApplication
 
-newtype Snapshots a = Snapshots { unSnapshots :: [Resources a]}
+newtype Snapshots a = Snapshots { unSnapshots :: Zipper (Resources a)}
 
 instance Show (Snapshots Integer) where
-  show (Snapshots rs) = show $ length rs
+  show (Snapshots rs) = case safeCursor rs of
+    Nothing -> "Nothing to show yet."
+    Just x -> let y = view (elements . elementPaperclips . count) x in "Paperclips in focus of snapshot: " ++ show y
 
 newtype Title = Title Text
 
@@ -295,6 +312,9 @@ decPaperclipsWith' (AdvancedHelperPrice hp) p = liftA2 (-) p hp
 
 addActions :: State a -> [Action a] -> State a
 addActions state newActions = over actions (\as -> newActions ++ as) state
+
+removeLefts :: Zipper a -> Zipper a
+removeLefts (Zip _ rs) = Zip [] rs
 
 startResearch :: DurationAdvancedHelper a -> (ResearchProgress a)
 startResearch = f . unDurationAdvanced
