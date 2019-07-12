@@ -13,9 +13,9 @@ import           Data.Vector                    ( Vector
                                                 , fromList
                                                 , mapMaybe
                                                 )
-import           Data.Text                      ( append
+import           Data.Text                      ( Text
+                                                , append
                                                 , pack
-                                                , Text
                                                 )
 import qualified GI.Gdk                        as Gdk
 import           GI.Gtk                         ( Box(..)
@@ -160,7 +160,13 @@ createButtons state = mapMaybe
 
 createButton :: ButtonData -> Maybe (BoxChild MyEvent)
 createButton (ButtonData (ButtonTitle t) (ButtonStatus Enabled) (ButtonEvent e))
-  = Just $ widget Button [#label := t, on #clicked e]
+  = Just $ widget
+    Button
+    [ #label := t
+    , on #clicked e
+    , #tooltipMarkup
+      := "<span foreground=\"white\" size=\"large\">White text</span> is <i>cool</i>"
+    ]
 createButton (ButtonData (ButtonTitle t) (ButtonStatus Disabled) _) =
   Just $ widget Button [#label := t, #sensitive := False]
 createButton (ButtonData _ (ButtonStatus Hidden) _) = Nothing
