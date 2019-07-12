@@ -19,6 +19,7 @@ import           Control.Lens                   ( over
 import           Data.List.Zipper               ( insert
                                                 , left
                                                 , right
+                                                , safeCursor
                                                 )
 import           Data.Text                      ( Text
                                                 , pack
@@ -179,16 +180,27 @@ previousSnapshot =
 nextSnapshot :: State a -> State a
 nextSnapshot = over snapshots (\old -> Snapshots . left . unSnapshots $ old)
 
+applySnapshot :: State a -> State a
+applySnapshot state = over
+  resources
+  (\old -> case safeCursor (unSnapshots $ view snapshots state) of
+    Nothing  -> old
+    Just new -> new
+  )
+  state
+
 setStarted :: Bool -> State a -> State a
 setStarted True =
   saveSnapshot
     . set (events . eventStart . eventStartButtonData . buttonTitle)
           (ButtonTitle "Pause")
     . set isStarted (IsStarted True)
-setStarted False = clearAllFutureSnapshots .
-  set (events . eventStart . eventStartButtonData . buttonTitle)
-      (ButtonTitle "Start")
+setStarted False =
+  clearAllFutureSnapshots
+    . set (events . eventStart . eventStartButtonData . buttonTitle)
+          (ButtonTitle "Start")
     . set isStarted (IsStarted False)
 
 clearAllFutureSnapshots :: State a -> State a
-clearAllFutureSnapshots = over snapshots (\old -> Snapshots . removeLefts . unSnapshots $ old)
+clearAllFutureSnapshots =
+  over snapshots (\old -> Snapshots . removeLefts . unSnapshots $ old)

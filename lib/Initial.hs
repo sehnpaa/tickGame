@@ -2,7 +2,7 @@
 
 module Initial where
 
-import Data.List.Zipper (empty)
+import           Data.List.Zipper               ( empty )
 
 import           Config
 import           Elements
@@ -140,6 +140,12 @@ events = Events
         (ButtonData (ButtonTitle "Next snapshot")
                     (ButtonStatus Enabled)
                     (ButtonEvent NextSnapshot)
+        )
+    )
+    (EventApplySnapshot
+        (ButtonData (ButtonTitle "Apply snapshot")
+                    (ButtonStatus Enabled)
+                    (ButtonEvent ApplySnapshot)
         )
     )
     (EventExitApplication

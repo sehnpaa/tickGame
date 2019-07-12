@@ -88,6 +88,12 @@ events = Events
                 (ButtonEvent NextSnapshot)
     )
   )
+  (EventApplySnapshot
+    (ButtonData (ButtonTitle "Apply snapshot")
+                (ButtonStatus Enabled)
+                (ButtonEvent ApplySnapshot)
+    )
+  )
   (EventExitApplication
     (ButtonData (ButtonTitle "Exit")
                 (ButtonStatus Enabled)

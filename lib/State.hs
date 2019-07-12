@@ -11,7 +11,7 @@ import           Control.Lens                   ( makeLenses
                                                 , set
                                                 , view
                                                 )
-import Data.List.Zipper
+import           Data.List.Zipper
 import           Data.Text                      ( Text
                                                 , concat
                                                 , pack
@@ -104,6 +104,7 @@ data MyEvent
   | ResearchAdvancedHelper
   | PreviousSnapshot
   | NextSnapshot
+  | ApplySnapshot
   | ExitApplication
   | Tick
   | Compile Text
@@ -168,6 +169,10 @@ newtype EventNextSnapshot =
   EventNextSnapshot { _eventNextSnapshotButtonData :: ButtonData }
 makeLenses ''EventNextSnapshot
 
+newtype EventApplySnapshot =
+  EventApplySnapshot { _eventApplySnapshotButtonData :: ButtonData }
+makeLenses ''EventApplySnapshot
+
 newtype EventExitApplication =
   EventExitApplication { _eventExitApplicationButtonData :: ButtonData }
 makeLenses ''EventExitApplication
@@ -184,6 +189,7 @@ data Events = Events
   , _eventResearchAdvancedHelper :: EventResearchAdvancedHelper
   , _eventPreviousSnapshot :: EventPreviousSnapshot
   , _eventNextSnapshot :: EventNextSnapshot
+  , _eventApplySnapshot :: EventApplySnapshot
   , _eventExitApplication :: EventExitApplication }
 makeLenses ''Events
 
@@ -199,6 +205,7 @@ data Button
   | ButtonResearchAdvancedHelper
   | ButtonPreviousSnapshot
   | ButtonNextSnapshot
+  | ButtonApplySnapshot
   | ButtonExitApplication
 
 newtype Snapshots a = Snapshots { unSnapshots :: Zipper (Resources a)}
@@ -206,7 +213,9 @@ newtype Snapshots a = Snapshots { unSnapshots :: Zipper (Resources a)}
 instance Show (Snapshots Integer) where
   show (Snapshots rs) = case safeCursor rs of
     Nothing -> "Nothing to show yet."
-    Just x -> let y = view (elements . elementPaperclips . count) x in "Paperclips in focus of snapshot: " ++ show y
+    Just x ->
+      let y = view (elements . elementPaperclips . count) x
+      in  "Paperclips in focus of snapshot: " ++ show y
 
 newtype Title = Title Text
 

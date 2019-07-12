@@ -54,6 +54,7 @@ import           Lib                            ( buyASeed
                                                 , researchAdvancedHelper
                                                 , previousSnapshot
                                                 , nextSnapshot
+                                                , applySnapshot
                                                 , setStarted
                                                 , unErrorLogLine
                                                 , plantASeed
@@ -153,6 +154,7 @@ createButtons state = mapMaybe
   , viewButtonData ButtonResearchAdvancedHelper state
   , viewButtonData ButtonPreviousSnapshot       state
   , viewButtonData ButtonNextSnapshot           state
+  , viewButtonData ButtonApplySnapshot          state
   , viewButtonData ButtonExitApplication        state
   ]
 
@@ -215,11 +217,16 @@ update' state event = case (unIsStarted (viewIsStarted state), event) of
   (True , PlantASeed     ) -> Transition (plantASeed state) (pure Nothing)
   (True, ResearchAdvancedHelper) ->
     Transition (researchAdvancedHelper state) (pure Nothing)
+
+  -- Snapshots can only be managed when the game is not running
   (False, PreviousSnapshot) ->
     Transition (previousSnapshot state) (pure Nothing)
   (True , PreviousSnapshot) -> Transition state (pure Nothing)
   (False, NextSnapshot    ) -> Transition (nextSnapshot state) (pure Nothing)
   (True , NextSnapshot    ) -> Transition state (pure Nothing)
+  (False, ApplySnapshot   ) -> Transition (applySnapshot state) (pure Nothing)
+  (True , ApplySnapshot   ) -> Transition state (pure Nothing)
+
   (True , Tick            ) -> Transition (nextTick state) ticker
   (True , Compile t       ) -> Transition (compile t state) (pure Nothing)
   (False, _               ) -> Transition state (pure Nothing)

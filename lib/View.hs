@@ -48,7 +48,7 @@ viewAdvancedHelperResearch =
 viewSeconds :: State a -> Seconds a
 viewSeconds = view seconds
 
-viewSnapshots:: State a -> Snapshots a
+viewSnapshots :: State a -> Snapshots a
 viewSnapshots = view snapshots
 
 viewSource :: State a -> SourceText
@@ -84,16 +84,12 @@ viewButtonData ButtonResearchAdvancedHelper = view
     . eventResearchAdvancedHelper
     . eventResearchAdvancedHelperButtonData
     )
-viewButtonData ButtonPreviousSnapshot = view
-    ( events
-    . eventPreviousSnapshot
-    . eventPreviousSnapshotButtonData
-    )
-viewButtonData ButtonNextSnapshot = view
-    ( events
-    . eventNextSnapshot
-    . eventNextSnapshotButtonData
-    )
+viewButtonData ButtonPreviousSnapshot =
+    view (events . eventPreviousSnapshot . eventPreviousSnapshotButtonData)
+viewButtonData ButtonNextSnapshot =
+    view (events . eventNextSnapshot . eventNextSnapshotButtonData)
+viewButtonData ButtonApplySnapshot =
+    view (events . eventApplySnapshot . eventApplySnapshotButtonData)
 viewButtonData ButtonExitApplication =
     view (events . eventExitApplication . eventExitApplicationButtonData)
 
