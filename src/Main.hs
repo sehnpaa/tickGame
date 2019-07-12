@@ -180,6 +180,7 @@ stats state = container
   , statProperty "Wood"                     (viewWood state)
   , statProperty "Advanced helper research" (viewAdvancedHelperResearch state)
   , statProperty "Seconds"                  (viewSeconds state)
+  , statProperty "Snapshots"                (viewSnapshots state)
   ]
 
 statProperty :: Show a => Text -> a -> BoxChild MyEvent
@@ -195,7 +196,8 @@ ticker = fmap (const (Just Tick)) (threadDelay 1000000)
 
 update' :: State Integer -> MyEvent -> Transition (State Integer) MyEvent
 update' state event = case (unIsStarted (viewIsStarted state), event) of
-  (False, Start          ) -> Transition (setStarted state) ticker
+  (False, Start          ) -> Transition (setStarted True state) ticker
+  (True , Start          ) -> Transition (setStarted False state) ticker
   (_    , ExitApplication) -> Exit
   (True , BuyASeed       ) -> Transition (buyASeed state) (pure Nothing)
   (True , CreatePaperclip) -> Transition (createPaperclip state) (pure Nothing)
@@ -206,7 +208,6 @@ update' state event = case (unIsStarted (viewIsStarted state), event) of
   (True , PlantASeed     ) -> Transition (plantASeed state) (pure Nothing)
   (True, ResearchAdvancedHelper) ->
     Transition (researchAdvancedHelper state) (pure Nothing)
-  (True , Start    ) -> Transition state (pure Nothing)
   (True , Tick     ) -> Transition (nextTick state) ticker
   (True , Compile t) -> Transition (compile t state) (pure Nothing)
   (False, _        ) -> Transition state (pure Nothing)

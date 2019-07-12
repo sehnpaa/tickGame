@@ -48,6 +48,9 @@ viewAdvancedHelperResearch =
 viewSeconds :: State a -> Seconds a
 viewSeconds = view seconds
 
+viewSnapshots:: State a -> Snapshots a
+viewSnapshots = view snapshots
+
 viewSource :: State a -> SourceText
 viewSource = view (source . sourceText)
 

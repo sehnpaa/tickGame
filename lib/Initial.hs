@@ -144,6 +144,7 @@ getInitialState = State Initial.config
                         Initial.researchAreas
                         Initial.resources
                         (Seconds 0)
+                        (Snapshots [])
                         (Source (SourceText "") (SourceStatus ""))
                         (Title "tickGame")
                         (IsStarted False)

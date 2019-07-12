@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Lib
   ( Initial.getInitialState
   , module Config
@@ -32,10 +34,22 @@ import           Utils
 
 nextTick :: (Enum a, Integral a, Num a, Ord a, Show a) => State a -> State a
 nextTick =
-  handleActions . helperWork . seedWork . researchWork . runCode . addSecond
+  handleActions
+    . saveSnapshot
+    . helperWork
+    . seedWork
+    . researchWork
+    . runCode
+    . addSecond
+
+saveSnapshot :: State a -> State a
+saveSnapshot state =
+  let r = view resources state
+  in  over snapshots (\old -> Snapshots $ r : unSnapshots old) state
 
 runCode :: (Eq a, Integral a, Num a) => State a -> State a
-runCode state = addActions state $ (singleton . SetP) $ uncurryN BL.run $ PBL.run $ state
+runCode state =
+  addActions state . (singleton . SetP) . uncurryN BL.run . PBL.run $ state
 
 handleActions :: Num a => State a -> State a
 handleActions state =
@@ -154,5 +168,12 @@ compile text = set (source . sourceText) (SourceText text) . set
     Right _              -> SourceStatus $ pack "OK!"
   )
 
-setStarted :: State a -> State a
-setStarted = set isStarted (IsStarted True)
+setStarted :: Bool -> State a -> State a
+setStarted True =
+  set (events . eventStart . eventStartButtonData . buttonTitle)
+      (ButtonTitle "Pause")
+    . set isStarted (IsStarted True)
+setStarted False =
+  set (events . eventStart . eventStartButtonData . buttonTitle)
+      (ButtonTitle "Start")
+    . set isStarted (IsStarted False)

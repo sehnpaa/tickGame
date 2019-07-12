@@ -186,6 +186,11 @@ data Button
   | ButtonResearchAdvancedHelper
   | ButtonExitApplication
 
+newtype Snapshots a = Snapshots { unSnapshots :: [Resources a]}
+
+instance Show (Snapshots Integer) where
+  show (Snapshots rs) = show $ length rs
+
 newtype Title = Title Text
 
 instance Show Title where
@@ -199,6 +204,7 @@ data State a = State
   , _researchAreas :: ResearchAreas a
   , _resources :: Resources a
   , _seconds :: Seconds a
+  , _snapshots :: Snapshots a
   , _source :: Source a
   , _title :: Title
   , _isStarted :: IsStarted }
