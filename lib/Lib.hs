@@ -49,8 +49,7 @@ nextTick =
 
 saveSnapshot :: State a -> State a
 saveSnapshot state =
-  let r = view resources state
-  in  over snapshots (\old -> Snapshots $ insert r $ unSnapshots old) state
+  let r = view resources state in over (snapshots . zipper) (insert r) state
 
 runCode :: (Eq a, Integral a, Num a) => State a -> State a
 runCode state =
@@ -174,16 +173,15 @@ compile text = set (source . sourceText) (SourceText text) . set
   )
 
 previousSnapshot :: State a -> State a
-previousSnapshot =
-  over snapshots (\old -> Snapshots . right . unSnapshots $ old)
+previousSnapshot = over (snapshots . zipper) right
 
 nextSnapshot :: State a -> State a
-nextSnapshot = over snapshots (\old -> Snapshots . left . unSnapshots $ old)
+nextSnapshot = over (snapshots . zipper) left
 
 applySnapshot :: State a -> State a
 applySnapshot state = over
   resources
-  (\old -> case safeCursor (unSnapshots $ view snapshots state) of
+  (\old -> case safeCursor (view (snapshots . zipper) state) of
     Nothing  -> old
     Just new -> new
   )
@@ -200,7 +198,3 @@ setStarted False =
     . set (events . eventStart . eventStartButtonData . buttonTitle)
           (ButtonTitle "Start")
     . set isStarted (IsStarted False)
-
-clearAllFutureSnapshots :: State a -> State a
-clearAllFutureSnapshots =
-  over snapshots (\old -> Snapshots . removeLefts . unSnapshots $ old)

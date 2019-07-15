@@ -11,7 +11,9 @@ import           Control.Lens                   ( makeLenses
                                                 , set
                                                 , view
                                                 )
-import           Data.List.Zipper
+import           Data.List.Zipper               ( Zipper(..)
+                                                , safeCursor
+                                                )
 import           Data.Text                      ( Text
                                                 , concat
                                                 , pack
@@ -208,7 +210,8 @@ data Button
   | ButtonApplySnapshot
   | ButtonExitApplication
 
-newtype Snapshots a = Snapshots { unSnapshots :: Zipper (Resources a)}
+newtype Snapshots a = Snapshots { _zipper :: Zipper (Resources a)}
+makeLenses ''Snapshots
 
 instance Show (Snapshots Integer) where
   show (Snapshots rs) = case safeCursor rs of
@@ -324,6 +327,10 @@ addActions state newActions = over actions (\as -> newActions ++ as) state
 
 removeLefts :: Zipper a -> Zipper a
 removeLefts (Zip _ rs) = Zip [] rs
+
+clearAllFutureSnapshots :: State a -> State a
+clearAllFutureSnapshots =
+  over (snapshots . zipper) removeLefts
 
 startResearch :: DurationAdvancedHelper a -> (ResearchProgress a)
 startResearch = f . unDurationAdvanced
