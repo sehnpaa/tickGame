@@ -35,6 +35,7 @@ library tickGameLib
       , gi-gtk-declarative-app-simple
       , lens
       , megaparsec
+      , pretty-simple
       , tasty
       , tasty-hunit
       , tasty-quickcheck

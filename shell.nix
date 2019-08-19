@@ -9,7 +9,7 @@ let
 
   f = { mkDerivation, async, base, bytestring, gi-gdk, gi-gtk
       , gi-gtk-declarative, gi-gtk-declarative-app-simple, lens
-      , ListZipper, megaparsec, stdenv, tasty, tasty-hunit
+      , ListZipper, megaparsec, pretty-simple, stdenv, tasty, tasty-hunit
       , tasty-quickcheck, text, tuple, vector
       }:
       mkDerivation {
@@ -20,7 +20,8 @@ let
         isExecutable = true;
         libraryHaskellDepends = [
           base gi-gtk gi-gtk-declarative gi-gtk-declarative-app-simple lens
-          ListZipper megaparsec tasty tasty-hunit tasty-quickcheck text tuple
+          ListZipper megaparsec pretty-simple tasty tasty-hunit
+          tasty-quickcheck text tuple
         ];
         executableHaskellDepends = [
           async base bytestring gi-gdk gi-gtk gi-gtk-declarative

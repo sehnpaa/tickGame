@@ -92,7 +92,7 @@ newtype IsStarted = IsStarted { unIsStarted :: Bool }
 instance Show IsStarted where
   show (IsStarted a) = show a
 
-data Status = Hidden | Disabled | Enabled
+data Status = Hidden | Disabled | Enabled deriving Show
 
 data MyEvent
   = Start
@@ -117,66 +117,66 @@ newtype ButtonTitle = ButtonTitle Text
 instance Show ButtonTitle where
   show (ButtonTitle t) = unpack t
 
-newtype ButtonStatus = ButtonStatus Status
+newtype ButtonStatus = ButtonStatus Status deriving Show
 
-newtype ButtonEvent = ButtonEvent MyEvent
+newtype ButtonEvent = ButtonEvent MyEvent deriving Show
 
 data ButtonData = ButtonData
   { _buttonTitle :: ButtonTitle
   , _buttonStatus :: ButtonStatus
-  , _buttonEvent :: ButtonEvent }
+  , _buttonEvent :: ButtonEvent } deriving Show
 makeLenses ''ButtonData
 
 newtype EventStart =
-  EventStart { _eventStartButtonData :: ButtonData }
+  EventStart { _eventStartButtonData :: ButtonData } deriving Show
 makeLenses ''EventStart
 
 newtype EventCreatePaperclip =
-  EventCreatePaperclip { _eventCreatePaperclipButtonData :: ButtonData }
+  EventCreatePaperclip { _eventCreatePaperclipButtonData :: ButtonData } deriving Show
 makeLenses ''EventCreatePaperclip
 
 newtype EventCreateHelper =
-  EventCreateHelper { _eventCreateHelperButtonData :: ButtonData }
+  EventCreateHelper { _eventCreateHelperButtonData :: ButtonData } deriving Show
 makeLenses ''EventCreateHelper
 
 newtype EventExtendStorage =
-  EventExtendStorage { _eventExtendStorageButtonData :: ButtonData }
+  EventExtendStorage { _eventExtendStorageButtonData :: ButtonData } deriving Show
 makeLenses ''EventExtendStorage
 
 newtype EventPumpWater =
-  EventPumpWater { _eventPumpWaterButtonData :: ButtonData }
+  EventPumpWater { _eventPumpWaterButtonData :: ButtonData } deriving Show
 makeLenses ''EventPumpWater
 
 newtype EventGenerateEnergy =
-  EventGenerateEnergy { _eventGenerateEnergyButtonData :: ButtonData }
+  EventGenerateEnergy { _eventGenerateEnergyButtonData :: ButtonData } deriving Show
 makeLenses ''EventGenerateEnergy
 
 newtype EventBuyASeed =
-  EventBuyASeed { _eventBuyASeedButtonData :: ButtonData }
+  EventBuyASeed { _eventBuyASeedButtonData :: ButtonData } deriving Show
 makeLenses ''EventBuyASeed
 
 newtype EventPlantASeed =
-  EventPlantASeed { _eventPlantASeedButtonData :: ButtonData }
+  EventPlantASeed { _eventPlantASeedButtonData :: ButtonData } deriving Show
 makeLenses ''EventPlantASeed
 
 newtype EventResearchAdvancedHelper =
-  EventResearchAdvancedHelper { _eventResearchAdvancedHelperButtonData :: ButtonData }
+  EventResearchAdvancedHelper { _eventResearchAdvancedHelperButtonData :: ButtonData } deriving Show
 makeLenses ''EventResearchAdvancedHelper
 
 newtype EventPreviousSnapshot =
-  EventPreviousSnapshot { _eventPreviousSnapshotButtonData :: ButtonData }
+  EventPreviousSnapshot { _eventPreviousSnapshotButtonData :: ButtonData } deriving Show
 makeLenses ''EventPreviousSnapshot
 
 newtype EventNextSnapshot =
-  EventNextSnapshot { _eventNextSnapshotButtonData :: ButtonData }
+  EventNextSnapshot { _eventNextSnapshotButtonData :: ButtonData } deriving Show
 makeLenses ''EventNextSnapshot
 
 newtype EventApplySnapshot =
-  EventApplySnapshot { _eventApplySnapshotButtonData :: ButtonData }
+  EventApplySnapshot { _eventApplySnapshotButtonData :: ButtonData } deriving Show
 makeLenses ''EventApplySnapshot
 
 newtype EventExitApplication =
-  EventExitApplication { _eventExitApplicationButtonData :: ButtonData }
+  EventExitApplication { _eventExitApplicationButtonData :: ButtonData } deriving Show
 makeLenses ''EventExitApplication
 
 data Events = Events
@@ -192,7 +192,7 @@ data Events = Events
   , _eventPreviousSnapshot :: EventPreviousSnapshot
   , _eventNextSnapshot :: EventNextSnapshot
   , _eventApplySnapshot :: EventApplySnapshot
-  , _eventExitApplication :: EventExitApplication }
+  , _eventExitApplication :: EventExitApplication } deriving Show
 makeLenses ''Events
 
 data Button
