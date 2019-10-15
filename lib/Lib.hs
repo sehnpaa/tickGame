@@ -124,7 +124,7 @@ extendStorage state =
     . addActions state
     . withError SetE (\(s, w) -> SetStorage s : SetWood w : [])
     . uncurryN BL.extendStorage
-    . PBL.extendStorage2
+    . PBL.extendStorage
     $ state
 
 generateEnergy :: (Enum a, Ord a, Num a, Show a) => State a -> State a

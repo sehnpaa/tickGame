@@ -94,8 +94,8 @@ createPaperclip :: State a -> (Paperclips a, Storage (Paperclips a))
 createPaperclip = get2 (resources . elements . elementPaperclips . count)
                        (resources . storage)
 
-extendStorage2 :: State a -> (Seconds a, Wood a, Storage (Paperclips a))
-extendStorage2 = get3 seconds
+extendStorage :: State a -> (Seconds a, Wood a, Storage (Paperclips a))
+extendStorage = get3 seconds
                       (resources . elements . elementWood . count)
                       (resources . storage)
 
