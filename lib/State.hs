@@ -273,16 +273,12 @@ addHelperWork inc h p =
 productOfHelperWork :: Num a => HelperInc (Helpers a) -> Helpers a -> Helpers a
 productOfHelperWork (HelperInc inc) h = liftA2 (*) h inc
 
-calcRemainingWater
-  :: (Num a, Ord a)
-  => TreeSeedCostPerTick a
-  -> [Prog a]
-  -> Water a
-  -> Maybe (Water a)
+calcRemainingWater :: (Num a, Ord a) =>
+                        CostWater a -> [Prog a] -> Water a -> Maybe (Water a)
 calcRemainingWater price ps w =
   let calculatedCost = calcWaterCost
         ps
-        (unWater $ view costWater $ unTreeSeedCostPerTick price)
+        (unWater $ view costWater price)
   in  case calculatedCost > w of
         True  -> Nothing
         False -> Just $ Iso.under2 isoWater (-) w calculatedCost

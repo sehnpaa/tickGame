@@ -48,7 +48,7 @@ elements = Elements
     (Element
         (AcquireTrees
             (TreesFromTreeSeeds (CostTreeSeeds (TreeSeeds [GrowingDone])))
-            (TreeSeedCostPerTick (CostWater (Water 2)))
+            (TreeSeedCostPerTick (CostWater (Water 2)) "Not enough water for the seeds.")
         )
         (Trees 0)
         (DurationTrees Instant)

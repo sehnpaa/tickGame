@@ -40,14 +40,14 @@ seedWork
   -> Either
        (ErrorLogLine, [Prog a])
        (Water a, [Prog a], Trees a)
-seedWork s w price ps ts =
+seedWork s w (TreeSeedCostPerTick price errorMessage) ps ts =
   let ts'    = additionalTrees ps
       progs' = filter (not . isGrowingDone) $ progressGrowing ps
   in  if any isGrowing ps
         then case calcRemainingWater price ps w of
           Nothing ->
             Left
-              ( mkErrorLogLine s "Not enough water for the seeds."
+              ( mkErrorLogLine s errorMessage
               , removeGrowingSeeds ps
               )
           Just w' -> Right $ (w', progs', ts + ts')
