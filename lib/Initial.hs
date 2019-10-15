@@ -54,7 +54,11 @@ elements = Elements
         (DurationTrees Instant)
     )
     (Element
-        (AcquireTreeSeeds (BuyTreeSeeds (CostPaperclips (Paperclips 100))))
+        (AcquireTreeSeeds
+            (BuyTreeSeeds (CostPaperclips (Paperclips 100))
+                          "Not enough paperclips."
+            )
+        )
         (TreeSeeds (replicate 10 NotGrowing))
         (DurationTreeSeeds $ Ticks 20)
     )

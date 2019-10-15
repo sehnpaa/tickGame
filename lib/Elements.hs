@@ -110,7 +110,7 @@ data AcquirePaperclips a = AcquirePaperclips
   , _paperclipsFromHelpers :: PaperclipsFromHelper a }
 makeLenses ''AcquirePaperclips
 
-newtype BuyTreeSeeds a = BuyTreeSeeds { unBuyTreeSeeds :: CostPaperclips a }
+data BuyTreeSeeds a = BuyTreeSeeds { unBuyTreeSeeds :: CostPaperclips a, buyTreeSeedsErrorMessage :: T.Text }
 
 newtype AcquireTreeSeeds a = AcquireTreeSeeds { _acquireBuyTreeSeeds :: BuyTreeSeeds a }
 makeLenses ''AcquireTreeSeeds
@@ -262,7 +262,7 @@ enoughPaperclips
 enoughPaperclips (Paperclips cp) (Paperclips p) =
   if cp <= p then Nothing else Just NotEnoughPaperclips
 
-calcPaperclips :: (Num a, Ord a) => CostPaperclips a -> Paperclips a -> Either (ErrorCount PaymentError) (Paperclips a)
-calcPaperclips (CostPaperclips c) p = case enoughPaperclips c p of
-  Nothing -> Right (liftA2 (-) p c)
-  Just e -> Left $ OneError e
+calcPaperclips
+  :: (Num a, Ord a) => CostPaperclips a -> Paperclips a -> Maybe (Paperclips a)
+calcPaperclips (CostPaperclips c) p =
+  if c <= p then Just (liftA2 (-) p c) else Nothing
