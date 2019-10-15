@@ -73,10 +73,9 @@ researchAdvancedHelper
   => Seconds a
   -> Paperclips a
   -> AdvancedHelperPrice (Paperclips a)
-  -> ResearchProgress a
-  -> DurationAdvancedHelper a
+  -> ResearchComp a
   -> Either ErrorLogLine (Paperclips a, ResearchProgress a)
-researchAdvancedHelper s p price progress dur =
+researchAdvancedHelper s p price (ResearchComp dur progress) =
   case (unAdvancedHelperPrice price > p, progress) of
     (True, NotResearched) -> Left $ mkErrorLogLine s "Not enough paperclips."
     (False, NotResearched) ->
