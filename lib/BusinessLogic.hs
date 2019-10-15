@@ -121,7 +121,7 @@ extendStorage
   -> Either ErrorLogLine (Storage (Paperclips a), Wood a)
 extendStorage sec (Wood w) s = if w >= 1
   then Right ((fmap . fmap) (+ 1) s, Wood $ w - 1)
-  else Left $ mkErrorLogLine sec "Not enough paperclips."
+  else Left $ mkErrorLogLine sec "Not enough wood."
 
 run
   :: (Eq a, Integral a, Num a)
