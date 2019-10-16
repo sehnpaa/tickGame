@@ -1,11 +1,13 @@
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeOperators #-}
 
 module Resources where
 
-import           Control.Lens                   ( Lens'
-                                                , Profunctor
+import           Control.Lens                   ( Profunctor
                                                 , iso
+                                                , makeClassy
                                                 , view
                                                 , withIso
                                                 )
@@ -14,12 +16,13 @@ import           Elements
 import           NaturalTransformation
 import qualified Iso
 
-data Resources a = Resources
-  { _elements :: Elements a
-  , _storage :: Storage (Paperclips a)
-  , _waterTank :: WaterTank a }
-
 newtype WaterTank a = WaterTank { unWaterTank :: a }
+
+data Resources a = Resources
+  { _resourcesElements :: Elements a
+  , _resourcesStorage :: Storage (Paperclips a)
+  , _resourcesWaterTank :: WaterTank a }
+makeClassy ''Resources
 
 instance Show (WaterTank Integer) where
   show (WaterTank a) = show a
@@ -53,8 +56,7 @@ additionalTrees = Trees . fromIntegral . length . filter
   )
 
 countNotGrowingSeeds :: Num a => TreeSeeds a -> a
-countNotGrowingSeeds =
-  fromIntegral . length . filter isNotGrowing . view treeSeeds
+countNotGrowingSeeds = fromIntegral . length . filter isNotGrowing . view progs
 
 isNotGrowing :: Prog a -> Bool
 isNotGrowing a = case a of
@@ -71,18 +73,6 @@ progressGrowing = map
   )
 
 ---
-
-elements :: Lens' (Resources a) (Elements a)
-elements f state =
-  (\elements' -> state { _elements = elements' }) <$> f (_elements state)
-
-storage :: Lens' (Resources a) (Storage (Paperclips a))
-storage f state =
-  (\storage' -> state { _storage = storage' }) <$> f (_storage state)
-
-waterTank :: Lens' (Resources a) (WaterTank a)
-waterTank f state =
-  (\tank' -> state { _waterTank = tank' }) <$> f (_waterTank state)
 
 isoHelpers
   :: (Profunctor p, Functor f) => p (Helpers a) (f (Helpers a)) -> p a (f a)

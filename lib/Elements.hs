@@ -1,11 +1,14 @@
 {-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE TemplateHaskell #-}
 
 module Elements where
 
-import           Control.Lens
+import           Control.Lens            hiding ( element
+                                                , elements
+                                                )
 import           Control.Applicative            ( liftA2 )
 import qualified Data.Text                     as T
 
@@ -16,14 +19,13 @@ newtype DurationEnergy a = DurationEnergy { unDurationEnergy :: Duration a }
 newtype DurationHelpers a = DurationHelpers { unDurationHelpers :: Duration a }
 newtype DurationStorage a = DurationStorage { unDurationStorage :: Duration a }
 newtype DurationTrees a = DurationTrees { unDurationTrees :: Duration a }
-newtype DurationTreeSeeds a = DurationTreeSeeds { _durationTreeSeeds :: Duration a }
-makeLenses ''DurationTreeSeeds
+newtype DurationTreeSeeds a = DurationTreeSeeds { _durationTreeSeedsDur :: Duration a }
+makeClassy ''DurationTreeSeeds
 
 newtype DurationWater a = DurationWater { unDurationWater :: Duration a }
 newtype DurationWood a = DurationWood { unDurationWood :: Duration a }
 
-data Paperclips a = Paperclips { _paperclips :: a } deriving (Eq, Functor, Ord)
-makeLenses ''Paperclips
+newtype Paperclips a = Paperclips a deriving (Eq, Functor, Ord)
 
 instance Applicative Paperclips where
   pure = Paperclips
@@ -32,8 +34,7 @@ instance Applicative Paperclips where
 instance Show (Paperclips Integer) where
   show (Paperclips a) = show a
 
-newtype Energy a = Energy { _energy :: a } deriving (Eq, Functor, Ord)
-makeLenses ''Energy
+newtype Energy a = Energy a deriving (Eq, Functor, Ord)
 
 instance Applicative Energy where
   pure = Energy
@@ -72,8 +73,8 @@ instance Show (Prog Integer) where
     noun _ = "ticks"
   show GrowingDone = show "Growing done"
 
-newtype TreeSeeds a = TreeSeeds { _treeSeeds :: [Prog a]} deriving (Eq)
-makeLenses ''TreeSeeds
+newtype TreeSeeds a = TreeSeeds { _progs :: [Prog a]} deriving (Eq)
+makeClassy ''TreeSeeds
 
 instance Show (TreeSeeds Integer) where
   show (TreeSeeds a) = show a
@@ -100,17 +101,19 @@ data Cost a = Cost
   , _treeSeedsCost :: TreeSeeds a
   , _waterCost :: Water a
   , _woodCost :: Wood a }
-makeLenses ''Cost
+makeClassy ''Cost
 
 data NoCost a = NoCost
 
 data CostEnergyPaperclips a = CostEnergyPaperclips (Energy a) (Paperclips a)
-data CostPaperclips a = CostPaperclips { _costPaperclips :: Paperclips a }
-makeLenses ''CostPaperclips
-data CostWood a = CostWood { _costWood :: Wood a }
-makeLenses ''CostWood
-data CostWater a = CostWater { _costWater :: Water a }
-makeLenses ''CostWater
+
+-- FIX: Messed up naming
+data CostPaperclips a = CostPaperclips { _costPaperclipsA :: Paperclips a }
+makeClassy ''CostPaperclips
+data CostWood a = CostWood { _costWoodA :: Wood a }
+makeClassy ''CostWood
+data CostWater a = CostWater { _costWaterA :: Water a }
+makeClassy ''CostWater
 
 data CostTreeSeeds a = CostTreeSeeds (TreeSeeds [Prog a])
 
@@ -120,12 +123,12 @@ newtype PaperclipsFromHelper a = PaperclipsFromHelper { unPaperclipsFromHelper :
 data AcquirePaperclips a = AcquirePaperclips
   { _paperclipsManually :: PaperclipsManually a
   , _paperclipsFromHelpers :: PaperclipsFromHelper a }
-makeLenses ''AcquirePaperclips
+makeClassy ''AcquirePaperclips
 
 data BuyTreeSeeds a = BuyTreeSeeds { unBuyTreeSeeds :: CostPaperclips a, buyTreeSeedsErrorMessage :: T.Text }
 
 newtype AcquireTreeSeeds a = AcquireTreeSeeds { _acquireBuyTreeSeeds :: BuyTreeSeeds a }
-makeLenses ''AcquireTreeSeeds
+makeClassy ''AcquireTreeSeeds
 
 newtype TreesFromTreeSeeds a = TreesFromTreeSeeds { unTreesFromTreeSeeds :: CostTreeSeeds a }
 data TreeSeedCostPerTick a = TreeSeedCostPerTick { unTreeSeedCostPerTick :: CostWater a, treeSeedCostPerTickErrorMessage :: T.Text }
@@ -134,28 +137,28 @@ data EnergyManually a = EnergyManually { _energyManually :: NoCost a}
 
 data AcquireEnergy cost = AcquireEnergy
   { _acquireEnergyManually :: EnergyManually cost }
-makeLenses ''AcquireEnergy
+makeClassy ''AcquireEnergy
 
-data HelpersManually a = HelpersManually { _helpersManually :: CostEnergyPaperclips a
+data HelpersManually a = HelpersManually { _helpersManuallyCost :: CostEnergyPaperclips a
 , _helpersManuallyEnergyErrorMessage :: T.Text
 , _helpersManuallyPaperclipsErrorMessage :: T.Text }
-makeLenses ''HelpersManually
+makeClassy ''HelpersManually
 
 data AcquireHelpers a = AcquireHelpers
   { _acquireHelpersManually :: HelpersManually a }
-makeLenses ''AcquireHelpers
+makeClassy ''AcquireHelpers
 
-data StorageManually a = StorageManually { _storageManually :: CostWood a, _storageManuallyErrorMessage :: T.Text }
-makeLenses ''StorageManually
+data StorageManually a = StorageManually { _storageManuallyCost :: CostWood a, _storageManuallyErrorMessage :: T.Text }
+makeClassy ''StorageManually
 
 data AcquireStorage a = AcquireStorage
   { _acquireStorageManually :: StorageManually a }
-makeLenses ''AcquireStorage
+makeClassy ''AcquireStorage
 
 data AcquireTrees a = AcquireTrees
   { _acquireTreesFromTreeSeeds :: TreesFromTreeSeeds a
   , _acquireTreeSeedCostPerTick :: TreeSeedCostPerTick a }
-makeLenses ''AcquireTrees
+makeClassy ''AcquireTrees
 
 newtype WaterManually a = WaterManually { unWaterManually :: NoCost a }
 newtype AcquireWater a = AcquireWater { _acquireWater :: WaterManually a }
@@ -164,55 +167,21 @@ newtype WoodManually a = WoodManually { unWoodManually :: NoCost a }
 newtype AcquireWood a = AcquireWood { _acquireWood :: WoodManually a }
 
 data Element acquire duration f a = Element
-  { _cost :: acquire a
+  { _elementCost :: acquire a
   , _count :: f a
   , _duration :: duration a }
-makeLenses ''Element
+makeClassy ''Element
 
 data Elements a = Elements
   { _elementsPaperclips :: Element AcquirePaperclips DurationPaperclips Paperclips a
-  , _elementEnergy :: Element AcquireEnergy DurationEnergy Energy a
-  , _helpers :: Element AcquireHelpers DurationHelpers Helpers a
+  , _elementsEnergy :: Element AcquireEnergy DurationEnergy Energy a
+  , _elementsHelpers :: Element AcquireHelpers DurationHelpers Helpers a
   , _elementsStorage :: Element AcquireStorage DurationStorage Storage a
-  , _elementTrees :: Element AcquireTrees DurationTrees Trees a
+  , _elementsTrees :: Element AcquireTrees DurationTrees Trees a
   , _elementsTreeSeeds :: Element AcquireTreeSeeds DurationTreeSeeds TreeSeeds a
-  , _water :: Element AcquireWater DurationWater Water a
-  , _wood :: Element AcquireWood DurationWood Wood a }
-makeLenses ''Elements
-
-elementPaperclips
-  :: Lens'
-       (Elements a)
-       (Element AcquirePaperclips DurationPaperclips Paperclips a)
-elementPaperclips f state =
-  (\paperclips' -> state { _elementsPaperclips = paperclips' })
-    <$> f (_elementsPaperclips state)
-
-elementHelpers
-  :: Lens' (Elements a) (Element AcquireHelpers DurationHelpers Helpers a)
-elementHelpers f state =
-  (\helpers' -> state { _helpers = helpers' }) <$> f (_helpers state)
-
-elementStorage
-  :: Lens' (Elements a) (Element AcquireStorage DurationStorage Storage a)
-elementStorage f state = (\storage' -> state { _elementsStorage = storage' })
-  <$> f (_elementsStorage state)
-
-elementWater :: Lens' (Elements a) (Element AcquireWater DurationWater Water a)
-elementWater f state =
-  (\water' -> state { _water = water' }) <$> f (_water state)
-
-elementTreeSeeds
-  :: Lens' (Elements a) (Element AcquireTreeSeeds DurationTreeSeeds TreeSeeds a)
-elementTreeSeeds f state =
-  (\treeSeeds' -> state { _elementsTreeSeeds = treeSeeds' })
-    <$> f (_elementsTreeSeeds state)
-
-progs :: Lens' (TreeSeeds a) [Prog a]
-progs f state = TreeSeeds <$> f (view treeSeeds state)
-
-elementWood :: Lens' (Elements a) (Element AcquireWood DurationWood Wood a)
-elementWood f state = (\wood' -> state { _wood = wood' }) <$> f (_wood state)
+  , _elementsWater :: Element AcquireWater DurationWater Water a
+  , _elementsWood :: Element AcquireWood DurationWood Wood a }
+makeClassy ''Elements
 
 freeEnergy :: (Enum a) => NoCost a -> Energy a -> Energy a
 freeEnergy = const (fmap succ)

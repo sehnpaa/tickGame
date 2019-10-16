@@ -9,89 +9,94 @@ import           Source
 import           State
 
 viewActions :: State a -> [Action a]
-viewActions = view actions
+viewActions = view stateActions
 
 viewEnergy :: State a -> Energy a
-viewEnergy = view (resources . elements . elementEnergy . count)
+viewEnergy = view (stateResources . resourcesElements . elementsEnergy . count)
 
 viewErrorLog :: State a -> [ErrorLogLine]
-viewErrorLog = view errorLog
+viewErrorLog = view stateErrorLog
 
 viewPaperclips :: State a -> Paperclips a
-viewPaperclips = view (resources . elements . elementPaperclips . count)
+viewPaperclips =
+    view (stateResources . resourcesElements . elementsPaperclips . count)
 
 viewHelpers :: State a -> Helpers a
-viewHelpers = view (resources . elements . elementHelpers . count)
+viewHelpers =
+    view (stateResources . resourcesElements . elementsHelpers . count)
 
 viewStorage :: State a -> Storage (Paperclips a)
-viewStorage = view (resources . storage)
+viewStorage = view (stateResources . resourcesStorage)
 
 viewTrees :: State a -> Trees a
-viewTrees = view (resources . elements . elementTrees . count)
+viewTrees = view (stateResources . resourcesElements . elementsTrees . count)
 
 viewTreeSeeds :: State a -> TreeSeeds a
-viewTreeSeeds = view (resources . elements . elementTreeSeeds . count)
+viewTreeSeeds =
+    view (stateResources . resourcesElements . elementsTreeSeeds . count)
 
 viewWater :: State a -> Water a
-viewWater = view (resources . elements . elementWater . count)
+viewWater = view (stateResources . resourcesElements . elementsWater . count)
 
 viewWaterTank :: State a -> WaterTank a
-viewWaterTank = view (resources . waterTank)
+viewWaterTank = view (stateResources . resourcesWaterTank)
 
 viewWood :: State a -> Wood a
-viewWood = view (resources . elements . elementWood . count)
+viewWood = view (stateResources . resourcesElements . elementsWood . count)
 
 viewAdvancedHelperResearch :: State a -> ResearchProgress a
 viewAdvancedHelperResearch =
-    view (researchAreas . advancedHelperResearch . researchCompProgress)
+    view (stateResearchAreas . advancedHelperResearch . researchCompProgress)
 
 viewSeconds :: State a -> Seconds a
-viewSeconds = view seconds
+viewSeconds = view stateSeconds
 
 viewSnapshots :: State a -> Snapshots a
-viewSnapshots = view snapshots
+viewSnapshots = view stateSnapshots
 
 viewSource :: State a -> SourceText
-viewSource = view (source . sourceText)
+viewSource = view (stateSource . sourceText)
 
 viewSourceStatus :: State a -> SourceStatus
-viewSourceStatus = view (source . sourceStatus)
+viewSourceStatus = view (stateSource . sourceStatus)
 
 viewIsStarted :: State a -> IsStarted
-viewIsStarted = view isStarted
+viewIsStarted = view stateIsStarted
 
 viewCreatePaperclip :: State a -> EventCreatePaperclip
-viewCreatePaperclip = view (events . eventCreatePaperclip)
+viewCreatePaperclip = view (stateEvents . eventsEventCreatePaperclip)
 
 viewButtonData :: Button -> State a -> ButtonData
-viewButtonData ButtonStart = view (events . eventStart . eventStartButtonData)
-viewButtonData ButtonCreatePaperclip =
-    view (events . eventCreatePaperclip . eventCreatePaperclipButtonData)
+viewButtonData ButtonStart =
+    view (stateEvents . eventsEventStart . eventStartButtonData)
+viewButtonData ButtonCreatePaperclip = view
+    (stateEvents . eventsEventCreatePaperclip . eventCreatePaperclipButtonData)
 viewButtonData ButtonCreateHelper =
-    view (events . eventCreateHelper . eventCreateHelperButtonData)
+    view (stateEvents . eventsEventCreateHelper . eventCreateHelperButtonData)
 viewButtonData ButtonExtendStorage =
-    view (events . eventExtendStorage . eventExtendStorageButtonData)
+    view (stateEvents . eventsEventExtendStorage . eventExtendStorageButtonData)
 viewButtonData ButtonPumpWater =
-    view (events . eventPumpWater . eventPumpWaterButtonData)
-viewButtonData ButtonGenerateEnergy =
-    view (events . eventGenerateEnergy . eventGenerateEnergyButtonData)
+    view (stateEvents . eventsEventPumpWater . eventPumpWaterButtonData)
+viewButtonData ButtonGenerateEnergy = view
+    (stateEvents . eventsEventGenerateEnergy . eventGenerateEnergyButtonData)
 viewButtonData ButtonBuyASeed =
-    view (events . eventBuyASeed . eventBuyASeedButtonData)
+    view (stateEvents . eventsEventBuyASeed . eventBuyASeedButtonData)
 viewButtonData ButtonPlantASeed =
-    view (events . eventPlantASeed . eventPlantASeedButtonData)
+    view (stateEvents . eventsEventPlantASeed . eventPlantASeedButtonData)
 viewButtonData ButtonResearchAdvancedHelper = view
-    ( events
-    . eventResearchAdvancedHelper
+    ( stateEvents
+    . eventsEventResearchAdvancedHelper
     . eventResearchAdvancedHelperButtonData
     )
-viewButtonData ButtonPreviousSnapshot =
-    view (events . eventPreviousSnapshot . eventPreviousSnapshotButtonData)
+viewButtonData ButtonPreviousSnapshot = view
+    (stateEvents . eventsEventPreviousSnapshot . eventPreviousSnapshotButtonData
+    )
 viewButtonData ButtonNextSnapshot =
-    view (events . eventNextSnapshot . eventNextSnapshotButtonData)
+    view (stateEvents . eventsEventNextSnapshot . eventNextSnapshotButtonData)
 viewButtonData ButtonApplySnapshot =
-    view (events . eventApplySnapshot . eventApplySnapshotButtonData)
-viewButtonData ButtonExitApplication =
-    view (events . eventExitApplication . eventExitApplicationButtonData)
+    view (stateEvents . eventsEventApplySnapshot . eventApplySnapshotButtonData)
+viewButtonData ButtonExitApplication = view
+    (stateEvents . eventsEventExitApplication . eventExitApplicationButtonData)
 
 viewTitle :: State a -> Title
-viewTitle = view title
+viewTitle = view stateTitle

@@ -1,4 +1,6 @@
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
@@ -6,7 +8,7 @@
 module State where
 
 import           Control.Applicative            ( liftA2 )
-import           Control.Lens                   ( makeLenses
+import           Control.Lens                   ( makeClassy
                                                 , over
                                                 , set
                                                 , view
@@ -84,11 +86,11 @@ data ResearchComp a = ResearchComp
   , _researchCompErrorMessage :: Text
   , _researchCompInProgressErr :: Text
   , _researchCompDoneErr :: Text }
-makeLenses ''ResearchComp
+makeClassy ''ResearchComp
 
 data ResearchAreas a = ResearchAreas
   { _advancedHelperResearch :: ResearchComp a}
-makeLenses ''ResearchAreas
+makeClassy ''ResearchAreas
 
 newtype IsStarted = IsStarted { unIsStarted :: Bool }
 
@@ -128,75 +130,75 @@ data ButtonData = ButtonData
   { _buttonTitle :: ButtonTitle
   , _buttonStatus :: ButtonStatus
   , _buttonEvent :: ButtonEvent } deriving Show
-makeLenses ''ButtonData
+makeClassy ''ButtonData
 
 newtype EventStart =
   EventStart { _eventStartButtonData :: ButtonData } deriving Show
-makeLenses ''EventStart
+makeClassy ''EventStart
 
 newtype EventCreatePaperclip =
   EventCreatePaperclip { _eventCreatePaperclipButtonData :: ButtonData } deriving Show
-makeLenses ''EventCreatePaperclip
+makeClassy ''EventCreatePaperclip
 
 newtype EventCreateHelper =
   EventCreateHelper { _eventCreateHelperButtonData :: ButtonData } deriving Show
-makeLenses ''EventCreateHelper
+makeClassy ''EventCreateHelper
 
 newtype EventExtendStorage =
   EventExtendStorage { _eventExtendStorageButtonData :: ButtonData } deriving Show
-makeLenses ''EventExtendStorage
+makeClassy ''EventExtendStorage
 
 newtype EventPumpWater =
   EventPumpWater { _eventPumpWaterButtonData :: ButtonData } deriving Show
-makeLenses ''EventPumpWater
+makeClassy ''EventPumpWater
 
 newtype EventGenerateEnergy =
   EventGenerateEnergy { _eventGenerateEnergyButtonData :: ButtonData } deriving Show
-makeLenses ''EventGenerateEnergy
+makeClassy ''EventGenerateEnergy
 
 newtype EventBuyASeed =
   EventBuyASeed { _eventBuyASeedButtonData :: ButtonData } deriving Show
-makeLenses ''EventBuyASeed
+makeClassy ''EventBuyASeed
 
 newtype EventPlantASeed =
   EventPlantASeed { _eventPlantASeedButtonData :: ButtonData } deriving Show
-makeLenses ''EventPlantASeed
+makeClassy ''EventPlantASeed
 
 newtype EventResearchAdvancedHelper =
   EventResearchAdvancedHelper { _eventResearchAdvancedHelperButtonData :: ButtonData } deriving Show
-makeLenses ''EventResearchAdvancedHelper
+makeClassy ''EventResearchAdvancedHelper
 
 newtype EventPreviousSnapshot =
   EventPreviousSnapshot { _eventPreviousSnapshotButtonData :: ButtonData } deriving Show
-makeLenses ''EventPreviousSnapshot
+makeClassy ''EventPreviousSnapshot
 
 newtype EventNextSnapshot =
   EventNextSnapshot { _eventNextSnapshotButtonData :: ButtonData } deriving Show
-makeLenses ''EventNextSnapshot
+makeClassy ''EventNextSnapshot
 
 newtype EventApplySnapshot =
   EventApplySnapshot { _eventApplySnapshotButtonData :: ButtonData } deriving Show
-makeLenses ''EventApplySnapshot
+makeClassy ''EventApplySnapshot
 
 newtype EventExitApplication =
   EventExitApplication { _eventExitApplicationButtonData :: ButtonData } deriving Show
-makeLenses ''EventExitApplication
+makeClassy ''EventExitApplication
 
 data Events = Events
-  { _eventStart :: EventStart
-  , _eventCreatePaperclip :: EventCreatePaperclip
-  , _eventCreateHelper :: EventCreateHelper
-  , _eventExtendStorage :: EventExtendStorage
-  , _eventPumpWater :: EventPumpWater
-  , _eventGenerateEnergy :: EventGenerateEnergy
-  , _eventBuyASeed :: EventBuyASeed
-  , _eventPlantASeed :: EventPlantASeed
-  , _eventResearchAdvancedHelper :: EventResearchAdvancedHelper
-  , _eventPreviousSnapshot :: EventPreviousSnapshot
-  , _eventNextSnapshot :: EventNextSnapshot
-  , _eventApplySnapshot :: EventApplySnapshot
-  , _eventExitApplication :: EventExitApplication } deriving Show
-makeLenses ''Events
+  { _eventsEventStart :: EventStart
+  , _eventsEventCreatePaperclip :: EventCreatePaperclip
+  , _eventsEventCreateHelper :: EventCreateHelper
+  , _eventsEventExtendStorage :: EventExtendStorage
+  , _eventsEventPumpWater :: EventPumpWater
+  , _eventsEventGenerateEnergy :: EventGenerateEnergy
+  , _eventsEventBuyASeed :: EventBuyASeed
+  , _eventsEventPlantASeed :: EventPlantASeed
+  , _eventsEventResearchAdvancedHelper :: EventResearchAdvancedHelper
+  , _eventsEventPreviousSnapshot :: EventPreviousSnapshot
+  , _eventsEventNextSnapshot :: EventNextSnapshot
+  , _eventsEventApplySnapshot :: EventApplySnapshot
+  , _eventsEventExitApplication :: EventExitApplication } deriving Show
+makeClassy ''Events
 
 data Button
   = ButtonStart
@@ -214,14 +216,17 @@ data Button
   | ButtonExitApplication
 
 newtype Snapshots a = Snapshots { _zipper :: Zipper (Resources a)}
-makeLenses ''Snapshots
+makeClassy ''Snapshots
 
 instance Show (Snapshots Integer) where
   show (Snapshots rs) = case safeCursor rs of
     Nothing -> "Nothing to show yet."
     Just x ->
-      let y = view (elements . elementPaperclips . count) x
+      let y = view (resourcesElements . elementsPaperclips . count) x
       in  "Paperclips in focus of snapshot: " ++ show y
+
+      -- let y = view (elements . elementPaperclips . count) x
+      -- in  "Paperclips in focus of snapshot: " ++ show y
 
 newtype Title = Title Text
 
@@ -229,44 +234,45 @@ instance Show Title where
   show (Title t) = unpack t
 
 data State a = State
-  { _config :: Config a
-  , _actions :: [Action a]
-  , _errorLog :: [ErrorLogLine]
-  , _events :: Events
-  , _researchAreas :: ResearchAreas a
-  , _resources :: Resources a
-  , _seconds :: Seconds a
-  , _snapshots :: Snapshots a
-  , _source :: Source a
-  , _title :: Title
-  , _isStarted :: IsStarted }
-makeLenses ''State
+  { _stateConfig :: Config a
+  , _stateActions :: [Action a]
+  , _stateErrorLog :: [ErrorLogLine]
+  , _stateEvents :: Events
+  , _stateResearchAreas :: ResearchAreas a
+  , _stateResources :: Resources a
+  , _stateSeconds :: Seconds a
+  , _stateSnapshots :: Snapshots a
+  , _stateSource :: Source a
+  , _stateTitle :: Title
+  , _stateIsStarted :: IsStarted }
+makeClassy ''State
 
 applyAction :: Num a => Action a -> State a -> State a
-applyAction (SetP p) state =
-  set (resources . elements . elementPaperclips . count) p state
-applyAction (SetH h) state =
-  set (resources . elements . elementHelpers . count) h state
-applyAction (SetE err) state = over errorLog (\errs -> err : errs) state
-applyAction (SetEnergy e) state =
-  set (resources . elements . elementEnergy . count) e state
-applyAction (SetStorage a) state = set (resources . storage) a state
-applyAction (SetR r) state =
-  set (researchAreas . advancedHelperResearch . researchCompProgress) r state
-applyAction (SetTreeSeeds s) state =
-  set (resources . elements . elementTreeSeeds . count) s state
-applyAction (SetTrees t) state =
-  set (resources . elements . elementTrees . count) t state
-applyAction (SetAdvancedHelperResearchProgress p) state =
-  set (researchAreas . advancedHelperResearch . researchCompProgress) p state
-applyAction (SetHelperInc i) state =
-  set (config . constants . helperInc) i state
-applyAction (SetProgs ps) state =
-  set (resources . elements . elementTreeSeeds . count . progs) ps state
-applyAction (SetWater w) state =
-  set (resources . elements . elementWater . count) w state
-applyAction (SetWood w) state =
-  set (resources . elements . elementWood . count) w state
+applyAction (SetP p) =
+  set (stateResources . resourcesElements . elementsPaperclips . count) p
+applyAction (SetH h) =
+  set (stateResources . resourcesElements . elementsHelpers . count) h
+applyAction (SetE err) = over stateErrorLog (\errs -> err : errs)
+applyAction (SetEnergy e) =
+  set (stateResources . resourcesElements . elementsEnergy . count) e
+applyAction (SetStorage a) = set (stateResources . resourcesStorage) a
+applyAction (SetR r) =
+  set (stateResearchAreas . advancedHelperResearch . researchCompProgress) r
+applyAction (SetTreeSeeds s) =
+  set (stateResources . resourcesElements . elementsTreeSeeds . count) s
+applyAction (SetTrees t) =
+  set (stateResources . resourcesElements . elementsTrees . count) t
+applyAction (SetAdvancedHelperResearchProgress p) =
+  set (stateResearchAreas . advancedHelperResearch . researchCompProgress) p
+applyAction (SetHelperInc i) =
+  set (stateConfig . configConstants . helperInc) i
+applyAction (SetProgs ps) = set
+  (stateResources . resourcesElements . elementsTreeSeeds . count . progs)
+  ps
+applyAction (SetWater w) =
+  set (stateResources . resourcesElements . elementsWater . count) w
+applyAction (SetWood w) =
+  set (stateResources . resourcesElements . elementsWood . count) w
 
 addHelperWork
   :: Num a => HelperInc (Helpers a) -> Helpers a -> Paperclips a -> Paperclips a
@@ -279,7 +285,7 @@ productOfHelperWork (HelperInc inc) h = liftA2 (*) h inc
 calcRemainingWater
   :: (Num a, Ord a) => CostWater a -> [Prog a] -> Water a -> Maybe (Water a)
 calcRemainingWater price ps w =
-  let calculatedCost = calcWaterCost ps (unWater $ view costWater price)
+  let calculatedCost = calcWaterCost ps (unWater $ view costWaterA price)
   in  case calculatedCost > w of
         True  -> Nothing
         False -> Just $ Iso.under2 isoWater (-) w calculatedCost
@@ -303,8 +309,8 @@ initializeASeed
 initializeASeed dur =
   TreeSeeds
     . changeFirst (== NotGrowing)
-                  (const $ moveItForward $ view durationTreeSeeds dur)
-    . view treeSeeds
+                  (const $ moveItForward $ view durationTreeSeedsDur dur)
+    . view progs
  where
   moveItForward Instant   = GrowingDone
   moveItForward (Ticks n) = Growing n
@@ -314,13 +320,13 @@ decPaperclipsWith'
 decPaperclipsWith' (AdvancedHelperPrice hp) p = liftA2 (-) p hp
 
 addActions :: State a -> [Action a] -> State a
-addActions state newActions = over actions (\as -> newActions ++ as) state
+addActions st newActions = over stateActions (\as -> newActions ++ as) st
 
 removeLefts :: Zipper a -> Zipper a
 removeLefts (Zip _ rs) = Zip [] rs
 
 clearAllFutureSnapshots :: State a -> State a
-clearAllFutureSnapshots = over (snapshots . zipper) removeLefts
+clearAllFutureSnapshots = over (stateSnapshots . zipper) removeLefts
 
 startResearch :: DurationAdvancedHelper a -> (ResearchProgress a)
 startResearch = f . unDurationAdvanced

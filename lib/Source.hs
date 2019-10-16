@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 
@@ -32,7 +34,7 @@ instance Show SourceStatus where
 data Source a = Source
   { _sourceText :: SourceText
   , _sourceStatus :: SourceStatus }
-makeLenses ''Source
+makeClassy ''Source
 
 type Parser = Parsec Void Text
 

@@ -21,39 +21,39 @@ helperWork
          , HelperInc (Helpers a)
          , Storage (Paperclips a)
          )
-helperWork = get4 (resources . elements . elementPaperclips . count)
-                  (resources . elements . elementHelpers . count)
-                  (config . constants . helperInc)
-                  (resources . storage)
+helperWork = get4 (stateResources . resourcesElements . elementsPaperclips . count)
+                  (stateResources . resourcesElements . elementsHelpers . count)
+                  (stateConfig . configConstants . helperInc)
+                  (stateResources . resourcesStorage)
 
 researchWork :: State a -> (ResearchProgress a, HelperInc (Helpers a))
 researchWork = get2
-      (researchAreas . advancedHelperResearch . researchCompProgress)
-      (config . constants . helperInc)
+      (stateResearchAreas . advancedHelperResearch . researchCompProgress)
+      (stateConfig . configConstants . helperInc)
 
 seedWork
       :: State a
       -> (Seconds a, Water a, TreeSeedCostPerTick a, [Prog a], Trees a)
 seedWork = get5
-      seconds
-      (resources . elements . elementWater . count)
-      (resources . elements . elementTrees . cost . acquireTreeSeedCostPerTick)
-      (resources . elements . elementTreeSeeds . count . progs)
-      (resources . elements . elementTrees . count)
+      stateSeconds
+      (stateResources . resourcesElements . elementsWater . count)
+      (stateResources . resourcesElements . elementsTrees . elementCost . acquireTreeSeedCostPerTick)
+      (stateResources . resourcesElements . elementsTreeSeeds . count . progs)
+      (stateResources . resourcesElements . elementsTrees . count)
 
 buyHelper
       :: State a
       -> (Seconds a, HelpersManually a, Paperclips a, Energy a, Helpers a)
 buyHelper = get5
-      seconds
-      (resources . elements . elementHelpers . cost . acquireHelpersManually)
-      (resources . elements . elementPaperclips . count)
-      (resources . elements . elementEnergy . count)
-      (resources . elements . elementHelpers . count)
+      stateSeconds
+      (stateResources . resourcesElements . elementsHelpers . elementCost . acquireHelpersManually)
+      (stateResources . resourcesElements . elementsPaperclips . count)
+      (stateResources . resourcesElements . elementsEnergy . count)
+      (stateResources . resourcesElements . elementsHelpers . count)
 
 pumpWater :: State a -> (Water a, WaterTank a)
 pumpWater =
-      get2 (resources . elements . elementWater . count) (resources . waterTank)
+      get2 (stateResources . resourcesElements . elementsWater . count) (stateResources . resourcesWaterTank)
 
 researchAdvancedHelper
       :: State a
@@ -63,46 +63,46 @@ researchAdvancedHelper
          , ResearchComp a
          )
 researchAdvancedHelper = get4
-      seconds
-      (resources . elements . elementPaperclips . count)
-      (config . prices . advancedHelperPrice)
-      (researchAreas . advancedHelperResearch)
+      stateSeconds
+      (stateResources . resourcesElements . elementsPaperclips . count)
+      (stateConfig . configPrices . advancedHelperPrice)
+      (stateResearchAreas . advancedHelperResearch)
 
 plantASeed :: State a -> (Seconds a, DurationTreeSeeds a, TreeSeeds a)
-plantASeed = get3 seconds
-                  (resources . elements . elementTreeSeeds . duration)
-                  (resources . elements . elementTreeSeeds . count)
+plantASeed = get3 stateSeconds
+                  (stateResources . resourcesElements . elementsTreeSeeds . duration)
+                  (stateResources . resourcesElements . elementsTreeSeeds . count)
 
 buyASeed :: State a -> (Seconds a, BuyTreeSeeds a, Paperclips a, TreeSeeds a)
 buyASeed = get4
-      seconds
-      (resources . elements . elementTreeSeeds . cost . acquireBuyTreeSeeds)
-      (resources . elements . elementPaperclips . count)
-      (resources . elements . elementTreeSeeds . count)
+      stateSeconds
+      (stateResources . resourcesElements . elementsTreeSeeds . elementCost . acquireBuyTreeSeeds)
+      (stateResources . resourcesElements . elementsPaperclips . count)
+      (stateResources . resourcesElements . elementsTreeSeeds . count)
 
 generateEnergy
       :: (Enum a, Num a, Ord a, Show a)
       => State a
       -> (EnergyManually a, Energy a)
 generateEnergy = get2
-      (resources . elements . elementEnergy . cost . acquireEnergyManually)
-      (resources . elements . elementEnergy . count)
+      (stateResources . resourcesElements . elementsEnergy . elementCost . acquireEnergyManually)
+      (stateResources . resourcesElements . elementsEnergy . count)
 
 createPaperclip :: State a -> (Paperclips a, Storage (Paperclips a))
-createPaperclip = get2 (resources . elements . elementPaperclips . count)
-                       (resources . storage)
+createPaperclip = get2 (stateResources . resourcesElements . elementsPaperclips . count)
+                       (stateResources . resourcesStorage)
 
 extendStorage
       :: State a
       -> (Seconds a, StorageManually a, Wood a, Storage (Paperclips a))
 extendStorage = get4
-      seconds
-      (resources . elements . elementsStorage . cost . acquireStorageManually)
-      (resources . elements . elementWood . count)
-      (resources . storage)
+      stateSeconds
+      (stateResources . resourcesElements . elementsStorage . elementCost . acquireStorageManually)
+      (stateResources . resourcesElements . elementsWood . count)
+      (stateResources . resourcesStorage)
 
 run :: State a -> (Seconds a, Paperclips a, SourceText, Storage (Paperclips a))
-run = get4 seconds
-           (resources . elements . elementPaperclips . count)
-           (source . sourceText)
-           (resources . storage)
+run = get4 stateSeconds
+           (stateResources . resourcesElements . elementsPaperclips . count)
+           (stateSource . sourceText)
+           (stateResources . resourcesStorage)

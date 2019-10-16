@@ -48,37 +48,37 @@ nextTick =
     . addSecond
 
 saveSnapshot :: State a -> State a
-saveSnapshot state =
-  let r = view resources state in over (snapshots . zipper) (insert r) state
+saveSnapshot st =
+  let r = view stateResources st in over (stateSnapshots . zipper) (insert r) st
 
 runCode :: (Eq a, Integral a, Num a) => State a -> State a
-runCode state =
-  addActions state . (singleton . SetP) . uncurryN BL.run . PBL.run $ state
+runCode st =
+  addActions st . (singleton . SetP) . uncurryN BL.run . PBL.run $ st
 
 handleActions :: Num a => State a -> State a
-handleActions state =
-  let as = view actions state in set actions [] $ foldr applyAction state as
+handleActions st =
+  let as = view stateActions st in set stateActions [] $ foldr applyAction st as
 
 helperWork :: (Num a, Ord a) => State a -> State a
-helperWork state =
-  addActions state
+helperWork st =
+  addActions st
     . (singleton . SetP)
     . uncurryN BL.helperWork
     . PBL.helperWork
-    $ state
+    $ st
 
 researchWork :: (Eq a, Num a) => State a -> State a
-researchWork state =
+researchWork st =
   handleActions
-    . addActions state
+    . addActions st
     . (\(p, h) -> SetAdvancedHelperResearchProgress p : SetHelperInc h : [])
     . uncurryN BL.researchWork
     . PBL.researchWork
-    $ state
+    $ st
 
 seedWork :: (Num a, Ord a, Show a) => State a -> State a
-seedWork state =
-  addActions state
+seedWork st =
+  addActions st
     . (withExtendedError
         SetE
         (\p -> SetProgs p : [])
@@ -86,86 +86,86 @@ seedWork state =
       )
     . uncurryN BL.seedWork
     . PBL.seedWork
-    $ state
+    $ st
 
 addSecond :: (Enum a) => State a -> State a
-addSecond = over seconds succ
+addSecond = over stateSeconds succ
 
 createPaperclip :: (Enum a, Num a, Ord a) => State a -> State a
-createPaperclip state =
+createPaperclip st =
   handleActions
-    . addActions state
+    . addActions st
     . (\p -> SetP p : [])
     . uncurryN BL.createPaperclip
     . PBL.createPaperclip
-    $ state
+    $ st
 
 buyHelper :: (Enum a, Num a, Ord a, Show a) => State a -> State a
-buyHelper state =
+buyHelper st =
   handleActions
-    . addActions state
+    . addActions st
     . (withError SetE (\(h, e, p) -> SetH h : SetEnergy e : SetP p : []))
     . uncurryN BL.buyHelper
     . PBL.buyHelper
-    $ state
+    $ st
 
 buyASeed :: (Num a, Ord a, Show a) => State a -> State a
-buyASeed state =
+buyASeed st =
   handleActions
-    . addActions state
+    . addActions st
     . withError SetE (\(s, p) -> SetTreeSeeds s : SetP p : [])
     . uncurryN BL.buyASeed
     . PBL.buyASeed
-    $ state
+    $ st
 
 extendStorage :: (Num a, Ord a, Show a) => State a -> State a
-extendStorage state =
+extendStorage st =
   handleActions
-    . addActions state
+    . addActions st
     . withError SetE (\(s, w) -> SetStorage s : SetWood w : [])
     . uncurryN BL.extendStorage
     . PBL.extendStorage
-    $ state
+    $ st
 
 generateEnergy :: (Enum a, Ord a, Num a, Show a) => State a -> State a
-generateEnergy s =
+generateEnergy st =
   handleActions
-    . addActions s
+    . addActions st
     . (\e -> SetEnergy e : [])
     . uncurryN BL.generateEnergy
     . PBL.generateEnergy
-    $ s
+    $ st
 
 researchAdvancedHelper :: (Num a, Ord a, Show a) => State a -> State a
-researchAdvancedHelper state =
+researchAdvancedHelper st =
   handleActions
-    . addActions state
+    . addActions st
     . withError SetE (\(p, r) -> SetP p : SetR r : [])
     . uncurryN BL.researchAdvancedHelper
     . PBL.researchAdvancedHelper
-    $ state
+    $ st
 
 plantASeed :: (Num a, Ord a, Show a) => State a -> State a
-plantASeed state =
+plantASeed st =
   handleActions
-    . addActions state
+    . addActions st
     . withError SetE (\s -> SetTreeSeeds s : [])
     . uncurryN BL.plantASeed
     . PBL.plantASeed
-    $ state
+    $ st
 
 pumpWater :: (Enum a, Num a, Ord a) => State a -> State a
-pumpWater state =
+pumpWater st =
   handleActions
-    . addActions state
+    . addActions st
     . (\w -> SetWater w : [])
     . uncurryN BL.pumpWater
     . PBL.pumpWater
-    $ state
+    $ st
 
 compile :: Text -> State a -> State a
-compile text = set (source . sourceText) (SourceText text) . set
-  (source . sourceStatus)
+compile text = set (stateSource . sourceText) (SourceText text) . set
+  (stateSource . sourceStatus)
   (case parse text :: Either CustomParseError (Expr Integer) of
     Left  (CPE s)        -> SourceStatus $ pack $ "Not runnable:\n" ++ s
     Left  NothingToParse -> SourceStatus $ pack $ "Nothing to parse."
@@ -173,28 +173,28 @@ compile text = set (source . sourceText) (SourceText text) . set
   )
 
 previousSnapshot :: State a -> State a
-previousSnapshot = over (snapshots . zipper) right
+previousSnapshot = over (stateSnapshots . zipper) right
 
 nextSnapshot :: State a -> State a
-nextSnapshot = over (snapshots . zipper) left
+nextSnapshot = over (stateSnapshots . zipper) left
 
 applySnapshot :: State a -> State a
-applySnapshot state = over
-  resources
-  (\old -> case safeCursor (view (snapshots . zipper) state) of
+applySnapshot st = over
+  stateResources
+  (\old -> case safeCursor (view (stateSnapshots . zipper) st) of
     Nothing  -> old
     Just new -> new
   )
-  state
+  st
 
 setStarted :: Bool -> State a -> State a
 setStarted True =
   saveSnapshot
-    . set (events . eventStart . eventStartButtonData . buttonTitle)
+    . set (stateEvents . eventsEventStart . eventStartButtonData . buttonTitle)
           (ButtonTitle "Pause")
-    . set isStarted (IsStarted True)
+    . set stateIsStarted (IsStarted True)
 setStarted False =
   clearAllFutureSnapshots
-    . set (events . eventStart . eventStartButtonData . buttonTitle)
+    . set (stateEvents . eventsEventStart . eventStartButtonData . buttonTitle)
           (ButtonTitle "Start")
-    . set isStarted (IsStarted False)
+    . set stateIsStarted (IsStarted False)
