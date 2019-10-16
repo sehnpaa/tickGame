@@ -18,8 +18,13 @@ config :: Config Integer
 config = Config (Constants (HelperInc (Helpers 1))) Initial.prices
 
 researchAreas :: ResearchAreas Integer
-researchAreas =
-    ResearchAreas (ResearchComp (DurationAdvanced $ Ticks 20) NotResearched)
+researchAreas = ResearchAreas
+    (ResearchComp (DurationAdvanced $ Ticks 20)
+                  NotResearched
+                  "Not enough paperclips."
+                  "Already in progress."
+                  "Already done."
+    )
 
 resources :: Resources Integer
 resources =
@@ -40,15 +45,27 @@ elements = Elements
     )
     (Element
         (AcquireHelpers
-            (HelpersManually (CostEnergyPaperclips (Energy 10) (Paperclips 10)))
+            (HelpersManually
+                (CostEnergyPaperclips (Energy 10) (Paperclips 10))
+                "Not enough energy."
+                "Not enough paperclips."
+            )
         )
         (Helpers 0)
         (DurationHelpers Instant)
     )
     (Element
+        (AcquireStorage (StorageManually (CostWood (Wood 1)) "Not enough wood.")
+        )
+        (Storage 1000)
+        (DurationStorage Instant)
+    )
+    (Element
         (AcquireTrees
             (TreesFromTreeSeeds (CostTreeSeeds (TreeSeeds [GrowingDone])))
-            (TreeSeedCostPerTick (CostWater (Water 2)) "Not enough water for the seeds.")
+            (TreeSeedCostPerTick (CostWater (Water 2))
+                                 "Not enough water for the seeds."
+            )
         )
         (Trees 0)
         (DurationTrees Instant)

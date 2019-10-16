@@ -92,10 +92,14 @@ createPaperclip :: State a -> (Paperclips a, Storage (Paperclips a))
 createPaperclip = get2 (resources . elements . elementPaperclips . count)
                        (resources . storage)
 
-extendStorage :: State a -> (Seconds a, Wood a, Storage (Paperclips a))
-extendStorage = get3 seconds
-                      (resources . elements . elementWood . count)
-                      (resources . storage)
+extendStorage
+      :: State a
+      -> (Seconds a, StorageManually a, Wood a, Storage (Paperclips a))
+extendStorage = get4
+      seconds
+      (resources . elements . elementsStorage . cost . acquireStorageManually)
+      (resources . elements . elementWood . count)
+      (resources . storage)
 
 run :: State a -> (Seconds a, Paperclips a, SourceText, Storage (Paperclips a))
 run = get4 seconds

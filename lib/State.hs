@@ -80,7 +80,10 @@ newtype DurationAdvancedHelper a = DurationAdvanced { unDurationAdvanced :: Dura
 
 data ResearchComp a = ResearchComp
   { _researchCompDuration :: DurationAdvancedHelper a
-  , _researchCompProgress :: ResearchProgress a }
+  , _researchCompProgress :: ResearchProgress a
+  , _researchCompErrorMessage :: Text
+  , _researchCompInProgressErr :: Text
+  , _researchCompDoneErr :: Text }
 makeLenses ''ResearchComp
 
 data ResearchAreas a = ResearchAreas
@@ -273,12 +276,10 @@ addHelperWork inc h p =
 productOfHelperWork :: Num a => HelperInc (Helpers a) -> Helpers a -> Helpers a
 productOfHelperWork (HelperInc inc) h = liftA2 (*) h inc
 
-calcRemainingWater :: (Num a, Ord a) =>
-                        CostWater a -> [Prog a] -> Water a -> Maybe (Water a)
+calcRemainingWater
+  :: (Num a, Ord a) => CostWater a -> [Prog a] -> Water a -> Maybe (Water a)
 calcRemainingWater price ps w =
-  let calculatedCost = calcWaterCost
-        ps
-        (unWater $ view costWater price)
+  let calculatedCost = calcWaterCost ps (unWater $ view costWater price)
   in  case calculatedCost > w of
         True  -> Nothing
         False -> Just $ Iso.under2 isoWater (-) w calculatedCost
@@ -294,12 +295,6 @@ mkErrorLogLine (Seconds s) t =
 lineNeedMoreSeeds :: (Show a) => Seconds a -> ErrorLogLine
 lineNeedMoreSeeds (Seconds s) = ErrorLogLine
   $ Data.Text.concat ["Tick ", pack (show s), ": You need more seeds."]
-
-concatErrors :: (Show a) => Seconds a -> ErrorCount PaymentError -> ErrorLogLine
-concatErrors s errorCount = case errorCount of
-  OneError e -> mkErrorLogLine s (paymentErrorToText e)
-  TwoErrors e1 e2 ->
-    mkErrorLogLine s (paymentErrorToText e1 <> " " <> paymentErrorToText e2)
 
 -- When we initialize a seed, we take the first NotGrowing seed (if any) and
 -- 'move it forward' to Growing or GrowingDone (depending on DurationTreeSeeds)
@@ -325,8 +320,7 @@ removeLefts :: Zipper a -> Zipper a
 removeLefts (Zip _ rs) = Zip [] rs
 
 clearAllFutureSnapshots :: State a -> State a
-clearAllFutureSnapshots =
-  over (snapshots . zipper) removeLefts
+clearAllFutureSnapshots = over (snapshots . zipper) removeLefts
 
 startResearch :: DurationAdvancedHelper a -> (ResearchProgress a)
 startResearch = f . unDurationAdvanced

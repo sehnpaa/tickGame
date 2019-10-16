@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module BusinessLogic where
 
 import           Config
@@ -46,10 +44,7 @@ seedWork s w (TreeSeedCostPerTick price errorMessage) ps ts =
   in  if any isGrowing ps
         then case calcRemainingWater price ps w of
           Nothing ->
-            Left
-              ( mkErrorLogLine s errorMessage
-              , removeGrowingSeeds ps
-              )
+            Left (mkErrorLogLine s errorMessage, removeGrowingSeeds ps)
           Just w' -> Right $ (w', progs', ts + ts')
         else Right $ (w, ps, ts)
 
@@ -61,9 +56,10 @@ buyHelper
   -> Energy a
   -> Helpers a
   -> Either ErrorLogLine (Helpers a, Energy a, Paperclips a)
-buyHelper s (HelpersManually c) p e h = case calcEnergyPaperclipsCombo c e p of
-  Left  errors   -> Left $ concatErrors s errors
-  Right (e', p') -> Right (succ h, e', p')
+buyHelper s (HelpersManually c energyErr paperclipsErr) p e h =
+  case calcEnergyPaperclipsCombo c e p energyErr paperclipsErr of
+    Left  errors   -> Left $ mkErrorLogLine s errors
+    Right (e', p') -> Right (succ h, e', p')
 
 pumpWater :: (Enum a, Num a, Ord a) => Water a -> WaterTank a -> Water a
 pumpWater w tank = Water $ min (unWaterTank tank) (succ $ unWater w)
@@ -75,13 +71,13 @@ researchAdvancedHelper
   -> AdvancedHelperPrice (Paperclips a)
   -> ResearchComp a
   -> Either ErrorLogLine (Paperclips a, ResearchProgress a)
-researchAdvancedHelper s p price (ResearchComp dur progress) =
-  case (unAdvancedHelperPrice price > p, progress) of
-    (True, NotResearched) -> Left $ mkErrorLogLine s "Not enough paperclips."
+researchAdvancedHelper s p price (ResearchComp dur progress errorMessage inProgressErr doneErr)
+  = case (unAdvancedHelperPrice price > p, progress) of
+    (True, NotResearched) -> Left $ mkErrorLogLine s errorMessage
     (False, NotResearched) ->
       Right (decPaperclipsWith' price p, startResearch dur)
-    (_, ResearchInProgress _) -> Left $ mkErrorLogLine s "Already in progress."
-    (_, ResearchDone        ) -> Left $ mkErrorLogLine s "Already done."
+    (_, ResearchInProgress _) -> Left $ mkErrorLogLine s inProgressErr
+    (_, ResearchDone        ) -> Left $ mkErrorLogLine s doneErr
 
 plantASeed
   :: (Num a, Ord a, Show a)
@@ -116,12 +112,14 @@ createPaperclip p s = min (unStorage s) $ fmap succ p
 extendStorage
   :: (Num a, Ord a, Show a)
   => Seconds a
+  -> StorageManually a
   -> Wood a
   -> Storage (Paperclips a)
   -> Either ErrorLogLine (Storage (Paperclips a), Wood a)
-extendStorage sec (Wood w) s = if w >= 1
-  then Right ((fmap . fmap) (+ 1) s, Wood $ w - 1)
-  else Left $ mkErrorLogLine sec "Not enough wood."
+extendStorage sec (StorageManually (CostWood price) errorMessage) w s =
+  if w >= price
+    then Right ((fmap . fmap) (+ 1) s, (-) <$> w <*> price)
+    else Left $ mkErrorLogLine sec errorMessage
 
 run
   :: (Eq a, Integral a, Num a)

@@ -1,6 +1,4 @@
-{-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE TypeOperators #-}
 
 module Resources where
@@ -20,11 +18,6 @@ data Resources a = Resources
   { _elements :: Elements a
   , _storage :: Storage (Paperclips a)
   , _waterTank :: WaterTank a }
-
-newtype Storage a = Storage { unStorage :: a } deriving (Functor)
-
-instance Show (Storage (Paperclips Integer)) where
-  show (Storage a) = show a
 
 newtype WaterTank a = WaterTank { unWaterTank :: a }
 
