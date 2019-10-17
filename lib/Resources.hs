@@ -14,7 +14,6 @@ import           Control.Lens                   ( Profunctor
 
 import           Elements
 import           NaturalTransformation
-import qualified Iso
 
 newtype WaterTank a = WaterTank { unWaterTank :: a }
 
@@ -30,7 +29,7 @@ instance Show (WaterTank Integer) where
 ---
 
 limitByStorage :: Ord a => Storage a -> a -> a
-limitByStorage s = min (Iso.unwrap isoStorage s)
+limitByStorage s = min (view unStorage s)
 
 calcWaterCost :: Num a => [Prog a] -> a -> Water a
 calcWaterCost ps waterPerSeed =
@@ -77,10 +76,6 @@ progressGrowing = map
 isoHelpers
   :: (Profunctor p, Functor f) => p (Helpers a) (f (Helpers a)) -> p a (f a)
 isoHelpers = iso Helpers unHelpers
-
-isoStorage
-  :: (Profunctor p, Functor f) => p (Storage a) (f (Storage a)) -> p a (f a)
-isoStorage = iso Storage unStorage
 
 isoWater :: (Profunctor p, Functor f) => p (Water a) (f (Water a)) -> p a (f a)
 isoWater = iso Water unWater

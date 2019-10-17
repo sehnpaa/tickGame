@@ -1,4 +1,8 @@
+{-# LANGUAGE RankNTypes #-}
+
 module BusinessLogic where
+
+import Control.Lens (Getter, view)
 
 import           Config
 import           Elements
@@ -105,9 +109,28 @@ generateEnergy
   :: (Enum a, Num a, Ord a, Show a) => EnergyManually a -> Energy a -> Energy a
 generateEnergy (EnergyManually c) = freeEnergy c
 
-createPaperclip
-  :: (Enum a, Ord a) => Paperclips a -> Storage (Paperclips a) -> Paperclips a
-createPaperclip p s = min (unStorage s) $ fmap succ p
+-- createPaperclip
+--   :: (Enum a, Ord a) => Paperclips a -> Storage (Paperclips a) -> Paperclips a
+-- createPaperclip p s = min (unStorage s) $ (fmap succ p)
+
+createPaperclip :: (Enum a, Ord (f a), Functor f) =>
+       Getter s (f a)
+       -> Getter s s2
+       -> Getter s2 (f a)
+       -> s
+       -> f a
+-- createPaperclip :: (Enum a, Ord a) =>
+--        Getter s (Paperclips a)
+--        -> Getter s (Storage (Paperclips a))
+--        -> Getter (Storage (Paperclips a)) (Paperclips a)
+--        -> s
+--        -> Paperclips a
+createPaperclip l1 l2 l3 s = createPaperclip2 l3 (view l1 s) (view l2 s)
+
+createPaperclip2 :: (Ord (f b), Enum b, Functor f) =>
+                      Getter s (f b) -> f b -> s -> f b
+createPaperclip2 l3 paperclipCount storageLimit = min (view l3 storageLimit) $ fmap succ paperclipCount
+
 
 extendStorage
   :: (Num a, Ord a, Show a)

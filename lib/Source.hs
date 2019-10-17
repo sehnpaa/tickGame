@@ -21,7 +21,7 @@ data Expr a = SyncPaperclipsWithSeconds a | AddPaperclips [Seconds a]
 
 data CustomParseError = NothingToParse | CPE String
 
-newtype SourceText = SourceText { unSourceText :: Text }
+newtype SourceText = SourceText Text
 
 instance Show SourceText where
   show (SourceText a) = unpack a

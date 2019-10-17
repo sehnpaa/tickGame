@@ -1,3 +1,5 @@
+{-# LANGUAGE RankNTypes #-}
+
 module PathedBusinessLogic where
 
 -- The purpose of this module is to enable the type signatures
@@ -5,6 +7,8 @@ module PathedBusinessLogic where
 
 -- Note: Using lenses to rip out a minimal data set is only
 -- a secondary goal.
+
+import Control.Lens
 
 import           Config
 import           Elements
@@ -88,9 +92,14 @@ generateEnergy = get2
       (stateResources . resourcesElements . elementsEnergy . elementCost . acquireEnergyManually)
       (stateResources . resourcesElements . elementsEnergy . count)
 
-createPaperclip :: State a -> (Paperclips a, Storage (Paperclips a))
-createPaperclip = get2 (stateResources . resourcesElements . elementsPaperclips . count)
-                       (stateResources . resourcesStorage)
+-- createPaperclip2 :: (HasState s a) => s -> (Paperclips a, Storage (Paperclips a))
+createPaperclip2 :: (HasState s a, HasPaperclips p a, HasStorage storage p) => s -> Getter s p -> Getter s storage -> (p, storage)
+createPaperclip2 c f f2 = get2 f f2 c
+
+le :: (HasState s a, HasPaperclips p a, HasStorage storage a) => s -> Getter s p -> Getter s storage -> (p, storage)
+le c f f2 = (view f c, view f2 c)
+
+
 
 extendStorage
       :: State a

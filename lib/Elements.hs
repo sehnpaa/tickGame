@@ -25,7 +25,8 @@ makeClassy ''DurationTreeSeeds
 newtype DurationWater a = DurationWater { unDurationWater :: Duration a }
 newtype DurationWood a = DurationWood { unDurationWood :: Duration a }
 
-newtype Paperclips a = Paperclips a deriving (Eq, Functor, Ord)
+newtype Paperclips a = Paperclips { _unPaperclips :: a } deriving (Eq, Functor, Ord)
+makeClassy ''Paperclips
 
 instance Applicative Paperclips where
   pure = Paperclips
@@ -52,7 +53,8 @@ instance Applicative Helpers where
 instance Show (Helpers Integer) where
   show (Helpers a) = show a
 
-newtype Storage a = Storage { unStorage :: a } deriving (Functor)
+newtype Storage a = Storage { _unStorage :: a } deriving (Functor)
+makeClassy ''Storage
 
 instance Show (Storage (Paperclips Integer)) where
   show (Storage a) = show a

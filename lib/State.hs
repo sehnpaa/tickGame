@@ -225,9 +225,6 @@ instance Show (Snapshots Integer) where
       let y = view (resourcesElements . elementsPaperclips . count) x
       in  "Paperclips in focus of snapshot: " ++ show y
 
-      -- let y = view (elements . elementPaperclips . count) x
-      -- in  "Paperclips in focus of snapshot: " ++ show y
-
 newtype Title = Title Text
 
 instance Show Title where
@@ -247,7 +244,7 @@ data State a = State
   , _stateIsStarted :: IsStarted }
 makeClassy ''State
 
-applyAction :: Num a => Action a -> State a -> State a
+applyAction :: HasState t a => Action a -> t -> t
 applyAction (SetP p) =
   set (stateResources . resourcesElements . elementsPaperclips . count) p
 applyAction (SetH h) =
@@ -319,7 +316,7 @@ decPaperclipsWith'
   :: Num a => AdvancedHelperPrice (Paperclips a) -> Paperclips a -> Paperclips a
 decPaperclipsWith' (AdvancedHelperPrice hp) p = liftA2 (-) p hp
 
-addActions :: State a -> [Action a] -> State a
+addActions :: HasState t a => t -> [Action a] -> t
 addActions st newActions = over stateActions (\as -> newActions ++ as) st
 
 removeLefts :: Zipper a -> Zipper a

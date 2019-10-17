@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RankNTypes #-}
 
 module Lib
   ( Initial.getInitialState
@@ -12,7 +13,7 @@ module Lib
   )
 where
 
-import           Control.Lens                   ( over
+import           Control.Lens                   ( Getter, over
                                                 , set
                                                 , view
                                                 )
@@ -55,7 +56,7 @@ runCode :: (Eq a, Integral a, Num a) => State a -> State a
 runCode st =
   addActions st . (singleton . SetP) . uncurryN BL.run . PBL.run $ st
 
-handleActions :: Num a => State a -> State a
+handleActions :: HasState s a => s -> s
 handleActions st =
   let as = view stateActions st in set stateActions [] $ foldr applyAction st as
 
@@ -91,14 +92,22 @@ seedWork st =
 addSecond :: (Enum a) => State a -> State a
 addSecond = over stateSeconds succ
 
-createPaperclip :: (Enum a, Num a, Ord a) => State a -> State a
+createPaperclip :: (Enum a, HasState s a, Ord a) => s -> s
 createPaperclip st =
   handleActions
     . addActions st
     . (\p -> SetP p : [])
-    . uncurryN BL.createPaperclip
-    . PBL.createPaperclip
+    . BL.createPaperclip getPaperclipCount getStorage getStorageInPaperclips
     $ st
+
+getPaperclipCount :: (HasState s a) => Getter s (Paperclips a)
+getPaperclipCount = (stateResources . resourcesElements . elementsPaperclips . count)
+
+getStorage :: (HasState s a) => Getter s (Storage (Paperclips a))
+getStorage = (stateResources . resourcesStorage)
+
+getStorageInPaperclips :: (HasStorage storage p) => Getter storage p
+getStorageInPaperclips = unStorage
 
 buyHelper :: (Enum a, Num a, Ord a, Show a) => State a -> State a
 buyHelper st =
