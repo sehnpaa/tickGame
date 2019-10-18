@@ -44,7 +44,7 @@ import           Utils
 nextTick :: (Enum a, Integral a, Num a, Ord a, Show a) => State a -> State a
 nextTick =
   saveSnapshot
-    . handleActions
+    . (\st -> performActions stateActions applyAction st (view stateActions st))
     . helperWork
     . seedWork
     . researchWork
@@ -58,16 +58,15 @@ saveSnapshot st =
 
 runCode :: (Eq a, Integral a, Num a) => State a -> State a
 runCode st =
-  addActions st . (singleton . SetP) . uncurryN BL.run . PBL.run $ st
-
-handleActions :: HasState s a => s -> s
-handleActions st =
-  let as = view stateActions st
-  in  set stateActions [] $ foldr applyAction st as
+  performActions stateActions applyAction st
+    . (singleton . SetP)
+    . uncurryN BL.run
+    . PBL.run
+    $ st
 
 helperWork :: (Num a, Ord a) => State a -> State a
 helperWork st =
-  addActions st
+  performActions stateActions applyAction st
     . (singleton . SetP)
     . uncurryN BL.helperWork
     . PBL.helperWork
@@ -75,8 +74,7 @@ helperWork st =
 
 researchWork :: (Eq a, Num a) => State a -> State a
 researchWork st =
-  handleActions
-    . addActions st
+  performActions stateActions applyAction st
     . (\(p, h) -> SetAdvancedHelperResearchProgress p : SetHelperInc h : [])
     . uncurryN BL.researchWork
     . PBL.researchWork
@@ -84,7 +82,7 @@ researchWork st =
 
 seedWork :: (Num a, Ord a, Show a) => State a -> State a
 seedWork st =
-  addActions st
+  performActions stateActions applyAction st
     . (withExtendedError
         SetE
         (\p -> SetProgs p : [])
@@ -110,8 +108,7 @@ performActions l f st = set l [] . foldr f st
 
 buyHelper :: (Enum a, Num a, Ord a, Show a) => State a -> State a
 buyHelper st =
-  handleActions
-    . addActions st
+  performActions stateActions applyAction st
     . (withError SetE (\(h, e, p) -> SetH h : SetEnergy e : SetP p : []))
     . uncurryN BL.buyHelper
     . PBL.buyHelper
@@ -119,8 +116,7 @@ buyHelper st =
 
 buyASeed :: (Num a, Ord a, Show a) => State a -> State a
 buyASeed st =
-  handleActions
-    . addActions st
+  performActions stateActions applyAction st
     . withError SetE (\(s, p) -> SetTreeSeeds s : SetP p : [])
     . uncurryN BL.buyASeed
     . PBL.buyASeed
@@ -128,8 +124,7 @@ buyASeed st =
 
 extendStorage :: (Num a, Ord a, Show a) => State a -> State a
 extendStorage st =
-  handleActions
-    . addActions st
+  performActions stateActions applyAction st
     . withError SetE (\(s, w) -> SetStorage s : SetWood w : [])
     . uncurryN BL.extendStorage
     . PBL.extendStorage
@@ -137,8 +132,7 @@ extendStorage st =
 
 generateEnergy :: (Enum a, Ord a, Num a, Show a) => State a -> State a
 generateEnergy st =
-  handleActions
-    . addActions st
+  performActions stateActions applyAction st
     . (\e -> SetEnergy e : [])
     . uncurryN BL.generateEnergy
     . PBL.generateEnergy
@@ -146,8 +140,7 @@ generateEnergy st =
 
 researchAdvancedHelper :: (Num a, Ord a, Show a) => State a -> State a
 researchAdvancedHelper st =
-  handleActions
-    . addActions st
+  performActions stateActions applyAction st
     . withError SetE (\(p, r) -> SetP p : SetR r : [])
     . uncurryN BL.researchAdvancedHelper
     . PBL.researchAdvancedHelper
@@ -155,8 +148,7 @@ researchAdvancedHelper st =
 
 plantASeed :: (Num a, Ord a, Show a) => State a -> State a
 plantASeed st =
-  handleActions
-    . addActions st
+  performActions stateActions applyAction st
     . withError SetE (\s -> SetTreeSeeds s : [])
     . uncurryN BL.plantASeed
     . PBL.plantASeed
@@ -164,8 +156,7 @@ plantASeed st =
 
 pumpWater :: (Enum a, Num a, Ord a) => State a -> State a
 pumpWater st =
-  handleActions
-    . addActions st
+  performActions stateActions applyAction st
     . (\w -> SetWater w : [])
     . uncurryN BL.pumpWater
     . PBL.pumpWater

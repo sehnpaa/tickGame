@@ -318,9 +318,6 @@ decPaperclipsWith'
   :: Num a => AdvancedHelperPrice (Paperclips a) -> Paperclips a -> Paperclips a
 decPaperclipsWith' (AdvancedHelperPrice hp) p = liftA2 (-) p hp
 
-addActions :: HasState t a => t -> [Action a] -> t
-addActions st newActions = over stateActions (\as -> newActions ++ as) st
-
 removeLefts :: Zipper a -> Zipper a
 removeLefts (Zip _ rs) = Zip [] rs
 
