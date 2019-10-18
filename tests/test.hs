@@ -107,7 +107,14 @@ state1 = State
   []
   []
   Main.events
-  (ResearchAreas (ResearchComp (DurationAdvanced $ Ticks 20) NotResearched))
+  (ResearchAreas
+    (ResearchComp (DurationAdvanced $ Ticks 20)
+                  NotResearched
+                  "Not enough paperclips."
+                  "Already in progress."
+                  "Already done."
+    )
+  )
   Main.resources
   (Seconds 0)
   (Snapshots Data.List.Zipper.empty)
@@ -130,21 +137,34 @@ elements = Elements
            (Energy 20)
            (DurationEnergy Instant)
   )
-  (Element (AcquireHelpers (HelpersManually helperCost))
-           (Helpers 0)
-           (DurationHelpers Instant)
+  (Element
+    (AcquireHelpers
+      (HelpersManually helperCost "Not enough energy." "Not enough paperclips.")
+    )
+    (Helpers 0)
+    (DurationHelpers Instant)
+  )
+  (Element
+    (AcquireStorage (StorageManually (CostWood (Wood 1)) "Not enough wood."))
+    (Storage 1000)
+    (DurationStorage Instant)
   )
   (Element
     (AcquireTrees
       (TreesFromTreeSeeds (CostTreeSeeds (TreeSeeds [GrowingDone])))
-      (TreeSeedCostPerTick (CostWater (Water 2)))
+      (TreeSeedCostPerTick (CostWater (Water 2))
+                           "Not enough water for the seeds."
+      )
     )
     (Trees 0)
     (DurationTrees Instant)
   )
-  (Element (AcquireTreeSeeds (BuyTreeSeeds (CostPaperclips (Paperclips 10))))
-           (TreeSeeds (replicate 10 NotGrowing))
-           (DurationTreeSeeds $ Ticks 20)
+  (Element
+    (AcquireTreeSeeds
+      (BuyTreeSeeds (CostPaperclips (Paperclips 10)) "Not enough paperclips.")
+    )
+    (TreeSeeds (replicate 10 NotGrowing))
+    (DurationTreeSeeds $ Ticks 20)
   )
 
   (Element (AcquireWater (WaterManually NoCost))

@@ -142,7 +142,10 @@ buyASeed s (BuyTreeSeeds c errorMessage) p (TreeSeeds seeds) =
     Just p' -> Right $ (TreeSeeds $ seeds ++ [NotGrowing], p')
 
 generateEnergy
-  :: (Enum e, Num a, Ord a, Show a, HasEnergy e a) => Getter s e -> s -> e
+  :: (Enum energy, Num a, Ord a, Show a, HasEnergy energy a)
+  => Getter s energy
+  -> s
+  -> energy
 generateEnergy e st = succ (view e st)
 
 createPaperclip
@@ -180,7 +183,6 @@ run
 run s p (SourceText t) storage' = case parse t of
   Left _ -> p
   Right (SyncPaperclipsWithSeconds s') ->
-    -- if view unSeconds s == s' then Paperclips . unSeconds $ _ $ s else p
     if view unSeconds s == s' then Paperclips $ view unSeconds s else p
   Right (AddPaperclips ss) ->
     if elem s ss then limitByStorage storage' (fmap (+ 10) p) else p
