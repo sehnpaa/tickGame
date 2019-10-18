@@ -9,11 +9,9 @@ import           Control.Lens                   ( Profunctor
                                                 , iso
                                                 , makeClassy
                                                 , view
-                                                , withIso
                                                 )
 
 import           Elements
-import           NaturalTransformation
 
 newtype WaterTank a = WaterTank { unWaterTank :: a }
 
@@ -73,13 +71,5 @@ progressGrowing = map
 
 ---
 
-isoHelpers
-  :: (Profunctor p, Functor f) => p (Helpers a) (f (Helpers a)) -> p a (f a)
-isoHelpers = iso Helpers unHelpers
-
 isoWater :: (Profunctor p, Functor f) => p (Water a) (f (Water a)) -> p a (f a)
 isoWater = iso Water unWater
-
-helpersToPaperclips :: Helpers :~> Paperclips
-helpersToPaperclips =
-  Nat (\h -> Paperclips $ withIso isoHelpers (\_ eli -> eli h))

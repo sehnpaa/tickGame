@@ -106,12 +106,19 @@ performActions
   :: (Foldable t) => ASetter' s [a] -> (a -> s -> s) -> s -> t a -> s
 performActions l f st = set l [] . foldr f st
 
-buyHelper :: (Enum a, Num a, Ord a, Show a) => State a -> State a
+buyHelper :: (Enum a, Num a, Ord a, Show a, HasState s a) => s -> s
 buyHelper st =
   performActions stateActions applyAction st
     . (withError SetE (\(h, e, p) -> SetH h : SetEnergy e : SetP p : []))
-    . uncurryN BL.buyHelper
-    . PBL.buyHelper
+    . BL.buyHelper getSeconds
+                   getHelpersManuallyCostEnergy
+                   getHelpersManuallyCostPaperclips
+                   getHelpersManuallyEnergyErrorMessage
+                   getHelpersManuallyPaperclipsErrorMessage
+                   getPaperclipCount
+                   getEnergyCount
+                   getHelperCount
+                   mkErrorLogLine
     $ st
 
 buyASeed :: (Num a, Ord a, Show a) => State a -> State a
@@ -134,8 +141,7 @@ generateEnergy :: (Enum a, Ord a, Num a, Show a) => State a -> State a
 generateEnergy st =
   performActions stateActions applyAction st
     . (\e -> SetEnergy e : [])
-    . uncurryN BL.generateEnergy
-    . PBL.generateEnergy
+    . BL.generateEnergy getEnergyCount
     $ st
 
 researchAdvancedHelper :: (Num a, Ord a, Show a) => State a -> State a

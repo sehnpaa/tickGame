@@ -100,19 +100,6 @@ buyASeed = get4
       (stateResources . resourcesElements . elementsPaperclips . count)
       (stateResources . resourcesElements . elementsTreeSeeds . count)
 
-generateEnergy
-      :: (Enum a, Num a, Ord a, Show a)
-      => State a
-      -> (EnergyManually a, Energy a)
-generateEnergy = get2
-      ( stateResources
-      . resourcesElements
-      . elementsEnergy
-      . elementCost
-      . acquireEnergyManually
-      )
-      (stateResources . resourcesElements . elementsEnergy . count)
-
 extendStorage
       :: State a
       -> (Seconds a, StorageManually a, Wood a, Storage (Paperclips a))

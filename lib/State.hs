@@ -26,7 +26,6 @@ import           Data.Text                      ( Text
 import           Config
 import           Elements
 import           Iso
-import           NaturalTransformation
 import           Resources
 import           Seconds
 import           Source
@@ -273,10 +272,6 @@ applyAction (SetWater w) =
 applyAction (SetWood w) =
   set (stateResources . resourcesElements . elementsWood . count) w
 
-addHelperWork
-  :: Num a => HelperInc (Helpers a) -> Helpers a -> Paperclips a -> Paperclips a
-addHelperWork inc h p =
-  liftA2 (+) p $ unNat helpersToPaperclips $ productOfHelperWork inc h
 
 productOfHelperWork :: Num a => HelperInc (Helpers a) -> Helpers a -> Helpers a
 productOfHelperWork (HelperInc inc) h = liftA2 (*) h inc

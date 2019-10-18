@@ -2,9 +2,11 @@
 
 module BusinessLogic where
 
+import           Control.Applicative            ( liftA2 )
 import           Control.Lens                   ( Getter
                                                 , view
                                                 )
+import qualified Data.Text                     as T
 
 import           Config
 import           Elements
@@ -21,7 +23,11 @@ helperWork
   -> HelperInc (Helpers a)
   -> Storage (Paperclips a)
   -> Paperclips a
-helperWork p h inc s = limitByStorage s $ addHelperWork inc h p
+helperWork p h inc s =
+  limitByStorage s
+    $   (+)
+    <$> (Paperclips $ view unHelpers $ (*) <$> h <*> (unHelperInc inc))
+    <*> p
 
 researchWork
   :: (Eq a, Num a)
@@ -55,17 +61,45 @@ seedWork s w (TreeSeedCostPerTick price errorMessage) ps ts =
         else Right $ (w, ps, ts)
 
 buyHelper
-  :: (Enum a, Num a, Ord a, Show a)
-  => Seconds a
-  -> HelpersManually a
-  -> Paperclips a
-  -> Energy a
-  -> Helpers a
-  -> Either ErrorLogLine (Helpers a, Energy a, Paperclips a)
-buyHelper s (HelpersManually c energyErr paperclipsErr) p e h =
-  case calcEnergyPaperclipsCombo c e p energyErr paperclipsErr of
-    Left  errors   -> Left $ mkErrorLogLine s errors
-    Right (e', p') -> Right (succ h, e', p')
+  :: ( Enum (helpers a)
+     , Ord (paperclips a)
+     , Ord (energy a)
+     , Num a
+     , Applicative energy
+     , Applicative paperclips
+     , HasSeconds sec a
+     , HasEnergy (energy a) a
+     , HasPaperclips (paperclips a) a
+     , HasHelpers (helpers a) a
+     )
+  => Getter s sec
+  -> Getter s (energy a)
+  -> Getter s (paperclips a)
+  -> Getter s T.Text
+  -> Getter s T.Text
+  -> Getter s (paperclips a)
+  -> Getter s (energy a)
+  -> Getter s (helpers a)
+  -> (sec -> T.Text -> errorLogLine)
+  -> s
+  -> Either
+       errorLogLine
+       (helpers a, energy a, paperclips a)
+buyHelper s ce cp energyErr paperclipsErr p e h f st =
+  case ((view ce st) <= (view e st), (view cp st) <= (view p st)) of
+    (True, True) -> Right
+      ( succ (view h st)
+      , liftA2 (-) (view e st) (view ce st)
+      , liftA2 (-) (view p st) (view cp st)
+      )
+    (True , False) -> Left (f (view s st) (view paperclipsErr st))
+    (False, True ) -> Left (f (view s st) (view energyErr st))
+    (False, False) ->
+      Left
+        $  f (view s st)
+        $  (view energyErr st)
+        <> T.pack " "
+        <> (view paperclipsErr st)
 
 pumpWater :: (Enum a, Num a, Ord a) => Water a -> WaterTank a -> Water a
 pumpWater w tank = Water $ min (unWaterTank tank) (succ $ unWater w)
@@ -108,8 +142,8 @@ buyASeed s (BuyTreeSeeds c errorMessage) p (TreeSeeds seeds) =
     Just p' -> Right $ (TreeSeeds $ seeds ++ [NotGrowing], p')
 
 generateEnergy
-  :: (Enum a, Num a, Ord a, Show a) => EnergyManually a -> Energy a -> Energy a
-generateEnergy (EnergyManually c) = freeEnergy c
+  :: (Enum e, Num a, Ord a, Show a, HasEnergy e a) => Getter s e -> s -> e
+generateEnergy e st = succ (view e st)
 
 createPaperclip
   :: ( Functor paperclips
@@ -146,6 +180,7 @@ run
 run s p (SourceText t) storage' = case parse t of
   Left _ -> p
   Right (SyncPaperclipsWithSeconds s') ->
-    if unSeconds s == s' then Paperclips . unSeconds $ s else p
+    -- if view unSeconds s == s' then Paperclips . unSeconds $ _ $ s else p
+    if view unSeconds s == s' then Paperclips $ view unSeconds s else p
   Right (AddPaperclips ss) ->
     if elem s ss then limitByStorage storage' (fmap (+ 10) p) else p

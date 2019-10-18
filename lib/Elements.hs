@@ -35,7 +35,8 @@ instance Applicative Paperclips where
 instance Show (Paperclips Integer) where
   show (Paperclips a) = show a
 
-newtype Energy a = Energy a deriving (Eq, Functor, Ord)
+newtype Energy a = Energy a deriving (Enum, Eq, Functor, Ord)
+makeClassy ''Energy
 
 instance Applicative Energy where
   pure = Energy
@@ -44,7 +45,8 @@ instance Applicative Energy where
 instance Show (Energy Integer) where
   show (Energy a) = show a
 
-newtype Helpers a = Helpers { unHelpers :: a } deriving (Enum, Eq, Functor, Ord)
+newtype Helpers a = Helpers { _unHelpers :: a } deriving (Enum, Eq, Functor, Ord)
+makeClassy ''Helpers
 
 instance Applicative Helpers where
   pure = Helpers
@@ -107,7 +109,8 @@ makeClassy ''Cost
 
 data NoCost a = NoCost
 
-data CostEnergyPaperclips a = CostEnergyPaperclips (Energy a) (Paperclips a)
+data CostEnergyPaperclips a = CostEnergyPaperclips { _costEnergyPaperclipsE :: Energy a, _costEnergyPaperclipsP :: Paperclips a }
+makeClassy ''CostEnergyPaperclips
 
 -- FIX: Messed up naming
 data CostPaperclips a = CostPaperclips { _costPaperclipsA :: Paperclips a }
@@ -135,7 +138,8 @@ makeClassy ''AcquireTreeSeeds
 newtype TreesFromTreeSeeds a = TreesFromTreeSeeds { unTreesFromTreeSeeds :: CostTreeSeeds a }
 data TreeSeedCostPerTick a = TreeSeedCostPerTick { unTreeSeedCostPerTick :: CostWater a, treeSeedCostPerTickErrorMessage :: T.Text }
 
-data EnergyManually a = EnergyManually { _energyManually :: NoCost a}
+data EnergyManually a = EnergyManually { _energyManuallyCost :: NoCost a}
+makeClassy ''EnergyManually
 
 data AcquireEnergy cost = AcquireEnergy
   { _acquireEnergyManually :: EnergyManually cost }
@@ -184,9 +188,6 @@ data Elements a = Elements
   , _elementsWater :: Element AcquireWater DurationWater Water a
   , _elementsWood :: Element AcquireWood DurationWood Wood a }
 makeClassy ''Elements
-
-freeEnergy :: (Enum a) => NoCost a -> Energy a -> Energy a
-freeEnergy = const (fmap succ)
 
 calcEnergyPaperclipsCombo
   :: (Num a, Ord a)
