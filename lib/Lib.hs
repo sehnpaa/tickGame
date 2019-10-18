@@ -13,7 +13,8 @@ module Lib
   )
 where
 
-import           Control.Lens                   ( Getter, over
+import           Control.Lens                   ( ASetter'
+                                                , over
                                                 , set
                                                 , view
                                                 )
@@ -25,17 +26,19 @@ import           Data.List.Zipper               ( insert
 import           Data.Text                      ( Text
                                                 , pack
                                                 )
+import           Data.Tuple.Curry
 
 import qualified BusinessLogic                 as BL
 import           Config
 import           Elements
 import qualified Initial                       as Initial
+import           Path
 import qualified PathedBusinessLogic           as PBL
 import           Seconds
 import           Source
 import           State
 import           Resources
-import           Data.Tuple.Curry
+
 import           Utils
 
 nextTick :: (Enum a, Integral a, Num a, Ord a, Show a) => State a -> State a
@@ -50,7 +53,8 @@ nextTick =
 
 saveSnapshot :: State a -> State a
 saveSnapshot st =
-  let r = view stateResources st in over (stateSnapshots . zipper) (insert r) st
+  let r = view stateResources st
+  in  over (stateSnapshots . zipper) (insert r) st
 
 runCode :: (Eq a, Integral a, Num a) => State a -> State a
 runCode st =
@@ -58,7 +62,8 @@ runCode st =
 
 handleActions :: HasState s a => s -> s
 handleActions st =
-  let as = view stateActions st in set stateActions [] $ foldr applyAction st as
+  let as = view stateActions st
+  in  set stateActions [] $ foldr applyAction st as
 
 helperWork :: (Num a, Ord a) => State a -> State a
 helperWork st =
@@ -92,22 +97,16 @@ seedWork st =
 addSecond :: (Enum a) => State a -> State a
 addSecond = over stateSeconds succ
 
-createPaperclip :: (Enum a, HasState s a, Ord a) => s -> s
+createPaperclip :: (Ord a, Enum a, HasState s a) => s -> s
 createPaperclip st =
-  handleActions
-    . addActions st
+  performActions stateActions applyAction st
     . (\p -> SetP p : [])
-    . BL.createPaperclip getPaperclipCount getStorage getStorageInPaperclips
+    . BL.createPaperclip getPaperclipCount getStorage
     $ st
 
-getPaperclipCount :: (HasState s a) => Getter s (Paperclips a)
-getPaperclipCount = (stateResources . resourcesElements . elementsPaperclips . count)
-
-getStorage :: (HasState s a) => Getter s (Storage (Paperclips a))
-getStorage = (stateResources . resourcesStorage)
-
-getStorageInPaperclips :: (HasStorage storage p) => Getter storage p
-getStorageInPaperclips = unStorage
+performActions
+  :: (Foldable t) => ASetter' s [a] -> (a -> s -> s) -> s -> t a -> s
+performActions l f st = set l [] . foldr f st
 
 buyHelper :: (Enum a, Num a, Ord a, Show a) => State a -> State a
 buyHelper st =
@@ -199,11 +198,13 @@ applySnapshot st = over
 setStarted :: Bool -> State a -> State a
 setStarted True =
   saveSnapshot
-    . set (stateEvents . eventsEventStart . eventStartButtonData . buttonTitle)
-          (ButtonTitle "Pause")
+    . set
+        (stateEvents . eventsEventStart . eventStartButtonData . buttonTitle)
+        (ButtonTitle "Pause")
     . set stateIsStarted (IsStarted True)
 setStarted False =
   clearAllFutureSnapshots
-    . set (stateEvents . eventsEventStart . eventStartButtonData . buttonTitle)
-          (ButtonTitle "Start")
+    . set
+        (stateEvents . eventsEventStart . eventStartButtonData . buttonTitle)
+        (ButtonTitle "Start")
     . set stateIsStarted (IsStarted False)

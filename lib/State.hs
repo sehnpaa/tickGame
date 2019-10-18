@@ -9,6 +9,7 @@ module State where
 
 import           Control.Applicative            ( liftA2 )
 import           Control.Lens                   ( makeClassy
+                                                , makeClassyPrisms
                                                 , over
                                                 , set
                                                 , view
@@ -30,36 +31,6 @@ import           Resources
 import           Seconds
 import           Source
 import           Utils
-
-data Action a
-  = SetP (Paperclips a)
-  | SetH (Helpers a)
-  | SetE ErrorLogLine
-  | SetEnergy (Energy a)
-  | SetR (ResearchProgress a)
-  | SetStorage (Storage (Paperclips a))
-  | SetTreeSeeds (TreeSeeds a)
-  | SetTrees (Trees a)
-  | SetWater (Water a)
-  | SetWood (Wood a)
-  | SetAdvancedHelperResearchProgress (ResearchProgress a)
-  | SetHelperInc (HelperInc (Helpers a))
-  | SetProgs [Prog a]
-
-instance Show (Action Integer) where
-  show (SetP                              a            ) = show a
-  show (SetH                              a            ) = show a
-  show (SetE                              a            ) = show a
-  show (SetEnergy                         a            ) = show a
-  show (SetR                              a            ) = show a
-  show (SetStorage                        (Storage a)  ) = show a
-  show (SetTreeSeeds                      a            ) = show a
-  show (SetTrees                          a            ) = show a
-  show (SetWater                          a            ) = show a
-  show (SetWood                           a            ) = show a
-  show (SetAdvancedHelperResearchProgress a            ) = show a
-  show (SetHelperInc                      (HelperInc a)) = show a
-  show (SetProgs                          a            ) = show a
 
 newtype ErrorLogLine = ErrorLogLine { unErrorLogLine :: Text }
 
@@ -116,6 +87,37 @@ data MyEvent
   | Tick
   | Compile Text
   deriving (Eq, Show)
+
+data Action a
+  = SetP (Paperclips a)
+  | SetH (Helpers a)
+  | SetE ErrorLogLine
+  | SetEnergy (Energy a)
+  | SetR (ResearchProgress a)
+  | SetStorage (Storage (Paperclips a))
+  | SetTreeSeeds (TreeSeeds a)
+  | SetTrees (Trees a)
+  | SetWater (Water a)
+  | SetWood (Wood a)
+  | SetAdvancedHelperResearchProgress (ResearchProgress a)
+  | SetHelperInc (HelperInc (Helpers a))
+  | SetProgs [Prog a]
+makeClassyPrisms ''Action
+
+instance Show (Action Integer) where
+  show (SetP                              a            ) = show a
+  show (SetH                              a            ) = show a
+  show (SetE                              a            ) = show a
+  show (SetEnergy                         a            ) = show a
+  show (SetR                              a            ) = show a
+  show (SetStorage                        (Storage a)  ) = show a
+  show (SetTreeSeeds                      a            ) = show a
+  show (SetTrees                          a            ) = show a
+  show (SetWater                          a            ) = show a
+  show (SetWood                           a            ) = show a
+  show (SetAdvancedHelperResearchProgress a            ) = show a
+  show (SetHelperInc                      (HelperInc a)) = show a
+  show (SetProgs                          a            ) = show a
 
 newtype ButtonTitle = ButtonTitle Text
 
