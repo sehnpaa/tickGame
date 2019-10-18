@@ -12,11 +12,11 @@ extra-source-files:
 library tickGameLib
     hs-source-dirs: lib
     default-language: Haskell2010
-    exposed-modules: Lib, View
+    exposed-modules: Lib, View, Elements, BusinessLogic
     other-modules:
-      BusinessLogic
+      -- BusinessLogic
       Config
-      Elements
+      -- Elements
       Initial
       Iso
       LensUtils
@@ -69,6 +69,8 @@ test-suite test-foo
     hs-source-dirs: tests
     type: exitcode-stdio-1.0
     default-language: Haskell2010
+    other-modules:
+      Polytest
     build-depends:
         base >=4.11 && <5
       , ListZipper

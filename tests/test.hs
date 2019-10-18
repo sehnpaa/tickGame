@@ -11,6 +11,7 @@ import           Test.Tasty
 import           Test.Tasty.HUnit
 
 import           Lib
+import           Polytest
 import           View
 
 main :: IO ()
@@ -186,7 +187,7 @@ noCost = Cost (Paperclips 0)
               (Wood 0)
 
 tests :: TestTree
-tests = testGroup "Tests" [unitTests]
+tests = testGroup "Tests" [unitTests, polyTests]
 
 unitTests :: TestTree
 unitTests = testGroup
