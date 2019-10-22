@@ -17,7 +17,7 @@ newtype WaterTank a = WaterTank { unWaterTank :: a }
 
 data Resources a = Resources
   { _resourcesElements :: Elements a
-  , _resourcesStorage :: Storage (Paperclips a)
+  , _resourcesStorage :: StorageOfPaperclips a
   , _resourcesWaterTank :: WaterTank a }
 makeClassy ''Resources
 
@@ -26,8 +26,8 @@ instance Show (WaterTank Integer) where
 
 ---
 
-limitByStorage :: Ord a => Storage a -> a -> a
-limitByStorage s = min (view unStorage s)
+limitByStorage :: Ord a => StorageOfPaperclips a -> Paperclips a -> Paperclips a
+limitByStorage (StorageOfPaperclips s) (Paperclips p) = Paperclips $ min s p
 
 calcWaterCost :: Num a => [Prog a] -> a -> Water a
 calcWaterCost ps waterPerSeed =

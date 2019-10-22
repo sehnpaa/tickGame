@@ -55,11 +55,11 @@ instance Applicative Helpers where
 instance Show (Helpers Integer) where
   show (Helpers a) = show a
 
-newtype Storage a = Storage { _unStorage :: a } deriving (Functor)
-makeClassy ''Storage
+newtype StorageOfPaperclips a = StorageOfPaperclips { _unStorageOfPaperclips :: a } deriving (Functor)
+makeClassy ''StorageOfPaperclips
 
-instance Show (Storage (Paperclips Integer)) where
-  show (Storage a) = show a
+instance Show (StorageOfPaperclips Integer) where
+  show (StorageOfPaperclips a) = show a
 
 newtype Trees a = Trees { unTrees :: a } deriving (Enum, Eq, Num, Ord)
 
@@ -182,7 +182,7 @@ data Elements a = Elements
   { _elementsPaperclips :: Element AcquirePaperclips DurationPaperclips Paperclips a
   , _elementsEnergy :: Element AcquireEnergy DurationEnergy Energy a
   , _elementsHelpers :: Element AcquireHelpers DurationHelpers Helpers a
-  , _elementsStorage :: Element AcquireStorage DurationStorage Storage a
+  , _elementsStorage :: Element AcquireStorage DurationStorage StorageOfPaperclips a
   , _elementsTrees :: Element AcquireTrees DurationTrees Trees a
   , _elementsTreeSeeds :: Element AcquireTreeSeeds DurationTreeSeeds TreeSeeds a
   , _elementsWater :: Element AcquireWater DurationWater Water a

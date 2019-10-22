@@ -93,7 +93,7 @@ data Action a
   | SetE ErrorLogLine
   | SetEnergy (Energy a)
   | SetR (ResearchProgress a)
-  | SetStorage (Storage (Paperclips a))
+  | SetStorageOfPaperclips (StorageOfPaperclips a)
   | SetTreeSeeds (TreeSeeds a)
   | SetTrees (Trees a)
   | SetWater (Water a)
@@ -109,7 +109,7 @@ instance Show (Action Integer) where
   show (SetE                              a            ) = show a
   show (SetEnergy                         a            ) = show a
   show (SetR                              a            ) = show a
-  show (SetStorage                        (Storage a)  ) = show a
+  show (SetStorageOfPaperclips            a            ) = show a
   show (SetTreeSeeds                      a            ) = show a
   show (SetTrees                          a            ) = show a
   show (SetWater                          a            ) = show a
@@ -245,6 +245,12 @@ data State a = State
   , _stateIsStarted :: IsStarted }
 makeClassy ''State
 
+instance HasPaperclips (State a) a where
+  paperclips = stateResources . resourcesElements . elementsPaperclips . count
+
+instance HasStorageOfPaperclips (State a) a where
+  storageOfPaperclips = stateResources . resourcesStorage
+
 applyAction :: HasState t a => Action a -> t -> t
 applyAction (SetP p) =
   set (stateResources . resourcesElements . elementsPaperclips . count) p
@@ -253,7 +259,8 @@ applyAction (SetH h) =
 applyAction (SetE err) = over stateErrorLog (\errs -> err : errs)
 applyAction (SetEnergy e) =
   set (stateResources . resourcesElements . elementsEnergy . count) e
-applyAction (SetStorage a) = set (stateResources . resourcesStorage) a
+applyAction (SetStorageOfPaperclips a) =
+  set (stateResources . resourcesStorage) a
 applyAction (SetR r) =
   set (stateResearchAreas . advancedHelperResearch . researchCompProgress) r
 applyAction (SetTreeSeeds s) =

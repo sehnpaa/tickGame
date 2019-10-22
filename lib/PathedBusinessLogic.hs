@@ -21,7 +21,7 @@ helperWork
       -> ( Paperclips a
          , Helpers a
          , HelperInc (Helpers a)
-         , Storage (Paperclips a)
+         , StorageOfPaperclips a
          )
 helperWork = get4
       (stateResources . resourcesElements . elementsPaperclips . count)
@@ -102,7 +102,7 @@ buyASeed = get4
 
 extendStorage
       :: State a
-      -> (Seconds a, StorageManually a, Wood a, Storage (Paperclips a))
+      -> (Seconds a, StorageManually a, Wood a, StorageOfPaperclips a)
 extendStorage = get4
       stateSeconds
       ( stateResources
@@ -114,7 +114,7 @@ extendStorage = get4
       (stateResources . resourcesElements . elementsWood . count)
       (stateResources . resourcesStorage)
 
-run :: State a -> (Seconds a, Paperclips a, SourceText, Storage (Paperclips a))
+run :: State a -> (Seconds a, Paperclips a, SourceText, StorageOfPaperclips a)
 run = get4
       stateSeconds
       (stateResources . resourcesElements . elementsPaperclips . count)

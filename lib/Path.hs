@@ -15,9 +15,6 @@ getPaperclipCount :: (HasState s a) => Getter s (Paperclips a)
 getPaperclipCount =
     stateResources . resourcesElements . elementsPaperclips . count
 
-getStorage :: (HasState s a) => Getter s (Paperclips a)
-getStorage = stateResources . resourcesStorage . unStorage
-
 getEnergyCount :: (HasState s a) => Getter s (Energy a)
 getEnergyCount = (stateResources . resourcesElements . elementsEnergy . count)
 

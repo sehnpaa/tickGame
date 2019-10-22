@@ -28,7 +28,7 @@ researchAreas = ResearchAreas
 
 resources :: Resources Integer
 resources =
-    Resources Initial.elements (Storage (Paperclips 1000)) (WaterTank 100)
+    Resources Initial.elements (StorageOfPaperclips 1000) (WaterTank 100)
 
 elements :: Elements Integer
 elements = Elements
@@ -57,7 +57,7 @@ elements = Elements
     (Element
         (AcquireStorage (StorageManually (CostWood (Wood 1)) "Not enough wood.")
         )
-        (Storage 1000)
+        (StorageOfPaperclips 1000)
         (DurationStorage Instant)
     )
     (Element

@@ -6,6 +6,7 @@ import           Control.Applicative            ( liftA2 )
 import           Control.Lens                   ( Getter
                                                 , view
                                                 )
+import           Control.Monad.Reader
 import qualified Data.Text                     as T
 
 import           Config
@@ -21,7 +22,7 @@ helperWork
   => Paperclips a
   -> Helpers a
   -> HelperInc (Helpers a)
-  -> Storage (Paperclips a)
+  -> StorageOfPaperclips a
   -> Paperclips a
 helperWork p h inc s =
   limitByStorage s
@@ -149,28 +150,28 @@ generateEnergy
 generateEnergy e st = succ (view e st)
 
 createPaperclip
-  :: ( Functor paperclips
-     , Ord (paperclips a)
-     , HasPaperclips (paperclips a) a
+  :: ( HasPaperclips s a
+     , HasStorageOfPaperclips s a
+     , MonadReader s m
+     , Ord a
      , Enum a
      )
-  => Getter s (paperclips a)
-  -> Getter s (paperclips a)
-  -> s
-  -> paperclips a
-createPaperclip p storage' st =
-  (\x y -> min y $ fmap succ x) (view p st) (view storage' st)
+  => m (Paperclips a)
+createPaperclip = do
+  p        <- ask $ view paperclips
+  storage' <- ask $ view storageOfPaperclips
+  return $ limitByStorage storage' (fmap succ p)
 
 extendStorage
   :: (Num a, Ord a, Show a)
   => Seconds a
   -> StorageManually a
   -> Wood a
-  -> Storage (Paperclips a)
-  -> Either ErrorLogLine (Storage (Paperclips a), Wood a)
+  -> StorageOfPaperclips a
+  -> Either ErrorLogLine (StorageOfPaperclips a, Wood a)
 extendStorage sec (StorageManually (CostWood price) errorMessage) w s =
   if w >= price
-    then Right ((fmap . fmap) (+ 1) s, (-) <$> w <*> price)
+    then Right (fmap (+ 1) s, (-) <$> w <*> price)
     else Left $ mkErrorLogLine sec errorMessage
 
 run
@@ -178,7 +179,7 @@ run
   => Seconds a
   -> Paperclips a
   -> SourceText
-  -> Storage (Paperclips a)
+  -> StorageOfPaperclips a
   -> Paperclips a
 run s p (SourceText t) storage' = case parse t of
   Left _ -> p

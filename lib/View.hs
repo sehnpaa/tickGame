@@ -25,7 +25,7 @@ viewHelpers :: State a -> Helpers a
 viewHelpers =
     view (stateResources . resourcesElements . elementsHelpers . count)
 
-viewStorage :: State a -> Storage (Paperclips a)
+viewStorage :: State a -> StorageOfPaperclips a
 viewStorage = view (stateResources . resourcesStorage)
 
 viewTrees :: State a -> Trees a

@@ -18,6 +18,7 @@ import           Control.Lens                   ( ASetter'
                                                 , set
                                                 , view
                                                 )
+import           Control.Monad.Reader           ( runReader )
 import           Data.List.Zipper               ( insert
                                                 , left
                                                 , right
@@ -95,11 +96,11 @@ seedWork st =
 addSecond :: (Enum a) => State a -> State a
 addSecond = over stateSeconds succ
 
-createPaperclip :: (Ord a, Enum a, HasState s a) => s -> s
+createPaperclip :: (Ord a, Enum a, HasState s a, HasPaperclips s a, HasStorageOfPaperclips s a) => s -> s
 createPaperclip st =
   performActions stateActions applyAction st
     . (\p -> SetP p : [])
-    . BL.createPaperclip getPaperclipCount getStorage
+    . runReader BL.createPaperclip
     $ st
 
 performActions
@@ -132,7 +133,7 @@ buyASeed st =
 extendStorage :: (Num a, Ord a, Show a) => State a -> State a
 extendStorage st =
   performActions stateActions applyAction st
-    . withError SetE (\(s, w) -> SetStorage s : SetWood w : [])
+    . withError SetE (\(s, w) -> SetStorageOfPaperclips s : SetWood w : [])
     . uncurryN BL.extendStorage
     . PBL.extendStorage
     $ st
