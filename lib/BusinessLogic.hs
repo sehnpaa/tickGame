@@ -121,14 +121,22 @@ researchAdvancedHelper s p price (ResearchComp dur progress errorMessage inProgr
     (_, ResearchDone        ) -> Left $ mkErrorLogLine s doneErr
 
 plantASeed
-  :: (Num a, Ord a, Show a)
-  => Seconds a
-  -> DurationTreeSeeds a
-  -> TreeSeeds a
-  -> Either ErrorLogLine (TreeSeeds a)
-plantASeed s dur seeds = if countNotGrowingSeeds seeds > 0
-  then Right $ initializeASeed dur seeds
-  else Left $ lineNeedMoreSeeds s
+  :: ( Num a
+     , Ord a
+     , Show a
+     , HasSeconds s a
+     , HasDurationTreeSeeds s a
+     , HasTreeSeeds s a
+     , MonadReader s m
+     )
+  => m (Either ErrorLogLine (TreeSeeds a))
+plantASeed = do
+  s     <- ask $ view seconds
+  dur   <- ask $ view durationTreeSeeds
+  seeds <- ask $ view treeSeeds
+  return $ if countNotGrowingSeeds seeds > 0
+    then Right $ initializeASeed dur seeds
+    else Left $ lineNeedMoreSeeds s
 
 buyASeed
   :: (Num a, Ord a, Show a)

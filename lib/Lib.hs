@@ -153,12 +153,13 @@ researchAdvancedHelper st =
     . PBL.researchAdvancedHelper
     $ st
 
-plantASeed :: (Num a, Ord a, Show a) => State a -> State a
+plantASeed :: (HasTreeSeeds s a, HasDurationTreeSeeds s a,
+                 HasSeconds s a, Show a, Ord a, Num a, HasState s a) =>
+                s -> s
 plantASeed st =
   performActions stateActions applyAction st
     . withError SetE (\s -> SetTreeSeeds s : [])
-    . uncurryN BL.plantASeed
-    . PBL.plantASeed
+    . runReader BL.plantASeed
     $ st
 
 pumpWater :: (Enum a, Num a, Ord a) => State a -> State a

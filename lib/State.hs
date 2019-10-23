@@ -251,6 +251,15 @@ instance HasPaperclips (State a) a where
 instance HasStorageOfPaperclips (State a) a where
   storageOfPaperclips = stateResources . resourcesStorage
 
+instance HasTreeSeeds (State a) a where
+  treeSeeds = stateResources . resourcesElements . elementsTreeSeeds . count
+
+instance HasDurationTreeSeeds (State a) a where
+  durationTreeSeeds = stateResources . resourcesElements . elementsTreeSeeds . duration
+
+instance HasSeconds (State a) a where
+  seconds = stateSeconds
+
 applyAction :: HasState t a => Action a -> t -> t
 applyAction (SetP p) =
   set (stateResources . resourcesElements . elementsPaperclips . count) p
