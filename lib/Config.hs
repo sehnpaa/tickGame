@@ -9,10 +9,11 @@ import           Control.Lens
 
 import           Elements
 
-newtype AdvancedHelperPrice a = AdvancedHelperPrice { unAdvancedHelperPrice :: a }
+newtype AdvancedHelperPriceInPaperclips a = AdvancedHelperPriceInPaperclips { unAdvancedHelperPriceInPaperclips :: a }
+makeClassy ''AdvancedHelperPriceInPaperclips
 
 data Prices a = Prices
-  { _advancedHelperPrice :: AdvancedHelperPrice (Paperclips a) }
+  { _pricesAdvancedHelperPriceInPaperclips :: AdvancedHelperPriceInPaperclips a }
 makeClassy ''Prices
 
 newtype HelperInc a = HelperInc { unHelperInc :: a} deriving (Functor)

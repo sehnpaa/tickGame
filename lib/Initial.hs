@@ -12,7 +12,7 @@ import           Source
 import           State
 
 prices :: Prices Integer
-prices = Prices (AdvancedHelperPrice $ Paperclips 5)
+prices = Prices (AdvancedHelperPriceInPaperclips 5)
 
 config :: Config Integer
 config = Config (Constants (HelperInc 1)) Initial.prices

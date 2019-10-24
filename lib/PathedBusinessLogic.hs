@@ -73,13 +73,13 @@ researchAdvancedHelper
       :: State a
       -> ( Seconds a
          , Paperclips a
-         , AdvancedHelperPrice (Paperclips a)
+         , AdvancedHelperPriceInPaperclips a
          , ResearchComp a
          )
 researchAdvancedHelper = get4
       stateSeconds
       (stateResources . resourcesElements . elementsPaperclips . count)
-      (stateConfig . configPrices . advancedHelperPrice)
+      (stateConfig . configPrices . pricesAdvancedHelperPriceInPaperclips)
       (stateResearchAreas . advancedHelperResearch)
 
 plantASeed :: State a -> (Seconds a, DurationTreeSeeds a, TreeSeeds a)

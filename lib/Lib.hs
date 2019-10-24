@@ -27,7 +27,6 @@ import           Data.List.Zipper               ( insert
 import           Data.Text                      ( Text
                                                 , pack
                                                 )
-import           Data.Tuple.Curry
 
 import qualified BusinessLogic                 as BL
 import           Config
@@ -198,12 +197,11 @@ buyASeed st =
     . runReader BL.buyASeed
     $ st
 
-extendStorage :: (Num a, Ord a, Show a) => State a -> State a
+extendStorage :: (Num a, Ord a, Show a, HasSeconds s a, HasState s a, HasStorageManually s a, HasStorageOfPaperclips s a, HasWood s a) => s -> s
 extendStorage st =
   performActions stateActions applyAction st
     . withError SetE (\(s, w) -> SetStorageOfPaperclips s : SetWood w : [])
-    . uncurryN BL.extendStorage
-    . PBL.extendStorage
+    . runReader BL.extendStorage
     $ st
 
 generateEnergy :: (Enum a, Ord a, Num a, Show a, HasEnergy s a, HasState s a) => s -> s
@@ -213,12 +211,11 @@ generateEnergy st =
     . runReader BL.generateEnergy
     $ st
 
-researchAdvancedHelper :: (Num a, Ord a, Show a) => State a -> State a
+researchAdvancedHelper :: (Num a, Ord a, Show a, HasAdvancedHelperPriceInPaperclips s a, HasPaperclips s a, HasResearchComp s a, HasSeconds s a, HasState s a) => s -> s
 researchAdvancedHelper st =
   performActions stateActions applyAction st
     . withError SetE (\(p, r) -> SetP p : SetR r : [])
-    . uncurryN BL.researchAdvancedHelper
-    . PBL.researchAdvancedHelper
+    . runReader BL.researchAdvancedHelper
     $ st
 
 plantASeed
@@ -238,12 +235,11 @@ plantASeed st =
     . runReader BL.plantASeed
     $ st
 
-pumpWater :: (Enum a, Num a, Ord a) => State a -> State a
+pumpWater :: (Enum a, Num a, Ord a, HasState s a, HasWater s a, HasWaterTank s a) => s -> s
 pumpWater st =
   performActions stateActions applyAction st
     . (\w -> SetWater w : [])
-    . uncurryN BL.pumpWater
-    . PBL.pumpWater
+    . runReader BL.pumpWater
     $ st
 
 compile :: Text -> State a -> State a

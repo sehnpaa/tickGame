@@ -118,23 +118,40 @@ buyHelper s ce cp energyErr paperclipsErr p e h f st =
         <> T.pack " "
         <> (view paperclipsErr st)
 
-pumpWater :: (Enum a, Num a, Ord a) => Water a -> WaterTank a -> Water a
-pumpWater w tank = Water $ min (unWaterTank tank) (succ $ unWater w)
+pumpWater
+  :: (Enum a, Num a, Ord a, HasWater s a, HasWaterTank s a, MonadReader s m)
+  => m (Water a)
+pumpWater = do
+  w    <- ask $ view water
+  tank <- ask $ view waterTank
+  return $ Water $ min (unWaterTank tank) (succ $ unWater w)
 
 researchAdvancedHelper
-  :: (Num a, Ord a, Show a)
-  => Seconds a
-  -> Paperclips a
-  -> AdvancedHelperPrice (Paperclips a)
-  -> ResearchComp a
-  -> Either ErrorLogLine (Paperclips a, ResearchProgress a)
-researchAdvancedHelper s p price (ResearchComp dur progress errorMessage inProgressErr doneErr)
-  = case (unAdvancedHelperPrice price > p, progress) of
-    (True, NotResearched) -> Left $ mkErrorLogLine s errorMessage
-    (False, NotResearched) ->
-      Right (decPaperclipsWith' price p, startResearch dur)
-    (_, ResearchInProgress _) -> Left $ mkErrorLogLine s inProgressErr
-    (_, ResearchDone        ) -> Left $ mkErrorLogLine s doneErr
+  :: ( Num a
+     , Ord a
+     , Show a
+     , MonadReader s m
+     , HasSeconds s a
+     , HasPaperclips s a
+     , HasResearchComp s a
+     , HasAdvancedHelperPriceInPaperclips s a
+     )
+  => m (Either ErrorLogLine (Paperclips a, ResearchProgress a))
+researchAdvancedHelper = do
+  s     <- ask $ view seconds
+  p     <- ask $ view paperclips
+  price <- ask $ view advancedHelperPriceInPaperclips
+  (ResearchComp dur progress errorMessage inProgressErr doneErr) <- ask
+    $ view researchComp
+  return
+    $ case
+        ((Paperclips . unAdvancedHelperPriceInPaperclips $ price) > p, progress)
+      of
+        (True, NotResearched) -> Left $ mkErrorLogLine s errorMessage
+        (False, NotResearched) ->
+          Right (decPaperclipsWith' price p, startResearch dur)
+        (_, ResearchInProgress _) -> Left $ mkErrorLogLine s inProgressErr
+        (_, ResearchDone        ) -> Left $ mkErrorLogLine s doneErr
 
 plantASeed
   :: ( Num a
@@ -176,7 +193,7 @@ buyASeed = do
 
 generateEnergy
   :: (Enum a, Num a, Ord a, Show a, HasEnergy s a, MonadReader s m)
-  =>  m (Energy a)
+  => m (Energy a)
 generateEnergy = fmap succ (ask $ view energy)
 
 createPaperclip
@@ -193,23 +210,39 @@ createPaperclip = do
   return $ limitByStorage storage' (fmap succ p)
 
 extendStorage
-  :: (Num a, Ord a, Show a)
-  => Seconds a
-  -> StorageManually a
-  -> Wood a
-  -> StorageOfPaperclips a
-  -> Either ErrorLogLine (StorageOfPaperclips a, Wood a)
-extendStorage sec (StorageManually (CostWood price) errorMessage) w s =
-  if w >= price
-    then Right (fmap (+ 1) s, (-) <$> w <*> price)
+  :: ( Num a
+     , Ord a
+     , Show a
+     , MonadReader s m
+     , HasSeconds s a
+     , HasStorageManually s a
+     , HasStorageOfPaperclips s a
+     , HasWood s a
+     )
+  => m (Either ErrorLogLine (StorageOfPaperclips a, Wood a))
+extendStorage = do
+  sec      <- ask $ view seconds
+  (StorageManually (CostWood price) errorMessage) <- ask $ view storageManually
+  w        <- ask $ view wood
+  storage' <- ask $ view storageOfPaperclips
+  return $ if w >= price
+    then Right (fmap (+ 1) storage', (-) <$> w <*> price)
     else Left $ mkErrorLogLine sec errorMessage
 
-run :: (Integral a, HasPaperclips s a, HasSeconds s a, HasSource s a, HasStorageOfPaperclips s a, MonadReader s m) => m (Paperclips a)
+run
+  :: ( Integral a
+     , HasPaperclips s a
+     , HasSeconds s a
+     , HasSource s a
+     , HasStorageOfPaperclips s a
+     , MonadReader s m
+     )
+  => m (Paperclips a)
 run = do
-  s <- ask $ view seconds
-  p <- ask $ view paperclips
+  s              <- ask $ view seconds
+  p              <- ask $ view paperclips
   (SourceText t) <- ask $ view sourceText
-  storage' <- ask $ view storageOfPaperclips
+  storage'       <- ask $ view storageOfPaperclips
   return $ case parse t of
     Left _ -> p
     Right (SyncPaperclipsWithSeconds s') ->

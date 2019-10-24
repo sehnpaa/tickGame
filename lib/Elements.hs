@@ -84,13 +84,18 @@ makeClassy ''TreeSeeds
 instance Show (TreeSeeds Integer) where
   show (TreeSeeds a) = show a
 
-newtype Water a = Water { unWater :: a } deriving (Eq, Ord)
+newtype Water a = Water { unWater :: a } deriving (Eq, Ord, Functor)
 makeClassy ''Water
+
+instance Applicative Water where
+  pure = Water
+  (Water f) <*> (Water a) = Water $ f a
 
 instance Show (Water Integer) where
   show (Water a) = show a
 
 newtype Wood a = Wood { unWood :: a } deriving (Enum, Eq, Functor, Ord)
+makeClassy ''Wood
 
 instance Applicative Wood where
   pure = Wood

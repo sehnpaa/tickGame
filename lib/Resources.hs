@@ -14,6 +14,7 @@ import           Control.Lens                   ( Profunctor
 import           Elements
 
 newtype WaterTank a = WaterTank { unWaterTank :: a }
+makeClassy ''WaterTank
 
 data Resources a = Resources
   { _resourcesElements :: Elements a

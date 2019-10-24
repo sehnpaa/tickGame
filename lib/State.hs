@@ -25,7 +25,6 @@ import           Data.Text                      ( Text
 
 import           Config
 import           Elements
-import           Iso
 import           Resources
 import           Seconds
 import           Source
@@ -275,6 +274,14 @@ instance HasResearchProgress (State a) a where
 instance HasSource (State a) a where
   source = stateSource
 
+instance HasStorageManually (State a) a where
+  storageManually =
+    stateResources
+      . resourcesElements
+      . elementsStorage
+      . elementCost
+      . acquireStorageManually
+
 instance HasTreeSeedCostPerTick (State a) a where
   treeSeedCostPerTick =
     stateResources
@@ -289,6 +296,12 @@ instance HasTrees (State a) a where
 instance HasWater (State a) a where
   water = stateResources . resourcesElements . elementsWater . count
 
+instance HasWaterTank (State a) a where
+  waterTank = stateResources . resourcesWaterTank
+
+instance HasWood (State a) a where
+  wood = stateResources . resourcesElements . elementsWood . count
+
 instance HasBuyTreeSeeds (State a) a where
   buyTreeSeeds =
     stateResources
@@ -299,6 +312,13 @@ instance HasBuyTreeSeeds (State a) a where
 
 instance HasEnergy (State a) a where
   energy = stateResources . resourcesElements . elementsEnergy . count
+
+instance HasResearchComp (State a) a where
+  researchComp = stateResearchAreas . advancedHelperResearch
+
+instance HasAdvancedHelperPriceInPaperclips (State a) a where
+  advancedHelperPriceInPaperclips = 
+      stateConfig . configPrices . pricesAdvancedHelperPriceInPaperclips
 
 applyAction :: HasState t a => Action a -> t -> t
 applyAction (SetP p) =
@@ -338,7 +358,8 @@ calcRemainingWater price ps w =
   let calculatedCost = calcWaterCost ps (unWater $ view costWaterA price)
   in  case calculatedCost > w of
         True  -> Nothing
-        False -> Just $ Iso.under2 isoWater (-) w calculatedCost
+        -- False -> Just $ Iso.under2 isoWater (-) w calculatedCost
+        False -> Just $ liftA2 (-) w calculatedCost
 
 lineNeedMorePaperclips :: (Show a) => Seconds a -> ErrorLogLine
 lineNeedMorePaperclips (Seconds s) = ErrorLogLine
@@ -366,8 +387,8 @@ initializeASeed dur =
   moveItForward (Ticks n) = Growing n
 
 decPaperclipsWith'
-  :: Num a => AdvancedHelperPrice (Paperclips a) -> Paperclips a -> Paperclips a
-decPaperclipsWith' (AdvancedHelperPrice hp) p = liftA2 (-) p hp
+  :: Num a => AdvancedHelperPriceInPaperclips a -> Paperclips a -> Paperclips a
+decPaperclipsWith' (AdvancedHelperPriceInPaperclips hp) = fmap (\p -> p - hp)
 
 removeLefts :: Zipper a -> Zipper a
 removeLefts (Zip _ rs) = Zip [] rs
