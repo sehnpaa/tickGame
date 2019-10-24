@@ -154,9 +154,15 @@ data AcquireEnergy cost = AcquireEnergy
   { _acquireEnergyManually :: EnergyManually cost }
 makeClassy ''AcquireEnergy
 
+newtype EnergyErrorMessage = EnergyErrorMessage { unEnergyErrorMessage :: T.Text }
+makeClassy ''EnergyErrorMessage
+
+newtype PaperclipsErrorMessage = PaperclipsErrorMessage { unPaperclipsErrorMessage :: T.Text }
+makeClassy ''PaperclipsErrorMessage
+
 data HelpersManually a = HelpersManually { _helpersManuallyCost :: CostEnergyPaperclips a
-, _helpersManuallyEnergyErrorMessage :: T.Text
-, _helpersManuallyPaperclipsErrorMessage :: T.Text }
+, _helpersManuallyEnergyErrorMessage :: EnergyErrorMessage
+, _helpersManuallyPaperclipsErrorMessage :: PaperclipsErrorMessage }
 makeClassy ''HelpersManually
 
 data AcquireHelpers a = AcquireHelpers

@@ -320,6 +320,33 @@ instance HasAdvancedHelperPriceInPaperclips (State a) a where
   advancedHelperPriceInPaperclips = 
       stateConfig . configPrices . pricesAdvancedHelperPriceInPaperclips
 
+-- FIXME: The class names are general but the implementation is specific
+instance HasCostEnergyPaperclips (State a) a where
+  costEnergyPaperclips = 
+    stateResources
+      . resourcesElements
+      . elementsHelpers
+      . elementCost
+      . acquireHelpersManually . helpersManuallyCost
+
+-- FIXME: The class names are general but the implementation is specific
+instance HasEnergyErrorMessage (State a) where
+  energyErrorMessage = 
+    stateResources
+      . resourcesElements
+      . elementsHelpers
+      . elementCost
+      . acquireHelpersManually . helpersManuallyEnergyErrorMessage
+
+-- FIXME: The class names are general but the implementation is specific
+instance HasPaperclipsErrorMessage (State a) where
+  paperclipsErrorMessage = 
+    stateResources
+      . resourcesElements
+      . elementsHelpers
+      . elementCost
+      . acquireHelpersManually . helpersManuallyPaperclipsErrorMessage
+
 applyAction :: HasState t a => Action a -> t -> t
 applyAction (SetP p) =
   set (stateResources . resourcesElements . elementsPaperclips . count) p

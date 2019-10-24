@@ -3,9 +3,7 @@
 module BusinessLogic where
 
 import           Control.Applicative            ( liftA2 )
-import           Control.Lens                   ( Getter
-                                                , view
-                                                )
+import           Control.Lens                   ( view )
 import           Control.Monad.Reader
 import qualified Data.Text                     as T
 
@@ -78,45 +76,35 @@ seedWork = do
     else Right $ (w, ps, ts)
 
 buyHelper
-  :: ( Enum (helpers a)
-     , Ord (paperclips a)
-     , Ord (energy a)
+  :: ( Enum a
      , Num a
-     , Applicative energy
-     , Applicative paperclips
-     , HasSeconds sec a
-     , HasEnergy (energy a) a
-     , HasPaperclips (paperclips a) a
-     , HasHelpers (helpers a) a
+     , Ord a
+     , Show a
+     , HasCostEnergyPaperclips s a
+     , HasEnergy s a
+     , HasEnergyErrorMessage s
+     , HasHelpers s a
+     , HasPaperclips s a
+     , HasPaperclipsErrorMessage s
+     , HasSeconds s a
+     , MonadReader s m
      )
-  => Getter s sec
-  -> Getter s (energy a)
-  -> Getter s (paperclips a)
-  -> Getter s T.Text
-  -> Getter s T.Text
-  -> Getter s (paperclips a)
-  -> Getter s (energy a)
-  -> Getter s (helpers a)
-  -> (sec -> T.Text -> errorLogLine)
-  -> s
-  -> Either
-       errorLogLine
-       (helpers a, energy a, paperclips a)
-buyHelper s ce cp energyErr paperclipsErr p e h f st =
-  case ((view ce st) <= (view e st), (view cp st) <= (view p st)) of
-    (True, True) -> Right
-      ( succ (view h st)
-      , liftA2 (-) (view e st) (view ce st)
-      , liftA2 (-) (view p st) (view cp st)
-      )
-    (True , False) -> Left (f (view s st) (view paperclipsErr st))
-    (False, True ) -> Left (f (view s st) (view energyErr st))
+  => m (Either ErrorLogLine (Helpers a, Energy a, Paperclips a))
+buyHelper = do
+  s  <- ask $ view seconds
+  ce <- ask $ view costEnergyPaperclipsE
+  cp <- ask $ view costEnergyPaperclipsP
+  (EnergyErrorMessage     energyErr    ) <- ask $ view energyErrorMessage
+  (PaperclipsErrorMessage paperclipsErr) <- ask $ view paperclipsErrorMessage
+  p  <- ask $ view paperclips
+  e  <- ask $ view energy
+  h  <- ask $ view helpers
+  return $ case (ce <= e, cp <= p) of
+    (True , True ) -> Right (succ h, liftA2 (-) e ce, liftA2 (-) p cp)
+    (True , False) -> Left $ mkErrorLogLine s paperclipsErr
+    (False, True ) -> Left $ mkErrorLogLine s energyErr
     (False, False) ->
-      Left
-        $  f (view s st)
-        $  (view energyErr st)
-        <> T.pack " "
-        <> (view paperclipsErr st)
+      Left $ mkErrorLogLine s $ energyErr <> T.pack " " <> paperclipsErr
 
 pumpWater
   :: (Enum a, Num a, Ord a, HasWater s a, HasWaterTank s a, MonadReader s m)

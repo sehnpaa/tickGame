@@ -47,8 +47,8 @@ elements = Elements
         (AcquireHelpers
             (HelpersManually
                 (CostEnergyPaperclips (Energy 10) (Paperclips 10))
-                "Not enough energy."
-                "Not enough paperclips."
+                (EnergyErrorMessage "Not enough energy.")
+                (PaperclipsErrorMessage "Not enough paperclips.")
             )
         )
         (Helpers 0)

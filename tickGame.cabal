@@ -20,7 +20,6 @@ library tickGameLib
       Initial
       LensUtils
       NaturalTransformation
-      Path
       Resources
       Seconds
       Source

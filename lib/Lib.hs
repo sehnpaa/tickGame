@@ -32,7 +32,6 @@ import qualified BusinessLogic                 as BL
 import           Config
 import           Elements
 import qualified Initial                       as Initial
-import           Path
 import           Seconds
 import           Source
 import           State
@@ -163,19 +162,11 @@ performActions
   :: (Foldable t) => ASetter' s [a] -> (a -> s -> s) -> s -> t a -> s
 performActions l f st = set l [] . foldr f st
 
-buyHelper :: (Enum a, Num a, Ord a, Show a, HasState s a) => s -> s
+buyHelper :: (Enum a, Num a, Ord a, Show a, HasCostEnergyPaperclips s a, HasEnergy s a, HasEnergyErrorMessage s, HasHelpers s a, HasPaperclips s a, HasPaperclipsErrorMessage s, HasSeconds s a, HasState s a) => s -> s
 buyHelper st =
   performActions stateActions applyAction st
     . (withError SetE (\(h, e, p) -> SetH h : SetEnergy e : SetP p : []))
-    . BL.buyHelper getSeconds
-                   getHelpersManuallyCostEnergy
-                   getHelpersManuallyCostPaperclips
-                   getHelpersManuallyEnergyErrorMessage
-                   getHelpersManuallyPaperclipsErrorMessage
-                   getPaperclipCount
-                   getEnergyCount
-                   getHelperCount
-                   mkErrorLogLine
+    . runReader BL.buyHelper
     $ st
 
 buyASeed
