@@ -16,9 +16,10 @@ data Prices a = Prices
 makeClassy ''Prices
 
 newtype HelperInc a = HelperInc { unHelperInc :: a} deriving (Functor)
+makeClassy ''HelperInc
 
 data Constants a = Constants
-  { _helperInc :: HelperInc (Helpers a) }
+  { _constantsHelperInc :: HelperInc a }
 makeClassy ''Constants
 
 data Config a = Config

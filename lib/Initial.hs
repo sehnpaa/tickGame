@@ -15,7 +15,7 @@ prices :: Prices Integer
 prices = Prices (AdvancedHelperPrice $ Paperclips 5)
 
 config :: Config Integer
-config = Config (Constants (HelperInc (Helpers 1))) Initial.prices
+config = Config (Constants (HelperInc 1)) Initial.prices
 
 researchAreas :: ResearchAreas Integer
 researchAreas = ResearchAreas

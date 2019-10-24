@@ -38,6 +38,7 @@ instance Show ErrorLogLine where
 
 data ResearchProgress a = NotResearched | ResearchInProgress a | ResearchDone
   deriving (Eq)
+makeClassy ''ResearchProgress
 
 instance Show (ResearchProgress Integer) where
   show NotResearched = "Not researched"
@@ -99,7 +100,7 @@ data Action a
   | SetWater (Water a)
   | SetWood (Wood a)
   | SetAdvancedHelperResearchProgress (ResearchProgress a)
-  | SetHelperInc (HelperInc (Helpers a))
+  | SetHelperInc (HelperInc a)
   | SetProgs [Prog a]
 makeClassyPrisms ''Action
 
@@ -259,16 +260,45 @@ instance HasDurationTreeSeeds (State a) a where
     stateResources . resourcesElements . elementsTreeSeeds . duration
 
 instance HasSeconds (State a) a where
-  seconds = Seconds.seconds
+  seconds = stateSeconds
+
+instance HasHelperInc (State a) a where
+  helperInc = stateConfig . configConstants . constantsHelperInc
+
+instance HasHelpers (State a) a where
+  helpers = stateResources . resourcesElements . elementsHelpers . count
+
+instance HasResearchProgress (State a) a where
+  researchProgress =
+    stateResearchAreas . advancedHelperResearch . researchCompProgress
+
+instance HasSource (State a) a where
+  source = stateSource
+
+instance HasTreeSeedCostPerTick (State a) a where
+  treeSeedCostPerTick =
+    stateResources
+      . resourcesElements
+      . elementsTrees
+      . elementCost
+      . acquireTreeSeedCostPerTick
+
+instance HasTrees (State a) a where
+  trees = stateResources . resourcesElements . elementsTrees . count
+
+instance HasWater (State a) a where
+  water = stateResources . resourcesElements . elementsWater . count
 
 instance HasBuyTreeSeeds (State a) a where
   buyTreeSeeds =
-    ( stateResources
-    . resourcesElements
-    . elementsTreeSeeds
-    . elementCost
-    . acquireBuyTreeSeeds
-    )
+    stateResources
+      . resourcesElements
+      . elementsTreeSeeds
+      . elementCost
+      . acquireBuyTreeSeeds
+
+instance HasEnergy (State a) a where
+  energy = stateResources . resourcesElements . elementsEnergy . count
 
 applyAction :: HasState t a => Action a -> t -> t
 applyAction (SetP p) =
@@ -289,7 +319,7 @@ applyAction (SetTrees t) =
 applyAction (SetAdvancedHelperResearchProgress p) =
   set (stateResearchAreas . advancedHelperResearch . researchCompProgress) p
 applyAction (SetHelperInc i) =
-  set (stateConfig . configConstants . helperInc) i
+  set (stateConfig . configConstants . constantsHelperInc) i
 applyAction (SetProgs ps) = set
   (stateResources . resourcesElements . elementsTreeSeeds . count . progs)
   ps

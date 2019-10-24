@@ -1,17 +1,8 @@
 module Utils where
 
-import           Control.Applicative            ( liftA2 )
 import           Data.Bifoldable                ( Bifoldable
                                                 , bifoldMap
                                                 )
-
-twoLevels
-  :: (Applicative f, Applicative g)
-  => (a -> b -> c)
-  -> f (g a)
-  -> f (g b)
-  -> f (g c)
-twoLevels = liftA2 . liftA2
 
 changeFirst :: Eq a => (a -> Bool) -> (a -> a) -> [a] -> [a]
 changeFirst _ _ []       = []

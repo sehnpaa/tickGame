@@ -42,7 +42,27 @@ import           Resources
 
 import           Utils
 
-nextTick :: (Enum a, Integral a, Num a, Ord a, Show a) => State a -> State a
+nextTick
+  :: ( Enum a
+     , Integral a
+     , Num a
+     , Ord a
+     , Show a
+     , HasSeconds s a
+     , HasHelperInc s a
+     , HasHelpers s a
+     , HasPaperclips s a
+     , HasResearchProgress s a
+     , HasSource s a
+     , HasStorageOfPaperclips s a
+     , HasState s a
+     , HasTreeSeedCostPerTick s a
+     , HasTreeSeeds s a
+     , HasTrees s a
+     , HasWater s a
+     )
+  => s
+  -> s
 nextTick =
   saveSnapshot
     . (\st -> performActions stateActions applyAction st (view stateActions st))
@@ -52,36 +72,67 @@ nextTick =
     . runCode
     . addSecond
 
-saveSnapshot :: State a -> State a
+saveSnapshot :: (HasState s a) => s -> s
 saveSnapshot st =
   let r = view stateResources st
   in  over (stateSnapshots . zipper) (insert r) st
 
-runCode :: (Eq a, Integral a, Num a) => State a -> State a
+runCode
+  :: ( Integral a
+     , HasPaperclips s a
+     , HasSeconds s a
+     , HasSource s a
+     , HasState s a
+     , HasStorageOfPaperclips s a
+     )
+  => s
+  -> s
 runCode st =
   performActions stateActions applyAction st
     . (singleton . SetP)
-    . uncurryN BL.run
-    . PBL.run
+    . runReader BL.run
     $ st
 
-helperWork :: (Num a, Ord a) => State a -> State a
+helperWork
+  :: ( Num a
+     , Ord a
+     , HasHelperInc s a
+     , HasHelpers s a
+     , HasPaperclips s a
+     , HasState s a
+     , HasStorageOfPaperclips s a
+     )
+  => s
+  -> s
 helperWork st =
   performActions stateActions applyAction st
     . (singleton . SetP)
-    . uncurryN BL.helperWork
-    . PBL.helperWork
+    . runReader BL.helperWork
     $ st
 
-researchWork :: (Eq a, Num a) => State a -> State a
+researchWork
+  :: (Eq a, Num a, HasHelperInc s a, HasResearchProgress s a, HasState s a)
+  => s
+  -> s
 researchWork st =
   performActions stateActions applyAction st
     . (\(p, h) -> SetAdvancedHelperResearchProgress p : SetHelperInc h : [])
-    . uncurryN BL.researchWork
-    . PBL.researchWork
+    . runReader BL.researchWork
     $ st
 
-seedWork :: (Num a, Ord a, Show a) => State a -> State a
+seedWork
+  :: ( Num a
+     , Ord a
+     , Show a
+     , HasSeconds s a
+     , HasState s a
+     , HasTreeSeedCostPerTick s a
+     , HasTreeSeeds s a
+     , HasTrees s a
+     , HasWater s a
+     )
+  => s
+  -> s
 seedWork st =
   performActions stateActions applyAction st
     . (withExtendedError
@@ -89,11 +140,10 @@ seedWork st =
         (\p -> SetProgs p : [])
         (\(w, p, t) -> SetWater w : SetProgs p : SetTrees t : [])
       )
-    . uncurryN BL.seedWork
-    . PBL.seedWork
+    . runReader BL.seedWork
     $ st
 
-addSecond :: (Enum a) => State a -> State a
+addSecond :: (Enum a, HasState s a) => s -> s
 addSecond = over stateSeconds succ
 
 createPaperclip
@@ -156,11 +206,11 @@ extendStorage st =
     . PBL.extendStorage
     $ st
 
-generateEnergy :: (Enum a, Ord a, Num a, Show a) => State a -> State a
+generateEnergy :: (Enum a, Ord a, Num a, Show a, HasEnergy s a, HasState s a) => s -> s
 generateEnergy st =
   performActions stateActions applyAction st
     . (\e -> SetEnergy e : [])
-    . BL.generateEnergy getEnergyCount
+    . runReader BL.generateEnergy
     $ st
 
 researchAdvancedHelper :: (Num a, Ord a, Show a) => State a -> State a

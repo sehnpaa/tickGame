@@ -15,51 +15,67 @@ import           Resources
 import           Seconds
 import           Source
 import           State
-import           Utils
 
 helperWork
-  :: (Num a, Ord a)
-  => Paperclips a
-  -> Helpers a
-  -> HelperInc (Helpers a)
-  -> StorageOfPaperclips a
-  -> Paperclips a
-helperWork p h inc s =
-  limitByStorage s
+  :: ( Num a
+     , Ord a
+     , HasHelperInc s a
+     , HasHelpers s a
+     , HasPaperclips s a
+     , HasStorageOfPaperclips s a
+     , MonadReader s m
+     )
+  => m (Paperclips a)
+helperWork = do
+  p        <- ask $ view paperclips
+  h        <- ask $ view helpers
+  inc      <- ask $ view helperInc
+  storage' <- ask $ view storageOfPaperclips
+  return
+    $   limitByStorage storage'
     $   (+)
-    <$> (Paperclips $ view unHelpers $ (*) <$> h <*> (unHelperInc inc))
+    <$> (Paperclips $ view unHelpers $ (*) <$> h <*> (Helpers . unHelperInc) inc
+        )
     <*> p
 
 researchWork
-  :: (Eq a, Num a)
-  => ResearchProgress a
-  -> HelperInc (Helpers a)
-  -> (ResearchProgress a, HelperInc (Helpers a))
-researchWork progress c = case progress of
-  NotResearched        -> (progress, c)
-  ResearchInProgress 1 -> (ResearchDone, twoLevels (+) c c)
-  ResearchInProgress n -> (ResearchInProgress (n - 1), c)
-  ResearchDone         -> (progress, c)
+  :: (Eq a, Num a, HasHelperInc s a, HasResearchProgress s a, MonadReader s m)
+  => m (ResearchProgress a, HelperInc a)
+researchWork = do
+  progress <- view $ ask researchProgress
+  inc      <- view $ ask helperInc
+  return $ case progress of
+    NotResearched        -> (progress, inc)
+    ResearchInProgress 1 -> (ResearchDone, fmap (* 2) inc)
+    ResearchInProgress n -> (ResearchInProgress (n - 1), inc)
+    ResearchDone         -> (progress, inc)
 
 seedWork
-  :: (Num a, Ord a, Show a)
-  => Seconds a
-  -> Water a
-  -> TreeSeedCostPerTick a
-  -> [Prog a]
-  -> Trees a
-  -> Either
-       (ErrorLogLine, [Prog a])
-       (Water a, [Prog a], Trees a)
-seedWork s w (TreeSeedCostPerTick price errorMessage) ps ts =
+  :: ( Eq a
+     , Ord a
+     , Num a
+     , Show a
+     , HasSeconds s a
+     , HasTreeSeedCostPerTick s a
+     , HasTreeSeeds s a
+     , HasTrees s a
+     , HasWater s a
+     , MonadReader s m
+     )
+  => m (Either (ErrorLogLine, [Prog a]) (Water a, [Prog a], Trees a))
+seedWork = do
+  s  <- ask $ view seconds
+  w  <- ask $ view water
+  (TreeSeedCostPerTick price errorMessage) <- ask $ view treeSeedCostPerTick
+  (TreeSeeds ps                          ) <- ask $ view treeSeeds
+  ts <- ask $ view trees
   let ts'    = additionalTrees ps
-      progs' = filter (not . isGrowingDone) $ progressGrowing ps
-  in  if any isGrowing ps
-        then case calcRemainingWater price ps w of
-          Nothing ->
-            Left (mkErrorLogLine s errorMessage, removeGrowingSeeds ps)
-          Just w' -> Right $ (w', progs', ts + ts')
-        else Right $ (w, ps, ts)
+  let progs' = filter (not . isGrowingDone) $ progressGrowing ps
+  return $ if any isGrowing ps
+    then case calcRemainingWater price ps w of
+      Nothing -> Left (mkErrorLogLine s errorMessage, removeGrowingSeeds ps)
+      Just w' -> Right $ (w', progs', ts + ts')
+    else Right $ (w, ps, ts)
 
 buyHelper
   :: ( Enum (helpers a)
@@ -138,23 +154,30 @@ plantASeed = do
     then Right $ initializeASeed dur seeds
     else Left $ lineNeedMoreSeeds s
 
-buyASeed :: (Num a, Ord a, Show a, HasTreeSeeds s a, HasPaperclips s a, HasBuyTreeSeeds s a, HasSeconds s a, MonadReader s m) => m (Either ErrorLogLine (TreeSeeds a, Paperclips a))
+buyASeed
+  :: ( Num a
+     , Ord a
+     , Show a
+     , HasTreeSeeds s a
+     , HasPaperclips s a
+     , HasBuyTreeSeeds s a
+     , HasSeconds s a
+     , MonadReader s m
+     )
+  => m (Either ErrorLogLine (TreeSeeds a, Paperclips a))
 buyASeed = do
-  s <- ask $ view seconds
+  s                             <- ask $ view seconds
   (BuyTreeSeeds c errorMessage) <- ask $ view buyTreeSeeds
-  p <- ask $ view paperclips
-  (TreeSeeds seeds) <- ask $ view treeSeeds
-  return $
-    case calcPaperclips c p of
-      Nothing -> Left $ mkErrorLogLine s errorMessage
-      Just p' -> Right $ (TreeSeeds $ seeds ++ [NotGrowing], p')
+  p                             <- ask $ view paperclips
+  (TreeSeeds seeds)             <- ask $ view treeSeeds
+  return $ case calcPaperclips c p of
+    Nothing -> Left $ mkErrorLogLine s errorMessage
+    Just p' -> Right $ (TreeSeeds $ seeds ++ [NotGrowing], p')
 
 generateEnergy
-  :: (Enum energy, Num a, Ord a, Show a, HasEnergy energy a)
-  => Getter s energy
-  -> s
-  -> energy
-generateEnergy e st = succ (view e st)
+  :: (Enum a, Num a, Ord a, Show a, HasEnergy s a, MonadReader s m)
+  =>  m (Energy a)
+generateEnergy = fmap succ (ask $ view energy)
 
 createPaperclip
   :: ( HasPaperclips s a
@@ -181,16 +204,15 @@ extendStorage sec (StorageManually (CostWood price) errorMessage) w s =
     then Right (fmap (+ 1) s, (-) <$> w <*> price)
     else Left $ mkErrorLogLine sec errorMessage
 
-run
-  :: (Eq a, Integral a, Num a)
-  => Seconds a
-  -> Paperclips a
-  -> SourceText
-  -> StorageOfPaperclips a
-  -> Paperclips a
-run s p (SourceText t) storage' = case parse t of
-  Left _ -> p
-  Right (SyncPaperclipsWithSeconds s') ->
-    if view unSeconds s == s' then Paperclips $ view unSeconds s else p
-  Right (AddPaperclips ss) ->
-    if elem s ss then limitByStorage storage' (fmap (+ 10) p) else p
+run :: (Integral a, HasPaperclips s a, HasSeconds s a, HasSource s a, HasStorageOfPaperclips s a, MonadReader s m) => m (Paperclips a)
+run = do
+  s <- ask $ view seconds
+  p <- ask $ view paperclips
+  (SourceText t) <- ask $ view sourceText
+  storage' <- ask $ view storageOfPaperclips
+  return $ case parse t of
+    Left _ -> p
+    Right (SyncPaperclipsWithSeconds s') ->
+      if view unSeconds s == s' then Paperclips $ view unSeconds s else p
+    Right (AddPaperclips ss) ->
+      if elem s ss then limitByStorage storage' (fmap (+ 10) p) else p

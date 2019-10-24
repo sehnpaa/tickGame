@@ -20,19 +20,19 @@ helperWork
       :: State a
       -> ( Paperclips a
          , Helpers a
-         , HelperInc (Helpers a)
+         , HelperInc a
          , StorageOfPaperclips a
          )
 helperWork = get4
       (stateResources . resourcesElements . elementsPaperclips . count)
       (stateResources . resourcesElements . elementsHelpers . count)
-      (stateConfig . configConstants . helperInc)
+      (stateConfig . configConstants . constantsHelperInc)
       (stateResources . resourcesStorage)
 
-researchWork :: State a -> (ResearchProgress a, HelperInc (Helpers a))
+researchWork :: State a -> (ResearchProgress a, HelperInc a)
 researchWork = get2
       (stateResearchAreas . advancedHelperResearch . researchCompProgress)
-      (stateConfig . configConstants . helperInc)
+      (stateConfig . configConstants . constantsHelperInc)
 
 seedWork
       :: State a

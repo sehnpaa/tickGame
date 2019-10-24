@@ -62,6 +62,7 @@ instance Show (StorageOfPaperclips Integer) where
   show (StorageOfPaperclips a) = show a
 
 newtype Trees a = Trees { unTrees :: a } deriving (Enum, Eq, Num, Ord)
+makeClassy ''Trees
 
 instance Show (Trees Integer) where
   show (Trees a) = show a
@@ -84,6 +85,7 @@ instance Show (TreeSeeds Integer) where
   show (TreeSeeds a) = show a
 
 newtype Water a = Water { unWater :: a } deriving (Eq, Ord)
+makeClassy ''Water
 
 instance Show (Water Integer) where
   show (Water a) = show a
@@ -138,6 +140,7 @@ makeClassy ''AcquireTreeSeeds
 
 newtype TreesFromTreeSeeds a = TreesFromTreeSeeds { unTreesFromTreeSeeds :: CostTreeSeeds a }
 data TreeSeedCostPerTick a = TreeSeedCostPerTick { unTreeSeedCostPerTick :: CostWater a, treeSeedCostPerTickErrorMessage :: T.Text }
+makeClassy ''TreeSeedCostPerTick
 
 data EnergyManually a = EnergyManually { _energyManuallyCost :: NoCost a}
 makeClassy ''EnergyManually
