@@ -21,7 +21,6 @@ library tickGameLib
       LensUtils
       NaturalTransformation
       Path
-      PathedBusinessLogic
       Resources
       Seconds
       Source
