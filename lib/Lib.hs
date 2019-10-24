@@ -96,7 +96,15 @@ seedWork st =
 addSecond :: (Enum a) => State a -> State a
 addSecond = over stateSeconds succ
 
-createPaperclip :: (Ord a, Enum a, HasState s a, HasPaperclips s a, HasStorageOfPaperclips s a) => s -> s
+createPaperclip
+  :: ( Ord a
+     , Enum a
+     , HasState s a
+     , HasPaperclips s a
+     , HasStorageOfPaperclips s a
+     )
+  => s
+  -> s
 createPaperclip st =
   performActions stateActions applyAction st
     . (\p -> SetP p : [])
@@ -122,12 +130,22 @@ buyHelper st =
                    mkErrorLogLine
     $ st
 
-buyASeed :: (Num a, Ord a, Show a) => State a -> State a
+buyASeed
+  :: ( HasSeconds s a
+     , HasBuyTreeSeeds s a
+     , HasPaperclips s a
+     , HasTreeSeeds s a
+     , Show a
+     , Ord a
+     , Num a
+     , HasState s a
+     )
+  => s
+  -> s
 buyASeed st =
   performActions stateActions applyAction st
     . withError SetE (\(s, p) -> SetTreeSeeds s : SetP p : [])
-    . uncurryN BL.buyASeed
-    . PBL.buyASeed
+    . runReader BL.buyASeed
     $ st
 
 extendStorage :: (Num a, Ord a, Show a) => State a -> State a
@@ -153,9 +171,17 @@ researchAdvancedHelper st =
     . PBL.researchAdvancedHelper
     $ st
 
-plantASeed :: (HasTreeSeeds s a, HasDurationTreeSeeds s a,
-                 HasSeconds s a, Show a, Ord a, Num a, HasState s a) =>
-                s -> s
+plantASeed
+  :: ( HasTreeSeeds s a
+     , HasDurationTreeSeeds s a
+     , HasSeconds s a
+     , Show a
+     , Ord a
+     , Num a
+     , HasState s a
+     )
+  => s
+  -> s
 plantASeed st =
   performActions stateActions applyAction st
     . withError SetE (\s -> SetTreeSeeds s : [])

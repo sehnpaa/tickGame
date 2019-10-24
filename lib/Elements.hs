@@ -131,6 +131,7 @@ data AcquirePaperclips a = AcquirePaperclips
 makeClassy ''AcquirePaperclips
 
 data BuyTreeSeeds a = BuyTreeSeeds { unBuyTreeSeeds :: CostPaperclips a, buyTreeSeedsErrorMessage :: T.Text }
+makeClassy ''BuyTreeSeeds
 
 newtype AcquireTreeSeeds a = AcquireTreeSeeds { _acquireBuyTreeSeeds :: BuyTreeSeeds a }
 makeClassy ''AcquireTreeSeeds

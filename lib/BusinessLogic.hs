@@ -138,17 +138,16 @@ plantASeed = do
     then Right $ initializeASeed dur seeds
     else Left $ lineNeedMoreSeeds s
 
-buyASeed
-  :: (Num a, Ord a, Show a)
-  => Seconds a
-  -> BuyTreeSeeds a
-  -> Paperclips a
-  -> TreeSeeds a
-  -> Either ErrorLogLine (TreeSeeds a, Paperclips a)
-buyASeed s (BuyTreeSeeds c errorMessage) p (TreeSeeds seeds) =
-  case calcPaperclips c p of
-    Nothing -> Left $ mkErrorLogLine s errorMessage
-    Just p' -> Right $ (TreeSeeds $ seeds ++ [NotGrowing], p')
+buyASeed :: (Num a, Ord a, Show a, HasTreeSeeds s a, HasPaperclips s a, HasBuyTreeSeeds s a, HasSeconds s a, MonadReader s m) => m (Either ErrorLogLine (TreeSeeds a, Paperclips a))
+buyASeed = do
+  s <- ask $ view seconds
+  (BuyTreeSeeds c errorMessage) <- ask $ view buyTreeSeeds
+  p <- ask $ view paperclips
+  (TreeSeeds seeds) <- ask $ view treeSeeds
+  return $
+    case calcPaperclips c p of
+      Nothing -> Left $ mkErrorLogLine s errorMessage
+      Just p' -> Right $ (TreeSeeds $ seeds ++ [NotGrowing], p')
 
 generateEnergy
   :: (Enum energy, Num a, Ord a, Show a, HasEnergy energy a)

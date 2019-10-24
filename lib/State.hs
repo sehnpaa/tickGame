@@ -255,10 +255,20 @@ instance HasTreeSeeds (State a) a where
   treeSeeds = stateResources . resourcesElements . elementsTreeSeeds . count
 
 instance HasDurationTreeSeeds (State a) a where
-  durationTreeSeeds = stateResources . resourcesElements . elementsTreeSeeds . duration
+  durationTreeSeeds =
+    stateResources . resourcesElements . elementsTreeSeeds . duration
 
 instance HasSeconds (State a) a where
-  seconds = stateSeconds
+  seconds = Seconds.seconds
+
+instance HasBuyTreeSeeds (State a) a where
+  buyTreeSeeds =
+    ( stateResources
+    . resourcesElements
+    . elementsTreeSeeds
+    . elementCost
+    . acquireBuyTreeSeeds
+    )
 
 applyAction :: HasState t a => Action a -> t -> t
 applyAction (SetP p) =
