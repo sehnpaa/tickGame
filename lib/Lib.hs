@@ -62,7 +62,7 @@ nextTick
   -> s
 nextTick =
   saveSnapshot
-    . (\st -> performActions stateActions applyAction st (view stateActions st))
+    . (\st -> performActions (stateActions . unActions) applyAction st (view (stateActions . unActions) st))
     . helperWork
     . seedWork
     . researchWork
@@ -85,7 +85,7 @@ runCode
   => s
   -> s
 runCode st =
-  performActions stateActions applyAction st
+  performActions (stateActions . unActions) applyAction st
     . (singleton . SetP)
     . runReader BL.run
     $ st
@@ -102,7 +102,7 @@ helperWork
   => s
   -> s
 helperWork st =
-  performActions stateActions applyAction st
+  performActions (stateActions . unActions) applyAction st
     . (singleton . SetP)
     . runReader BL.helperWork
     $ st
@@ -112,7 +112,7 @@ researchWork
   => s
   -> s
 researchWork st =
-  performActions stateActions applyAction st
+  performActions (stateActions . unActions) applyAction st
     . (\(p, h) -> SetAdvancedHelperResearchProgress p : SetHelperInc h : [])
     . runReader BL.researchWork
     $ st
@@ -131,7 +131,7 @@ seedWork
   => s
   -> s
 seedWork st =
-  performActions stateActions applyAction st
+  performActions (stateActions . unActions) applyAction st
     . (withExtendedError
         SetE
         (\p -> SetProgs p : [])
@@ -147,13 +147,14 @@ createPaperclip
   :: ( Ord a
      , Enum a
      , HasState s a
+     , HasActions s a
      , HasPaperclips s a
      , HasStorageOfPaperclips s a
      )
   => s
   -> s
 createPaperclip st =
-  performActions stateActions applyAction st
+  performActions (stateActions . unActions) applyAction st
     . (\p -> SetP p : [])
     . runReader BL.createPaperclip
     $ st
@@ -162,9 +163,24 @@ performActions
   :: (Foldable t) => ASetter' s [a] -> (a -> s -> s) -> s -> t a -> s
 performActions l f st = set l [] . foldr f st
 
-buyHelper :: (Enum a, Num a, Ord a, Show a, HasCostEnergyPaperclips s a, HasEnergy s a, HasEnergyErrorMessage s, HasHelpers s a, HasPaperclips s a, HasPaperclipsErrorMessage s, HasSeconds s a, HasState s a) => s -> s
+buyHelper
+  :: ( Enum a
+     , Num a
+     , Ord a
+     , Show a
+     , HasCostEnergyPaperclips s a
+     , HasEnergy s a
+     , HasEnergyErrorMessage s
+     , HasHelpers s a
+     , HasPaperclips s a
+     , HasPaperclipsErrorMessage s
+     , HasSeconds s a
+     , HasState s a
+     )
+  => s
+  -> s
 buyHelper st =
-  performActions stateActions applyAction st
+  performActions (stateActions . unActions) applyAction st
     . (withError SetE (\(h, e, p) -> SetH h : SetEnergy e : SetP p : []))
     . runReader BL.buyHelper
     $ st
@@ -182,28 +198,51 @@ buyASeed
   => s
   -> s
 buyASeed st =
-  performActions stateActions applyAction st
+  performActions (stateActions . unActions) applyAction st
     . withError SetE (\(s, p) -> SetTreeSeeds s : SetP p : [])
     . runReader BL.buyASeed
     $ st
 
-extendStorage :: (Num a, Ord a, Show a, HasSeconds s a, HasState s a, HasStorageManually s a, HasStorageOfPaperclips s a, HasWood s a) => s -> s
+extendStorage
+  :: ( Num a
+     , Ord a
+     , Show a
+     , HasSeconds s a
+     , HasState s a
+     , HasStorageManually s a
+     , HasStorageOfPaperclips s a
+     , HasWood s a
+     )
+  => s
+  -> s
 extendStorage st =
-  performActions stateActions applyAction st
+  performActions (stateActions . unActions) applyAction st
     . withError SetE (\(s, w) -> SetStorageOfPaperclips s : SetWood w : [])
     . runReader BL.extendStorage
     $ st
 
-generateEnergy :: (Enum a, Ord a, Num a, Show a, HasEnergy s a, HasState s a) => s -> s
+generateEnergy
+  :: (Enum a, Ord a, Num a, Show a, HasEnergy s a, HasState s a) => s -> s
 generateEnergy st =
-  performActions stateActions applyAction st
+  performActions (stateActions . unActions) applyAction st
     . (\e -> SetEnergy e : [])
     . runReader BL.generateEnergy
     $ st
 
-researchAdvancedHelper :: (Num a, Ord a, Show a, HasAdvancedHelperPriceInPaperclips s a, HasPaperclips s a, HasResearchComp s a, HasSeconds s a, HasState s a) => s -> s
+researchAdvancedHelper
+  :: ( Num a
+     , Ord a
+     , Show a
+     , HasAdvancedHelperPriceInPaperclips s a
+     , HasPaperclips s a
+     , HasResearchComp s a
+     , HasSeconds s a
+     , HasState s a
+     )
+  => s
+  -> s
 researchAdvancedHelper st =
-  performActions stateActions applyAction st
+  performActions (stateActions . unActions) applyAction st
     . withError SetE (\(p, r) -> SetP p : SetR r : [])
     . runReader BL.researchAdvancedHelper
     $ st
@@ -220,14 +259,17 @@ plantASeed
   => s
   -> s
 plantASeed st =
-  performActions stateActions applyAction st
+  performActions (stateActions . unActions) applyAction st
     . withError SetE (\s -> SetTreeSeeds s : [])
     . runReader BL.plantASeed
     $ st
 
-pumpWater :: (Enum a, Num a, Ord a, HasState s a, HasWater s a, HasWaterTank s a) => s -> s
+pumpWater
+  :: (Enum a, Num a, Ord a, HasState s a, HasWater s a, HasWaterTank s a)
+  => s
+  -> s
 pumpWater st =
-  performActions stateActions applyAction st
+  performActions (stateActions . unActions) applyAction st
     . (\w -> SetWater w : [])
     . runReader BL.pumpWater
     $ st

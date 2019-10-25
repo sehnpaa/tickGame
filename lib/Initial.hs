@@ -179,7 +179,7 @@ events = Events
 
 getInitialState :: State Integer
 getInitialState = State Initial.config
-                        []
+                        (Actions [])
                         []
                         Initial.events
                         Initial.researchAreas

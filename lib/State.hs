@@ -231,9 +231,12 @@ newtype Title = Title Text
 instance Show Title where
   show (Title t) = unpack t
 
+newtype Actions a = Actions { _unActions :: [Action a] }
+makeClassy ''Actions
+
 data State a = State
   { _stateConfig :: Config a
-  , _stateActions :: [Action a]
+  , _stateActions :: Actions a
   , _stateErrorLog :: [ErrorLogLine]
   , _stateEvents :: Events
   , _stateResearchAreas :: ResearchAreas a
