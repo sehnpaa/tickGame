@@ -34,23 +34,21 @@ instance Show (MiniState Integer) where
 instance Arbitrary Text where
   arbitrary = pack <$> arbitrary
 
+instance Arbitrary (CostEnergyPaperclips Integer) where
+  arbitrary =
+    CostEnergyPaperclips <$> fmap Energy arbitrary <*> fmap Paperclips arbitrary
+
 instance Arbitrary (MiniState Integer) where
-  arbitrary = do
-    a <- arbitrary
-    b <- arbitrary
-    c <- arbitrary
-    d <- arbitrary
-    e <- arbitrary
-    f <- arbitrary
-    g <- arbitrary
-    h <- arbitrary
-    return $ MiniState (Energy a)
-                       (CostEnergyPaperclips (Energy b) (Paperclips c))
-                       (EnergyErrorMessage d)
-                       (Helpers e)
-                       (Paperclips f)
-                       (PaperclipsErrorMessage g)
-                       (Seconds h)
+  arbitrary =
+    MiniState
+      <$> helper Energy
+      <*> arbitrary
+      <*> helper EnergyErrorMessage
+      <*> helper Helpers
+      <*> helper Paperclips
+      <*> helper PaperclipsErrorMessage
+      <*> helper Seconds
+    where helper constructor = fmap constructor arbitrary
 
 instance HasCostEnergyPaperclips (MiniState a) a where
   costEnergyPaperclips = miniStateCostEnergyPaperclips
@@ -79,7 +77,7 @@ buyHelperProps = testGroup
   [ testProperty "" $ withMaxSuccess 10000 $ \state ->
       case runReader buyHelper (state :: MiniState Integer) of
         Right (h', _, _) -> moreHelpers h' state
-        Left  _            -> True
+        Left  _          -> True
   ]
 
 moreHelpers :: Ord a => Helpers a -> MiniState a -> Bool
