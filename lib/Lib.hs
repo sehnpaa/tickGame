@@ -147,7 +147,6 @@ createPaperclip
   :: ( Ord a
      , Enum a
      , HasState s a
-     , HasActions s a
      , HasPaperclips s a
      , HasStorageOfPaperclips s a
      )

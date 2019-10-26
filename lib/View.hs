@@ -9,7 +9,7 @@ import           Source
 import           State
 
 viewActions :: State a -> [Action a]
-viewActions = view stateActions
+viewActions = view (stateActions . unActions)
 
 viewEnergy :: State a -> Energy a
 viewEnergy = view (stateResources . resourcesElements . elementsEnergy . count)
