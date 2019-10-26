@@ -11,15 +11,17 @@ import           Test.Tasty
 import           Test.Tasty.HUnit
 
 import           Lib
-import           Polytest
 import           View
+
+import           BuyHelper
+import           GenerateEnergy
 
 main :: IO ()
 main = defaultMain tests
 
 defaultConfig :: Config Integer
-defaultConfig = Config (Constants (HelperInc (Helpers 1)))
-                       (Prices (AdvancedHelperPrice $ Paperclips 5))
+defaultConfig = Config (Constants (HelperInc 1))
+                       (Prices (AdvancedHelperPriceInPaperclips 5))
 
 events :: Events
 events = Events
@@ -105,7 +107,7 @@ events = Events
 state1 :: State Integer
 state1 = State
   defaultConfig
-  []
+  (Actions [])
   []
   Main.events
   (ResearchAreas
@@ -124,7 +126,7 @@ state1 = State
   (IsStarted True)
 
 resources :: Resources Integer
-resources = Resources Main.elements (Storage (Paperclips 1000)) (WaterTank 100)
+resources = Resources Main.elements (StorageOfPaperclips 1000) (WaterTank 100)
 
 elements :: Elements Integer
 elements = Elements
@@ -140,14 +142,14 @@ elements = Elements
   )
   (Element
     (AcquireHelpers
-      (HelpersManually helperCost "Not enough energy." "Not enough paperclips.")
+      (HelpersManually helperCost (EnergyErrorMessage "Not enough energy.") (PaperclipsErrorMessage "Not enough paperclips."))
     )
     (Helpers 0)
     (DurationHelpers Instant)
   )
   (Element
     (AcquireStorage (StorageManually (CostWood (Wood 1)) "Not enough wood."))
-    (Storage 1000)
+    (StorageOfPaperclips 1000)
     (DurationStorage Instant)
   )
   (Element
@@ -187,7 +189,7 @@ noCost = Cost (Paperclips 0)
               (Wood 0)
 
 tests :: TestTree
-tests = testGroup "Tests" [unitTests, polyTests]
+tests = testGroup "Tests" [unitTests, generateEnergyProps, buyHelperProps]
 
 unitTests :: TestTree
 unitTests = testGroup
