@@ -63,6 +63,7 @@ import           Lib                            ( buyASeed
                                                 , ButtonTitle(..)
                                                 , ButtonStatus(..)
                                                 , ButtonData(..)
+                                                , ButtonDataAPI(..)
                                                 , IsStarted(..)
                                                 , MyEvent(..)
                                                 , State(..)
@@ -140,7 +141,7 @@ view' state =
 requestCompilation :: Entry -> IO MyEvent
 requestCompilation c = fmap Compile (entryGetBuffer c >>= entryBufferGetText)
 
-createButtons :: State a -> Vector (BoxChild MyEvent)
+createButtons :: (Show a) => State a -> Vector (BoxChild MyEvent)
 createButtons state = mapMaybe
   createButton
   [ viewButtonData ButtonStart                  state
@@ -158,20 +159,20 @@ createButtons state = mapMaybe
   , viewButtonData ButtonExitApplication        state
   ]
 
-createButton :: ButtonData -> Maybe (BoxChild MyEvent)
-createButton (ButtonData (ButtonTitle t) (ButtonStatus Enabled) (ButtonEvent e))
+createButton :: ButtonDataAPI -> Maybe (BoxChild MyEvent)
+createButton (ButtonDataAPI (ButtonData (ButtonTitle t) (ButtonStatus Enabled) (ButtonEvent e) _) str)
   = Just $ widget
     Button
     [ #label := t
     , on #clicked e
     , #tooltipMarkup
-      := "<span foreground=\"white\" size=\"large\">White text</span> is <i>cool</i>"
+      := ("<span foreground=\"white\" size=\"medium\">" `append` pack str `append` "</span>")
     ]
-createButton (ButtonData (ButtonTitle t) (ButtonStatus Disabled) _) =
-  Just $ widget Button [#label := t, #sensitive := False]
-createButton (ButtonData _ (ButtonStatus Hidden) _) = Nothing
+createButton (ButtonDataAPI (ButtonData (ButtonTitle t) (ButtonStatus Disabled) _ _) str) =
+  Just $ widget Button [#label := t, #sensitive := False, #tooltipMarkup := ("<span foreground=\"white\" size=\"medium\">" `append` pack str `append` "</span>")]
+createButton (ButtonDataAPI (ButtonData _ (ButtonStatus Hidden) _ _) _) = Nothing
 
-buttons :: State a -> BoxChild MyEvent
+buttons :: (Show a) => State a -> BoxChild MyEvent
 buttons state = container
   Box
   [#orientation := OrientationVertical, #widthRequest := 150]

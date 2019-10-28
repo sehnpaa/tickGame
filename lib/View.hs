@@ -66,37 +66,252 @@ viewIsStarted = view stateIsStarted
 viewCreatePaperclip :: State a -> EventCreatePaperclip
 viewCreatePaperclip = view (stateEvents . eventsEventCreatePaperclip)
 
-viewButtonData :: Button -> State a -> ButtonData
-viewButtonData ButtonStart =
-    view (stateEvents . eventsEventStart . eventStartButtonData)
-viewButtonData ButtonCreatePaperclip = view
-    (stateEvents . eventsEventCreatePaperclip . eventCreatePaperclipButtonData)
-viewButtonData ButtonCreateHelper =
-    view (stateEvents . eventsEventCreateHelper . eventCreateHelperButtonData)
-viewButtonData ButtonExtendStorage =
-    view (stateEvents . eventsEventExtendStorage . eventExtendStorageButtonData)
-viewButtonData ButtonPumpWater =
-    view (stateEvents . eventsEventPumpWater . eventPumpWaterButtonData)
-viewButtonData ButtonGenerateEnergy = view
-    (stateEvents . eventsEventGenerateEnergy . eventGenerateEnergyButtonData)
-viewButtonData ButtonBuyASeed =
-    view (stateEvents . eventsEventBuyASeed . eventBuyASeedButtonData)
-viewButtonData ButtonPlantASeed =
-    view (stateEvents . eventsEventPlantASeed . eventPlantASeedButtonData)
-viewButtonData ButtonResearchAdvancedHelper = view
-    ( stateEvents
-    . eventsEventResearchAdvancedHelper
-    . eventResearchAdvancedHelperButtonData
+viewButtonData :: (Show a) => Button -> State a -> ButtonDataAPI
+viewButtonData ButtonStart st = ButtonDataAPI
+    (view (stateEvents . eventsEventStart . eventStartButtonData) st)
+    (case
+          (view
+              ( stateEvents
+              . eventsEventStart
+              . eventStartButtonData
+              . buttonDataStatus
+              . status
+              )
+              st
+          )
+      of
+          Enabled ->
+              case
+                      (view
+                          ( stateEvents
+                          . eventsEventStart
+                          . eventStartButtonData
+                          . buttonDataDisplayStatus
+                          . displayStatusEnabled
+                          )
+                          st
+                      )
+                  of
+                      ShowNothing  -> show ShowNothing
+                      ShowStatic s -> show $ ShowStatic s
+                      ShowCost     -> show $ ShowCost
+          Disabled ->
+              case
+                      (view
+                          ( stateEvents
+                          . eventsEventStart
+                          . eventStartButtonData
+                          . buttonDataDisplayStatus
+                          . displayStatusDisabled
+                          )
+                          st
+                      )
+                  of
+                      ShowNothing  -> show ShowNothing
+                      ShowStatic s -> show $ ShowStatic s
+                      ShowCost     -> show $ ShowCost
+          Hidden -> show Hidden
     )
-viewButtonData ButtonPreviousSnapshot = view
-    (stateEvents . eventsEventPreviousSnapshot . eventPreviousSnapshotButtonData
+viewButtonData ButtonCreatePaperclip st = ButtonDataAPI
+    (view
+        ( stateEvents
+        . eventsEventCreatePaperclip
+        . eventCreatePaperclipButtonData
+        )
+        st
     )
-viewButtonData ButtonNextSnapshot =
-    view (stateEvents . eventsEventNextSnapshot . eventNextSnapshotButtonData)
-viewButtonData ButtonApplySnapshot =
-    view (stateEvents . eventsEventApplySnapshot . eventApplySnapshotButtonData)
-viewButtonData ButtonExitApplication = view
-    (stateEvents . eventsEventExitApplication . eventExitApplicationButtonData)
+    (case
+          (view
+              ( stateEvents
+              . eventsEventCreatePaperclip
+              . eventCreatePaperclipButtonData
+              . buttonDataStatus
+              . status
+              )
+              st
+          )
+      of
+          Enabled ->
+              case
+                      (view
+                          ( stateEvents
+                          . eventsEventCreatePaperclip
+                          . eventCreatePaperclipButtonData
+                          . buttonDataDisplayStatus
+                          . displayStatusEnabled
+                          )
+                          st
+                      )
+                  of
+                      ShowNothing  -> show ShowNothing
+                      ShowStatic s -> show $ ShowStatic s
+                      ShowCost ->
+                          (show $ unPaperclipsManually $ view
+                              ( stateResources
+                              . resourcesElements
+                              . elementsPaperclips
+                              . elementCost
+                              . acquirePaperclips
+                              . paperclipsManually
+                              )
+                              st
+                          )
+          Disabled ->
+              case
+                      (view
+                          ( stateEvents
+                          . eventsEventCreatePaperclip
+                          . eventCreatePaperclipButtonData
+                          . buttonDataDisplayStatus
+                          . displayStatusDisabled
+                          )
+                          st
+                      )
+                  of
+                      ShowNothing  -> show ShowNothing
+                      ShowStatic s -> show $ ShowStatic s
+                      ShowCost ->
+                          (show $ unPaperclipsManually $ view
+                              ( stateResources
+                              . resourcesElements
+                              . elementsPaperclips
+                              . elementCost
+                              . acquirePaperclips
+                              . paperclipsManually
+                              )
+                              st
+                          )
+          Hidden -> show Hidden
+    )
+viewButtonData ButtonCreateHelper st = ButtonDataAPI
+    (view
+        (stateEvents . eventsEventCreateHelper . eventCreateHelperButtonData)
+        st
+    )
+    (case
+          (view
+              ( stateEvents
+              . eventsEventCreateHelper
+              . eventCreateHelperButtonData
+              . buttonDataStatus
+              . status
+              )
+              st
+          )
+      of
+          Enabled ->
+              case
+                      (view
+                          ( stateEvents
+                          . eventsEventCreateHelper
+                          . eventCreateHelperButtonData
+                          . buttonDataDisplayStatus
+                          . displayStatusEnabled
+                          )
+                          st
+                      )
+                  of
+                      ShowNothing  -> show ShowNothing
+                      ShowStatic s -> show $ ShowStatic s
+                      ShowCost ->
+                          (show $ view
+                              ( stateResources
+                              . resourcesElements
+                              . elementsHelpers
+                              . elementCost
+                              . acquireHelpersManually
+                              . helpersManuallyCost
+                              )
+                              st
+                          )
+          Disabled ->
+              case
+                      (view
+                          ( stateEvents
+                          . eventsEventCreateHelper
+                          . eventCreateHelperButtonData
+                          . buttonDataDisplayStatus
+                          . displayStatusDisabled
+                          )
+                          st
+                      )
+                  of
+                      ShowNothing  -> show ShowNothing
+                      ShowStatic s -> show $ ShowStatic s
+                      ShowCost ->
+                          (show $ view
+                              ( stateResources
+                              . resourcesElements
+                              . elementsHelpers
+                              . elementCost
+                              . acquireHelpersManually
+                              . helpersManuallyCost
+                              )
+                              st
+                          )
+          Hidden -> show Hidden
+    )
+viewButtonData ButtonExtendStorage st = ButtonDataAPI
+    (view
+        (stateEvents . eventsEventExtendStorage . eventExtendStorageButtonData)
+        st
+    )
+    ""
+viewButtonData ButtonPumpWater st = ButtonDataAPI
+    (view (stateEvents . eventsEventPumpWater . eventPumpWaterButtonData) st)
+    ""
+viewButtonData ButtonGenerateEnergy st = ButtonDataAPI
+    (view
+        (stateEvents . eventsEventGenerateEnergy . eventGenerateEnergyButtonData
+        )
+        st
+    )
+    ""
+viewButtonData ButtonBuyASeed st = ButtonDataAPI
+    (view (stateEvents . eventsEventBuyASeed . eventBuyASeedButtonData) st)
+    ""
+viewButtonData ButtonPlantASeed st = ButtonDataAPI
+    (view (stateEvents . eventsEventPlantASeed . eventPlantASeedButtonData) st)
+    ""
+viewButtonData ButtonResearchAdvancedHelper st = ButtonDataAPI
+    (view
+        ( stateEvents
+        . eventsEventResearchAdvancedHelper
+        . eventResearchAdvancedHelperButtonData
+        )
+        st
+    )
+    ""
+viewButtonData ButtonPreviousSnapshot st = ButtonDataAPI
+    (view
+        ( stateEvents
+        . eventsEventPreviousSnapshot
+        . eventPreviousSnapshotButtonData
+        )
+        st
+    )
+    ""
+viewButtonData ButtonNextSnapshot st = ButtonDataAPI
+    (view
+        (stateEvents . eventsEventNextSnapshot . eventNextSnapshotButtonData)
+        st
+    )
+    ""
+viewButtonData ButtonApplySnapshot st = ButtonDataAPI
+    (view
+        (stateEvents . eventsEventApplySnapshot . eventApplySnapshotButtonData)
+        st
+    )
+    ""
+viewButtonData ButtonExitApplication st = ButtonDataAPI
+    (view
+        ( stateEvents
+        . eventsEventExitApplication
+        . eventExitApplicationButtonData
+        )
+        st
+    )
+    ""
 
 viewTitle :: State a -> Title
 viewTitle = view stateTitle

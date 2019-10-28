@@ -123,17 +123,33 @@ newtype ButtonTitle = ButtonTitle Text
 instance Show ButtonTitle where
   show (ButtonTitle t) = unpack t
 
-newtype ButtonStatus = ButtonStatus Status deriving Show
+newtype ButtonStatus = ButtonStatus {_status :: Status} deriving Show
+makeClassy ''ButtonStatus
+
+data Tooltip = ShowNothing | ShowCost | ShowStatic String
+
+instance Show Tooltip where
+  show ShowNothing = ""
+  show ShowCost = ""
+  show (ShowStatic s) = s
+
+data ButtonDisplayStatus = ButtonDisplayStatus
+ { _displayStatusEnabled :: Tooltip
+ , _displayStatusDisabled :: Tooltip } deriving Show
+makeClassy ''ButtonDisplayStatus
 
 newtype ButtonEvent = ButtonEvent MyEvent deriving Show
 
 data ButtonData = ButtonData
   { _buttonTitle :: ButtonTitle
-  , _buttonStatus :: ButtonStatus
-  , _buttonEvent :: ButtonEvent } deriving Show
+  , _buttonDataStatus :: ButtonStatus
+  , _buttonEvent :: ButtonEvent
+  , _buttonDataDisplayStatus :: ButtonDisplayStatus } deriving Show
 makeClassy ''ButtonData
 
-newtype EventStart =
+data ButtonDataAPI = ButtonDataAPI { _apiButtonData :: ButtonData, _apiShow :: String }
+
+data EventStart =
   EventStart { _eventStartButtonData :: ButtonData } deriving Show
 makeClassy ''EventStart
 

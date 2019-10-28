@@ -116,8 +116,15 @@ makeClassy ''Cost
 
 data NoCost a = NoCost
 
+instance Show (NoCost a) where
+  show = const "No cost"
+
 data CostEnergyPaperclips a = CostEnergyPaperclips { _costEnergyPaperclipsE :: Energy a, _costEnergyPaperclipsP :: Paperclips a }
 makeClassy ''CostEnergyPaperclips
+
+instance (Show a) => Show (CostEnergyPaperclips a) where
+  show (CostEnergyPaperclips (Energy e) (Paperclips p)) =
+    "Energy: " ++ show e ++ "\n" ++ "Paperclips: " ++ show p
 
 -- FIX: Messed up naming
 data CostPaperclips a = CostPaperclips { _costPaperclipsA :: Paperclips a }
