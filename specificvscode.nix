@@ -1,5 +1,5 @@
 { nixpkgs ? import (fetchTarball {
-    url = https://github.com/NixOS/nixpkgs/archive/b943338ea582aeb9b0a406d7fb75f3f62bc16a9d.tar.gz;
+    url = https://github.com/NixOS/nixpkgs/archive/f23870a45b5844d2e8f49afc8a9f1a12dd2a8b66.tar.gz;
   }) {}}:
 
 
