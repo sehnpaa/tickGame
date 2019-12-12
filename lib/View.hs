@@ -1,6 +1,10 @@
 module View where
 
 import           Control.Lens                   ( view )
+import           Control.Monad.Reader           ( MonadReader
+                                                , ask
+                                                , runReader
+                                                )
 
 import           Elements
 import           Resources
@@ -8,63 +12,134 @@ import           Seconds
 import           Source
 import           State
 
-viewActions :: State a -> [Action a]
+viewActions :: (HasState s a) => s -> [Action a]
 viewActions = view (stateActions . unActions)
 
-viewEnergy :: State a -> Energy a
+viewEnergy :: (HasState s a) => s -> Energy a
 viewEnergy = view (stateResources . resourcesElements . elementsEnergy . count)
 
-viewErrorLog :: State a -> [ErrorLogLine]
+viewErrorLog :: (HasState s a) => s -> [ErrorLogLine]
 viewErrorLog = view stateErrorLog
 
-viewPaperclips :: State a -> Paperclips a
+viewPaperclips :: (Show a, HasState s a) => s -> Paperclips a
 viewPaperclips =
     view (stateResources . resourcesElements . elementsPaperclips . count)
 
-viewHelpers :: State a -> Helpers a
+viewHelpers :: (HasState s a) => s -> Helpers a
 viewHelpers =
     view (stateResources . resourcesElements . elementsHelpers . count)
 
-viewStorage :: State a -> StorageOfPaperclips a
-viewStorage = view (stateResources . resourcesStorage)
+viewStorageOfPaperclips :: (HasState s a) => s -> StorageOfPaperclips a
+viewStorageOfPaperclips = view (stateResources . resourcesStorage)
 
-viewTrees :: State a -> Trees a
+viewTrees :: (HasState s a) => s -> Trees a
 viewTrees = view (stateResources . resourcesElements . elementsTrees . count)
 
-viewTreeSeeds :: State a -> TreeSeeds a
+viewTreeSeeds :: (HasState s a) => s -> TreeSeeds a
 viewTreeSeeds =
     view (stateResources . resourcesElements . elementsTreeSeeds . count)
 
-viewWater :: State a -> Water a
+viewWater :: (HasState s a) => s -> Water a
 viewWater = view (stateResources . resourcesElements . elementsWater . count)
 
-viewWaterTank :: State a -> WaterTank a
+viewWaterTank :: (HasState s a) => s -> WaterTank a
 viewWaterTank = view (stateResources . resourcesWaterTank)
 
-viewWood :: State a -> Wood a
+viewWood :: (HasState s a) => s -> Wood a
 viewWood = view (stateResources . resourcesElements . elementsWood . count)
 
-viewAdvancedHelperResearch :: State a -> ResearchProgress a
+viewAdvancedHelperResearch :: (HasState s a) => s -> ResearchProgress a
 viewAdvancedHelperResearch =
     view (stateResearchAreas . advancedHelperResearch . researchCompProgress)
 
-viewSeconds :: State a -> Seconds a
+viewSeconds :: (HasState s a) => s -> Seconds a
 viewSeconds = view stateSeconds
 
-viewSnapshots :: State a -> Snapshots a
+viewSnapshots :: (HasState s a) => s -> Snapshots a
 viewSnapshots = view stateSnapshots
 
-viewSource :: State a -> SourceText
+viewSource :: (HasState s a) => s -> SourceText
 viewSource = view (stateSource . sourceText)
 
-viewSourceStatus :: State a -> SourceStatus
+viewSourceStatus :: (HasState s a) => s -> SourceStatus
 viewSourceStatus = view (stateSource . sourceStatus)
 
-viewIsStarted :: State a -> IsStarted
+viewIsStarted :: (HasState s a) => s -> IsStarted
 viewIsStarted = view stateIsStarted
 
-viewCreatePaperclip :: State a -> EventCreatePaperclip
+viewCreatePaperclip :: (HasState s a) => s -> EventCreatePaperclip
 viewCreatePaperclip = view (stateEvents . eventsEventCreatePaperclip)
+
+viewButtonData2
+    :: ( HasAcquirePaperclips s a
+       , HasButtonDisplayStatus s
+       , HasEventCreatePaperclip s
+       , HasEventStart s
+       , HasState s a
+       , Show a
+       )
+    => Button
+    -> s
+    -> ButtonDataAPI
+viewButtonData2 ButtonStart           = runReader buttonStartButton
+viewButtonData2 ButtonCreatePaperclip = runReader createPaperclipButton
+
+createPaperclipButton
+    :: (HasAcquirePaperclips s a, HasEventCreatePaperclip s, MonadReader s m)
+    => m ButtonDataAPI
+createPaperclipButton = do
+    (EventCreatePaperclip a    ) <- ask $ view eventCreatePaperclip
+    (PaperclipsManually   cost') <- ask $ view paperclipsManually
+    let b = case getStatus a of
+            Enabled -> case getTooltipForEnabled a of
+                ShowNothing  -> show ShowNothing
+                ShowStatic s -> show $ ShowStatic s
+                ShowCost     -> show cost'
+            Disabled -> case getTooltipForDisabled a of
+                ShowNothing  -> show ShowNothing
+                ShowStatic s -> show $ ShowStatic s
+                ShowCost     -> show cost'
+            Hidden -> show Hidden
+    return $ ButtonDataAPI a b
+
+getStatus2 :: (HasButtonData s) => s -> Status
+getStatus2 = view (buttonDataStatus . status)
+
+ff :: (HasButtonData s, HasButtonDisplayStatus s, MonadReader s m) => m String
+ff = do
+    a            <- ask $ view id
+    whenEnabled  <- ask $ view displayStatusEnabled
+    whenDisabled <- ask $ view displayStatusDisabled
+    return $ case getStatus2 a of
+        Enabled -> case whenEnabled of
+            ShowNothing  -> show ShowNothing
+            ShowStatic s -> show $ ShowStatic s
+            ShowCost     -> show $ ShowCost
+        Disabled -> case whenDisabled of
+            ShowNothing  -> show ShowNothing
+            ShowStatic s -> show $ ShowStatic s
+            ShowCost     -> show $ ShowCost
+        Hidden -> show Hidden
+
+buttonStartButton
+    :: ( HasButtonDisplayStatus s
+       , HasEventCreatePaperclip s
+       , HasEventStart s
+       , MonadReader s m
+       )
+    => m ButtonDataAPI
+buttonStartButton = do
+    a <- ask $ view eventStartButtonData
+    return $ ButtonDataAPI a (ff a)
+
+getStatus :: ButtonData -> Status
+getStatus = view (buttonDataStatus . status)
+
+getTooltipForEnabled :: ButtonData -> Tooltip
+getTooltipForEnabled = view (buttonDataDisplayStatus . displayStatusEnabled)
+
+getTooltipForDisabled :: ButtonData -> Tooltip
+getTooltipForDisabled = view (buttonDataDisplayStatus . displayStatusDisabled)
 
 viewButtonData :: (Show a) => Button -> State a -> ButtonDataAPI
 viewButtonData ButtonStart st = ButtonDataAPI
@@ -313,5 +388,5 @@ viewButtonData ButtonExitApplication st = ButtonDataAPI
     )
     ""
 
-viewTitle :: State a -> Title
+viewTitle :: (HasState s a) => s -> Title
 viewTitle = view stateTitle

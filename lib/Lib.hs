@@ -273,7 +273,7 @@ pumpWater st =
     . runReader BL.pumpWater
     $ st
 
-compile :: Text -> State a -> State a
+compile :: (HasState s a) => Text -> s -> s
 compile text = set (stateSource . sourceText) (SourceText text) . set
   (stateSource . sourceStatus)
   (case parse text :: Either CustomParseError (Expr Integer) of
@@ -282,13 +282,13 @@ compile text = set (stateSource . sourceText) (SourceText text) . set
     Right _              -> SourceStatus $ pack "OK!"
   )
 
-previousSnapshot :: State a -> State a
+previousSnapshot :: (HasState s a) => s -> s
 previousSnapshot = over (stateSnapshots . zipper) right
 
-nextSnapshot :: State a -> State a
+nextSnapshot :: (HasState s a) => s -> s
 nextSnapshot = over (stateSnapshots . zipper) left
 
-applySnapshot :: State a -> State a
+applySnapshot :: (HasState s a) => s -> s
 applySnapshot st = over
   stateResources
   (\old -> case safeCursor (view (stateSnapshots . zipper) st) of
@@ -297,7 +297,7 @@ applySnapshot st = over
   )
   st
 
-setStarted :: Bool -> State a -> State a
+setStarted :: (HasState s a) => Bool -> s -> s
 setStarted True =
   saveSnapshot
     . set

@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedLabels #-}
 {-# LANGUAGE OverloadedLists #-}
 {-# LANGUAGE OverloadedStrings #-}
@@ -64,6 +65,33 @@ import           Lib                            ( buyASeed
                                                 , ButtonStatus(..)
                                                 , ButtonData(..)
                                                 , ButtonDataAPI(..)
+                                                , HasAdvancedHelperPriceInPaperclips
+                                                , HasAcquirePaperclips
+                                                , HasButtonDisplayStatus
+                                                , HasBuyTreeSeeds
+                                                , HasCostEnergyPaperclips
+                                                , HasDurationTreeSeeds
+                                                , HasEnergy
+                                                , HasEnergyErrorMessage
+                                                , HasEventCreatePaperclip
+                                                , HasEventStart
+                                                , HasHelpers
+                                                , HasHelperInc
+                                                , HasPaperclips
+                                                , HasPaperclipsErrorMessage
+                                                , HasResearchProgress
+                                                , HasResearchComp
+                                                , HasSeconds
+                                                , HasSource
+                                                , HasState
+                                                , HasStorageManually
+                                                , HasStorageOfPaperclips
+                                                , HasTreeSeedCostPerTick
+                                                , HasTreeSeeds
+                                                , HasTrees
+                                                , HasWater
+                                                , HasWaterTank
+                                                , HasWood
                                                 , IsStarted(..)
                                                 , MyEvent(..)
                                                 , State(..)
@@ -101,7 +129,13 @@ styles = mconcat
   , ".yellow { color: goldenrod; }"
   ]
 
-view' :: State Integer -> AppView Window MyEvent
+testView' :: State Integer -> AppView Window MyEvent
+testView' = undefined
+
+view'
+  :: (Eq s, Num s, Show s)
+  => State s
+  -> AppView Window MyEvent
 view' state =
   bin
       Window
@@ -141,9 +175,10 @@ view' state =
 requestCompilation :: Entry -> IO MyEvent
 requestCompilation c = fmap Compile (entryGetBuffer c >>= entryBufferGetText)
 
-createButtons :: (Show a) => State a -> Vector (BoxChild MyEvent)
-createButtons state = mapMaybe
-  createButton
+createButtons
+  :: (Show s) => State s
+  -> Vector (BoxChild MyEvent)
+createButtons state = mapMaybe createButton
   [ viewButtonData ButtonStart                  state
   , viewButtonData ButtonCreatePaperclip        state
   , viewButtonData ButtonCreateHelper           state
@@ -166,13 +201,29 @@ createButton (ButtonDataAPI (ButtonData (ButtonTitle t) (ButtonStatus Enabled) (
     [ #label := t
     , on #clicked e
     , #tooltipMarkup
-      := ("<span foreground=\"white\" size=\"medium\">" `append` pack str `append` "</span>")
+      := (        "<span foreground=\"white\" size=\"medium\">"
+         `append` pack str
+         `append` "</span>"
+         )
     ]
-createButton (ButtonDataAPI (ButtonData (ButtonTitle t) (ButtonStatus Disabled) _ _) str) =
-  Just $ widget Button [#label := t, #sensitive := False, #tooltipMarkup := ("<span foreground=\"white\" size=\"medium\">" `append` pack str `append` "</span>")]
-createButton (ButtonDataAPI (ButtonData _ (ButtonStatus Hidden) _ _) _) = Nothing
+createButton (ButtonDataAPI (ButtonData (ButtonTitle t) (ButtonStatus Disabled) _ _) str)
+  = Just $ widget
+    Button
+    [ #label := t
+    , #sensitive := False
+    , #tooltipMarkup
+      := (        "<span foreground=\"white\" size=\"medium\">"
+         `append` pack str
+         `append` "</span>"
+         )
+    ]
+createButton (ButtonDataAPI (ButtonData _ (ButtonStatus Hidden) _ _) _) =
+  Nothing
 
-buttons :: (Show a) => State a -> BoxChild MyEvent
+buttons
+  :: Show s
+  => State s
+  -> BoxChild MyEvent
 buttons state = container
   Box
   [#orientation := OrientationVertical, #widthRequest := 150]
@@ -181,13 +232,12 @@ buttons state = container
 margin :: BoxChild MyEvent
 margin = container Box [#widthRequest := 10] []
 
-stats :: State Integer -> BoxChild MyEvent
-stats state = container
-  Box
-  [#orientation := OrientationVertical]
-  [ statProperty "Paperclips"               (viewPaperclips state)
+stats :: (Eq a, Num a, Show a, HasHelpers s a, HasState s a) => s -> BoxChild MyEvent
+stats state = container Box
+                        [#orientation := OrientationVertical]
+                        [statProperty "Paperclips" (viewPaperclips state)
   , statProperty "Helpers"                  (viewHelpers state)
-  , statProperty "Storage"                  (viewStorage state)
+  , statProperty "Storage of paperclips"     (viewStorageOfPaperclips state)
   , statProperty "Water"                    (viewWater state)
   , statProperty "Water tank"               (viewWaterTank state)
   , statProperty "Energy"                   (viewEnergy state)
@@ -197,7 +247,7 @@ stats state = container
   , statProperty "Advanced helper research" (viewAdvancedHelperResearch state)
   , statProperty "Seconds"                  (viewSeconds state)
   , statProperty "Snapshots"                (viewSnapshots state)
-  ]
+                                                                         ]
 
 statProperty :: Show a => Text -> a -> BoxChild MyEvent
 statProperty labelText n = container
@@ -210,7 +260,39 @@ statProperty labelText n = container
 ticker :: IO (Maybe MyEvent)
 ticker = fmap (const (Just Tick)) (threadDelay 1000000)
 
-update' :: State Integer -> MyEvent -> Transition (State Integer) MyEvent
+update'
+  :: ( Enum a
+     , Integral a
+     , Num a
+     , Ord a
+     , Show a
+     , HasAdvancedHelperPriceInPaperclips s a
+     , HasBuyTreeSeeds s a
+     , HasCostEnergyPaperclips s a
+     , HasDurationTreeSeeds s a
+     , HasEnergy s a
+     , HasEnergyErrorMessage s
+     , HasHelperInc s a
+     , HasHelpers s a
+     , HasPaperclips s a
+     , HasPaperclipsErrorMessage s
+     , HasResearchComp s a
+     , HasResearchProgress s a
+     , HasSeconds s a
+     , HasSource s a
+     , HasState s a
+     , HasStorageManually s a
+     , HasStorageOfPaperclips s a
+     , HasTreeSeedCostPerTick s a
+     , HasTreeSeeds s a
+     , HasTrees s a
+     , HasWater s a
+     , HasWaterTank s a
+     , HasWood s a
+     )
+  => s
+  -> MyEvent
+  -> Transition s MyEvent
 update' state event = case (unIsStarted (viewIsStarted state), event) of
   (False, Start          ) -> Transition (setStarted True state) ticker
   (True , Start          ) -> Transition (setStarted False state) ticker
@@ -237,6 +319,7 @@ update' state event = case (unIsStarted (viewIsStarted state), event) of
   (True , Tick            ) -> Transition (nextTick state) ticker
   (True , Compile t       ) -> Transition (compile t state) (pure Nothing)
   (False, _               ) -> Transition state (pure Nothing)
+
 
 app :: App Window (State Integer) MyEvent
 app = App { view         = view'

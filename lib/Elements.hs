@@ -32,7 +32,7 @@ instance Applicative Paperclips where
   pure = Paperclips
   Paperclips f <*> Paperclips a = Paperclips (f a)
 
-instance Show (Paperclips Integer) where
+instance (Show a) => Show (Paperclips a) where
   show (Paperclips a) = show a
 
 newtype Energy a = Energy a deriving (Enum, Eq, Functor, Ord)
@@ -42,7 +42,7 @@ instance Applicative Energy where
   pure = Energy
   Energy f <*> Energy a = Energy (f a)
 
-instance Show (Energy Integer) where
+instance (Show a) => Show (Energy a) where
   show (Energy a) = show a
 
 newtype Helpers a = Helpers { _unHelpers :: a } deriving (Enum, Eq, Functor, Ord)
@@ -52,24 +52,24 @@ instance Applicative Helpers where
   pure = Helpers
   Helpers f <*> Helpers a = Helpers (f a)
 
-instance Show (Helpers Integer) where
+instance (Show a) => Show (Helpers a) where
   show (Helpers a) = show a
 
 newtype StorageOfPaperclips a = StorageOfPaperclips { _unStorageOfPaperclips :: a } deriving (Functor)
 makeClassy ''StorageOfPaperclips
 
-instance Show (StorageOfPaperclips Integer) where
+instance (Show a) => Show (StorageOfPaperclips a) where
   show (StorageOfPaperclips a) = show a
 
 newtype Trees a = Trees { unTrees :: a } deriving (Enum, Eq, Num, Ord)
 makeClassy ''Trees
 
-instance Show (Trees Integer) where
+instance (Show a) => Show (Trees a) where
   show (Trees a) = show a
 
 data Prog a = NotGrowing | Growing a | GrowingDone deriving (Eq)
 
-instance Show (Prog Integer) where
+instance (Eq a, Num a, Show a) => Show (Prog a) where
   show NotGrowing = show "Not growing"
   show (Growing n) =
     show "Growing in progress - " ++ show n ++ " " ++ noun n ++ " left."
@@ -81,7 +81,7 @@ instance Show (Prog Integer) where
 newtype TreeSeeds a = TreeSeeds { _progs :: [Prog a]} deriving (Eq)
 makeClassy ''TreeSeeds
 
-instance Show (TreeSeeds Integer) where
+instance (Eq a, Num a, Show a) => Show (TreeSeeds a) where
   show (TreeSeeds a) = show a
 
 newtype Water a = Water { unWater :: a } deriving (Eq, Ord, Functor)
@@ -91,7 +91,7 @@ instance Applicative Water where
   pure = Water
   (Water f) <*> (Water a) = Water $ f a
 
-instance Show (Water Integer) where
+instance (Show a) => Show (Water a) where
   show (Water a) = show a
 
 newtype Wood a = Wood { unWood :: a } deriving (Enum, Eq, Functor, Ord)
@@ -101,7 +101,7 @@ instance Applicative Wood where
   pure = Wood
   (Wood f) <*> (Wood a) = Wood $ f a
 
-instance Show (Wood Integer) where
+instance (Show a) => Show (Wood a) where
   show (Wood a) = show a
 
 data Cost a = Cost

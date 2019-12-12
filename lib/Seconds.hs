@@ -10,5 +10,5 @@ import           Control.Lens                   ( makeClassy )
 newtype Seconds a = Seconds { _unSeconds :: a } deriving (Enum, Eq)
 makeClassy ''Seconds
 
-instance Show (Seconds Integer) where
+instance (Show a) => Show (Seconds a) where
   show (Seconds a) = show a

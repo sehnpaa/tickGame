@@ -39,7 +39,7 @@ data ResearchProgress a = NotResearched | ResearchInProgress a | ResearchDone
   deriving (Eq)
 makeClassy ''ResearchProgress
 
-instance Show (ResearchProgress Integer) where
+instance (Eq a, Num a, Show a) => Show (ResearchProgress a) where
   show NotResearched = "Not researched"
   show (ResearchInProgress n) =
     "Research in progress - " ++ show n ++ " " ++ noun n ++ " left."
@@ -235,7 +235,7 @@ data Button
 newtype Snapshots a = Snapshots { _zipper :: Zipper (Resources a)}
 makeClassy ''Snapshots
 
-instance Show (Snapshots Integer) where
+instance (Show a) => Show (Snapshots a) where
   show (Snapshots rs) = case safeCursor rs of
     Nothing -> "Nothing to show yet."
     Just x ->
@@ -366,6 +366,25 @@ instance HasPaperclipsErrorMessage (State a) where
       . elementCost
       . acquireHelpersManually . helpersManuallyPaperclipsErrorMessage
 
+instance HasAcquirePaperclips (State a) a where
+  acquirePaperclips =
+    stateResources
+      . resourcesElements
+      . elementsPaperclips
+      . elementCost
+
+
+-- Again, this can not be written since there are many places
+-- in (State a) where we can find a buttonDisplayStatus
+instance HasButtonDisplayStatus ButtonData where
+  buttonDisplayStatus = buttonDataDisplayStatus
+
+instance HasEventCreatePaperclip (State a) where
+  eventCreatePaperclip = stateEvents . eventsEventCreatePaperclip
+
+instance HasEventStart (State a) where
+  eventStart = stateEvents . eventsEventStart
+
 applyAction :: HasState t a => Action a -> t -> t
 applyAction (SetP p) =
   set (stateResources . resourcesElements . elementsPaperclips . count) p
@@ -439,7 +458,7 @@ decPaperclipsWith' (AdvancedHelperPriceInPaperclips hp) = fmap (\p -> p - hp)
 removeLefts :: Zipper a -> Zipper a
 removeLefts (Zip _ rs) = Zip [] rs
 
-clearAllFutureSnapshots :: State a -> State a
+clearAllFutureSnapshots :: (HasState s a) => s -> s
 clearAllFutureSnapshots = over (stateSnapshots . zipper) removeLefts
 
 startResearch :: DurationAdvancedHelper a -> (ResearchProgress a)

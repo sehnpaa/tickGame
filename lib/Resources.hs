@@ -22,7 +22,7 @@ data Resources a = Resources
   , _resourcesWaterTank :: WaterTank a }
 makeClassy ''Resources
 
-instance Show (WaterTank Integer) where
+instance (Show a) => Show (WaterTank a) where
   show (WaterTank a) = show a
 
 ---
