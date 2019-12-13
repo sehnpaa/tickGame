@@ -43,6 +43,7 @@ library tickGameLib
       , tasty-hunit
       , tasty-quickcheck
       , text
+      , validation
     ghc-options: -Wall
 
 executable tickGame

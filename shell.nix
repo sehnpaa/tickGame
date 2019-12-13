@@ -10,7 +10,7 @@ let
   f = { mkDerivation, async, base, bytestring, gi-gdk, gi-gtk
       , gi-gtk-declarative, gi-gtk-declarative-app-simple, lens
       , ListZipper, megaparsec, mtl, pretty-simple, stdenv, tasty
-      , tasty-hunit, tasty-quickcheck, text, vector
+      , tasty-hunit, tasty-quickcheck, text, validation, vector
       }:
       mkDerivation {
         pname = "tickGame";
@@ -21,7 +21,7 @@ let
         libraryHaskellDepends = [
           base gi-gtk gi-gtk-declarative gi-gtk-declarative-app-simple lens
           ListZipper megaparsec mtl pretty-simple tasty tasty-hunit
-          tasty-quickcheck text
+          tasty-quickcheck text validation
         ];
         executableHaskellDepends = [
           async base bytestring gi-gdk gi-gtk gi-gtk-declarative
@@ -29,7 +29,7 @@ let
           text vector
         ];
         testHaskellDepends = [
-          base lens tasty tasty-hunit tasty-quickcheck text
+          base lens ListZipper mtl tasty tasty-hunit tasty-quickcheck text
         ];
         doHaddock = false;
         license = stdenv.lib.licenses.bsd3;
