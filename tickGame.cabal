@@ -29,6 +29,7 @@ library tickGameLib
       -- Seconds
       Source
       State
+      Tradeoff
       Utils
     build-depends:
         base >=4.11 && <5 , ListZipper
