@@ -8,12 +8,10 @@ module Config where
 import           Control.Lens
 
 import           Elements
-
-newtype AdvancedHelperPriceInPaperclips a = AdvancedHelperPriceInPaperclips { unAdvancedHelperPriceInPaperclips :: a }
-makeClassy ''AdvancedHelperPriceInPaperclips
+import           Tradeoff
 
 data Prices a = Prices
-  { _pricesAdvancedHelperPriceInPaperclips :: AdvancedHelperPriceInPaperclips a }
+  { _pricesAdvancedHelperPriceInPaperclips :: Tradeoff a }
 makeClassy ''Prices
 
 newtype HelperInc a = HelperInc { unHelperInc :: a} deriving (Functor)

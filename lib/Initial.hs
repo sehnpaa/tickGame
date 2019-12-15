@@ -3,6 +3,7 @@
 module Initial where
 
 import           Data.List.Zipper               ( empty )
+import           Tradeoff
 
 import           Config
 import           Elements
@@ -12,7 +13,7 @@ import           Source
 import           State
 
 prices :: Prices Integer
-prices = Prices (AdvancedHelperPriceInPaperclips 5)
+prices = Prices (Tradeoff [] [(Resource "paperclips" (Just 0) Nothing, 25)] [] [])
 
 config :: Config Integer
 config = Config (Constants (HelperInc 1)) Initial.prices

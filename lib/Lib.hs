@@ -232,8 +232,8 @@ researchAdvancedHelper
   :: ( Num a
      , Ord a
      , Show a
-     , HasAdvancedHelperPriceInPaperclips s a
      , HasPaperclips s a
+     , HasPrices s a
      , HasResearchComp s a
      , HasSeconds s a
      , HasState s a

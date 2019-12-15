@@ -5,7 +5,9 @@ module BusinessLogic where
 import           Control.Applicative            ( liftA2 )
 import           Control.Lens                   ( view )
 import           Control.Monad.Reader
+import           Data.List                      ( find )
 import qualified Data.Text                     as T
+import           Data.Validation                ( Validation(Failure, Success) )
 
 import           Config
 import           Elements
@@ -13,6 +15,7 @@ import           Resources
 import           Seconds
 import           Source
 import           State
+import           Tradeoff
 
 helperWork
   :: ( Num a
@@ -114,6 +117,16 @@ pumpWater = do
   tank <- ask $ view waterTank
   return $ Water $ min (unWaterTank tank) (succ $ unWater w)
 
+createAsset :: Num a => Paperclips a -> Asset a
+createAsset (Paperclips a) =
+  Asset [(Resource "paperclips" (Just 0) Nothing, a)] []
+
+getP :: (Num a) => Asset a -> Paperclips a
+getP (Asset capital _) =
+  case find (\(Resource n _ _, _) -> n == "paperclips") capital of
+    Nothing          -> Paperclips 0
+    Just (_, amount) -> Paperclips amount
+
 researchAdvancedHelper
   :: ( Num a
      , Ord a
@@ -122,24 +135,20 @@ researchAdvancedHelper
      , HasSeconds s a
      , HasPaperclips s a
      , HasResearchComp s a
-     , HasAdvancedHelperPriceInPaperclips s a
+     , HasPrices s a
      )
   => m (Either ErrorLogLine (Paperclips a, ResearchProgress a))
 researchAdvancedHelper = do
-  s     <- ask $ view seconds
-  p     <- ask $ view paperclips
-  price <- ask $ view advancedHelperPriceInPaperclips
+  s         <- ask $ view seconds
+  p         <- ask $ view paperclips
+  tradeoff <- ask $ view pricesAdvancedHelperPriceInPaperclips
   (ResearchComp dur progress errorMessage inProgressErr doneErr) <- ask
     $ view researchComp
-  return
-    $ case
-        ((Paperclips . unAdvancedHelperPriceInPaperclips $ price) > p, progress)
-      of
-        (True, NotResearched) -> Left $ mkErrorLogLine s errorMessage
-        (False, NotResearched) ->
-          Right (decPaperclipsWith' price p, startResearch dur)
-        (_, ResearchInProgress _) -> Left $ mkErrorLogLine s inProgressErr
-        (_, ResearchDone        ) -> Left $ mkErrorLogLine s doneErr
+  return $ case (trade (createAsset p) tradeoff, progress) of
+    (Failure _, NotResearched) -> Left $ mkErrorLogLine s errorMessage
+    (Success asset, NotResearched) -> Right (getP asset, startResearch dur)
+    (_, ResearchInProgress _) -> Left $ mkErrorLogLine s inProgressErr
+    (_, ResearchDone) -> Left $ mkErrorLogLine s doneErr
 
 plantASeed
   :: ( Num a

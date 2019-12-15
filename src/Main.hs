@@ -65,7 +65,6 @@ import           Lib                            ( buyASeed
                                                 , ButtonStatus(..)
                                                 , ButtonData(..)
                                                 , ButtonDataAPI(..)
-                                                , HasAdvancedHelperPriceInPaperclips
                                                 , HasAcquirePaperclips
                                                 , HasButtonDisplayStatus
                                                 , HasBuyTreeSeeds
@@ -79,6 +78,7 @@ import           Lib                            ( buyASeed
                                                 , HasHelperInc
                                                 , HasPaperclips
                                                 , HasPaperclipsErrorMessage
+                                                , HasPrices
                                                 , HasResearchProgress
                                                 , HasResearchComp
                                                 , HasSeconds
@@ -128,9 +128,6 @@ styles = mconcat
   , ".blue { color: blue; }"
   , ".yellow { color: goldenrod; }"
   ]
-
-testView' :: State Integer -> AppView Window MyEvent
-testView' = undefined
 
 view'
   :: (Eq s, Num s, Show s)
@@ -266,7 +263,6 @@ update'
      , Num a
      , Ord a
      , Show a
-     , HasAdvancedHelperPriceInPaperclips s a
      , HasBuyTreeSeeds s a
      , HasCostEnergyPaperclips s a
      , HasDurationTreeSeeds s a
@@ -276,6 +272,7 @@ update'
      , HasHelpers s a
      , HasPaperclips s a
      , HasPaperclipsErrorMessage s
+     , HasPrices s a
      , HasResearchComp s a
      , HasResearchProgress s a
      , HasSeconds s a

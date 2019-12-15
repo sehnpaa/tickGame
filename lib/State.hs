@@ -335,10 +335,6 @@ instance HasEnergy (State a) a where
 instance HasResearchComp (State a) a where
   researchComp = stateResearchAreas . advancedHelperResearch
 
-instance HasAdvancedHelperPriceInPaperclips (State a) a where
-  advancedHelperPriceInPaperclips = 
-      stateConfig . configPrices . pricesAdvancedHelperPriceInPaperclips
-
 -- FIXME: The class names are general but the implementation is specific
 instance HasCostEnergyPaperclips (State a) a where
   costEnergyPaperclips = 
@@ -384,6 +380,9 @@ instance HasEventCreatePaperclip (State a) where
 
 instance HasEventStart (State a) where
   eventStart = stateEvents . eventsEventStart
+
+instance HasPrices (State a) a where
+  prices = stateConfig . configPrices
 
 applyAction :: HasState t a => Action a -> t -> t
 applyAction (SetP p) =
@@ -450,10 +449,6 @@ initializeASeed dur =
  where
   moveItForward Instant   = GrowingDone
   moveItForward (Ticks n) = Growing n
-
-decPaperclipsWith'
-  :: Num a => AdvancedHelperPriceInPaperclips a -> Paperclips a -> Paperclips a
-decPaperclipsWith' (AdvancedHelperPriceInPaperclips hp) = fmap (\p -> p - hp)
 
 removeLefts :: Zipper a -> Zipper a
 removeLefts (Zip _ rs) = Zip [] rs
